@@ -1,20 +1,21 @@
 # Architecture
 
-Status: Proposed architecture; validate choices before implementation.
+Status: Proposed architecture; validate choices before implementation.  
+Detailed Blueprint: [`docs/SCALABLE_ARCHITECTURE_PLAN.md`](SCALABLE_ARCHITECTURE_PLAN.md) (comprehensive system design primer mapping, schema DDL, RLS policies, request flows, and scaling milestones).
 
 ## Recommended starting point
 
-Use a modular monolith for the API and a separate background AI worker. Do not start with microservices unless a concrete scaling or deployment need appears.
+Use a modular monolith with managed backend services (Supabase PostgreSQL with Row-Level Security, GoTrue Auth, private S3-compatible storage) and an independent asynchronous Python AI worker. Do not start with microservices unless a concrete scaling or deployment bottleneck appears.
 
 ## Proposed components
 
-- Client: Flutter mobile app OR React/TypeScript web app. Choose one for MVP.
-- API: Node.js + Express + TypeScript.
-- Database: PostgreSQL.
-- Object storage: private S3-compatible storage.
-- Queue: start with a durable database-backed job table if volume is low; adopt a managed queue when operationally justified.
-- AI worker: Python service/library for image decoding, face detection, embeddings, matching, and contextual suggestions.
-- Delivery: GitHub repository, pull requests, CI, staging, and production environments.
+- **Client:** React/Vite web client (current MVP UI) with architecture designed for native Flutter mobile client reuse without backend modification.
+- **Backend Core:** Supabase / PostgreSQL 16+ with Row-Level Security (RLS) for automated room isolation.
+- **API Gateway & Auth:** Managed JWT authentication (GoTrue) + PostgREST / Node.js modular endpoints.
+- **Object Storage:** Private S3-compatible storage (raw original bucket + derived thumbnails bucket) accessed via short-lived presigned URLs.
+- **Queue:** Relational `processing_jobs` table using PostgreSQL `FOR UPDATE SKIP LOCKED` for transactional, durable background task coordination.
+- **AI Worker:** Standalone Python service/container for image normalization, WebP thumbnail generation, face detection, ephemeral vector extraction, and 3-level face clustering.
+- **Delivery:** GitHub repository, pull requests, automated CI, staging, and production environments.
 
 ## Module boundaries
 

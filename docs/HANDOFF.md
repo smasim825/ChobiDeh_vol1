@@ -3,13 +3,13 @@
 Update this file when starting or handing off a multi-file task. Keep entries short and current.
 
 ## Active work
-- Task: Standardize Design System & Component Library (Button, Input, Navbar, Spacing)
-  - Owner: Frontend / Design Systems agent
-  - Status: Completed (Ready to commit and push)
+- Task: Scalable Architecture Planning (System Design Primer Blueprint)
+  - Owner: Architecture & System Design agent
+  - Status: Completed (Review requested from user; no code modified or pushed)
   - Branch: main
-  - Scope: Created reusable `Button.tsx` and `Input.tsx` components, responsive `Navbar.tsx` preventing mobile overflow, added Tailwind component utilities in `index.css`, refactored all screens (`LoginScreen`, `SignupScreen`, `ForgotPasswordScreen`, `HomeScreen`, `RoomAreaScreen`, etc.) to use standardized components, fixed micro-copy typo on LoginScreen ("Don't have an account?"), and ensured 24px vertical spacing above privacy card.
-  - Files modified: client/src/components/Button.tsx, client/src/components/Input.tsx, client/src/components/Navbar.tsx, client/src/index.css, client/src/App.tsx, client/src/screens/*
-  - Tests run: 11/11 Vitest tests passed, `tsc -b` passed with 0 errors, `npm run build` completed successfully.
+  - Scope: Formulated production-oriented MVP architecture plan mapping Donne Martin's System Design Primer concepts to ChobiDeh (Supabase PostgreSQL + RLS, GoTrue Auth, direct S3 presigned uploads, PostgreSQL SKIP LOCKED queue, standalone Python AI worker, keyset pagination, thumbnail delivery, threat model, bottleneck-to-solution scale triggers, and ADRs DEC-0008 to DEC-0012).
+  - Files modified: docs/SCALABLE_ARCHITECTURE_PLAN.md (new), docs/ARCHITECTURE.md, docs/DECISIONS.md, docs/HANDOFF.md
+  - Files explicitly not touched: client/* (no code changes per engineering constraint).
 
 ## Handoff template
 
