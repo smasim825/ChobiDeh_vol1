@@ -29,6 +29,27 @@
   }
 }
 
+@layer components {
+  /* Standard Design System Buttons (48-52px min-height, 16px font-size, 600 weight, rounded-full) */
+  .btn-base {
+    @apply min-h-[48px] h-[50px] px-6 rounded-full font-semibold text-[16px] tracking-wide inline-flex items-center justify-center gap-2.5 transition-all duration-150 select-none focus:outline-none;
+  }
+  .btn-primary {
+    @apply btn-base bg-[#0F766E] text-white shadow-sm hover:bg-[#0D645E] active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed;
+  }
+  .btn-secondary {
+    @apply btn-base bg-[#E7F7F4] text-[#005C55] hover:bg-[#D8F1EB] active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed;
+  }
+  .btn-outline {
+    @apply btn-base bg-white border border-[#EBE6DC] text-[#253331] shadow-xs hover:bg-[#F3EFE7] active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed;
+  }
+
+  /* Standard Design System Inputs (moderate 10-12px rounded-xl, 48-50px height, distinct from action buttons) */
+  .input-base {
+    @apply w-full min-h-[48px] h-[50px] px-4 rounded-xl bg-white border border-[#E2DDD4] text-[#101E1C] placeholder-[#A0AAA8] text-[15px] focus:outline-none focus:border-[#0F766E] focus:ring-2 focus:ring-[#0F766E]/20 transition-all shadow-xs;
+  }
+}
+
 .material-symbols-outlined {
   font-family: 'Material Symbols Outlined';
   font-weight: normal;

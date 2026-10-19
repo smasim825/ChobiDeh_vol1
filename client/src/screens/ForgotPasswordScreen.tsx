@@ -4,6 +4,8 @@ import { ScreenHeader } from '../components/ScreenHeader';
 import { BrandLogo } from '../components/BrandLogo';
 import { PrivacyCard } from '../components/PrivacyCard';
 import { LegalFooter } from '../components/LegalFooter';
+import { Button } from '../components/Button';
+import { Input } from '../components/Input';
 
 export const ForgotPasswordScreen: React.FC = () => {
   const { setScreen, sendPasswordReset, isLoading, errorMessage, clearError } = useAuth();
@@ -70,49 +72,30 @@ export const ForgotPasswordScreen: React.FC = () => {
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-[13px] text-[#101E1C] mb-2 font-semibold" htmlFor="reset-email">
-                Email address
-              </label>
-              <div className="relative flex items-center">
-                <span className="material-symbols-outlined absolute left-4 text-[#6E7977] pointer-events-none text-[20px]">
-                  mail
-                </span>
-                <input
-                  id="reset-email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="tim.jennings@example.com"
-                  required
-                  className="w-full rounded-full border border-[#BDC9C6]/60 bg-white pl-11 pr-5 py-3.5 text-[14px] text-[#101E1C] placeholder:text-[#6E7977]/70 focus:outline-none focus:border-[#0F766E] focus:ring-2 focus:ring-[#0F766E]/20 transition-all shadow-xs"
-                />
-              </div>
-            </div>
+            {/* Email Field with moderate rounded-xl radius */}
+            <Input
+              id="reset-email"
+              type="email"
+              label="Email address"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="tim.jennings@example.com"
+              required
+              leadingIcon="mail"
+            />
 
-            {/* Primary CTA */}
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full mt-2 rounded-full bg-[#0F766E] hover:bg-[#005C55] text-white font-semibold text-[15px] py-3.5 px-6 shadow-sm active:scale-98 transition-all flex items-center justify-center space-x-2 group disabled:opacity-70 disabled:cursor-not-allowed"
-            >
-              {isLoading ? (
-                <>
-                  <svg className="animate-spin h-5 w-5 text-white" viewBox="0 0 24 24" fill="none">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
-                  </svg>
-                  <span>Sending reset link...</span>
-                </>
-              ) : (
-                <>
-                  <span>Send Reset Link</span>
-                  <span className="material-symbols-outlined text-[19px] transition-transform group-hover:translate-x-0.5">
-                    arrow_forward
-                  </span>
-                </>
-              )}
-            </button>
+            {/* Standardized Primary CTA Button (48-52px min-height, 16px semi-bold, rounded-full) */}
+            <div className="pt-2">
+              <Button
+                type="submit"
+                variant="primary"
+                fullWidth
+                isLoading={isLoading}
+                icon={<span className="material-symbols-outlined text-[19px]">arrow_forward</span>}
+              >
+                Send Reset Link
+              </Button>
+            </div>
           </form>
 
           {/* Success Toast */}

@@ -157,11 +157,11 @@ export const JoinRoomScreen: React.FC = () => {
             </div>
           )}
 
-          {/* Submit Action */}
+          {/* Submit Action (48-52px min-height, 16px font-semibold, rounded-full) */}
           <button
             type="submit"
             disabled={isJoining}
-            className="w-full py-3.5 px-6 rounded-full bg-[#0F766E] hover:bg-[#005C55] text-white font-semibold text-[15px] shadow-sm active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-70 mt-2"
+            className="w-full min-h-[48px] h-[50px] px-6 rounded-full bg-[#0F766E] hover:bg-[#005C55] text-white font-semibold text-[16px] tracking-wide shadow-sm active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-70 mt-2"
           >
             {isJoining ? (
               <span>Connecting to Vault...</span>

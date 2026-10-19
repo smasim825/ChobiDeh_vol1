@@ -337,13 +337,13 @@ export const HomeScreen: React.FC = () => {
             </p>
           </div>
 
-          {/* Action Buttons Row */}
+          {/* Action Buttons Row (Standardized 48-52px height, 16px semi-bold, rounded-full) */}
           <div className="grid grid-cols-2 gap-3 pt-1">
             {/* Primary CTA: Create a Room */}
             <button
               type="button"
               onClick={() => setScreen('create-room')}
-              className="flex items-center justify-center gap-2 bg-[#0F766E] text-white py-3 px-4 rounded-xl font-semibold text-[14px] shadow-sm hover:opacity-95 active:scale-[0.98] transition-all"
+              className="min-h-[48px] h-[50px] flex items-center justify-center gap-2 bg-[#0F766E] text-white px-4 rounded-full font-semibold text-[15px] sm:text-[16px] shadow-sm hover:bg-[#0D645E] active:scale-[0.98] transition-all"
             >
               <span className="material-symbols-outlined text-[20px]">add</span>
               <span>Create a Room</span>
@@ -353,7 +353,7 @@ export const HomeScreen: React.FC = () => {
             <button
               type="button"
               onClick={() => setScreen('join-room')}
-              className="flex items-center justify-center gap-2 bg-white text-[#005C55] border border-[#005C55]/30 py-3 px-4 rounded-xl font-semibold text-[14px] shadow-xs hover:bg-[#E7F7F4] active:scale-[0.98] transition-all"
+              className="min-h-[48px] h-[50px] flex items-center justify-center gap-2 bg-white text-[#005C55] border border-[#0F766E]/30 px-4 rounded-full font-semibold text-[15px] sm:text-[16px] shadow-xs hover:bg-[#E7F7F4] active:scale-[0.98] transition-all"
             >
               <span className="material-symbols-outlined text-[20px]">group_add</span>
               <span>Join a Room</span>

@@ -248,12 +248,12 @@ export const RoomAreaScreen: React.FC = () => {
           </div>
         </section>
 
-        {/* 3. QUICK ACTION BUTTONS */}
+        {/* 3. QUICK ACTION BUTTONS (Standardized 48-52px height, rounded-full) */}
         <section className="mt-4 flex items-center gap-2">
           <button
             type="button"
             onClick={handleSimulateUpload}
-            className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-[#0F766E] text-white font-semibold text-[14px] shadow-xs hover:bg-[#0D645E] active:scale-[0.98] transition-all"
+            className="flex-1 inline-flex items-center justify-center gap-2 px-5 min-h-[48px] h-[50px] rounded-full bg-[#0F766E] text-white font-semibold text-[16px] tracking-wide shadow-xs hover:bg-[#0D645E] active:scale-[0.98] transition-all"
           >
             <span className="material-symbols-outlined text-[18px]">upload_file</span>
             <span>Upload Photos</span>
@@ -261,7 +261,7 @@ export const RoomAreaScreen: React.FC = () => {
           <button
             type="button"
             onClick={() => alert('Playing Archival Memory Reel: Cox’s Bazar Sunset Highlight')}
-            className="inline-flex items-center gap-1.5 px-3.5 py-3 rounded-xl border border-[#E2DDD4] bg-white text-[#101E1C] hover:bg-[#F8F5EF] active:scale-[0.98] transition-all text-[13px] font-semibold shadow-xs"
+            className="inline-flex items-center gap-1.5 px-4 min-h-[48px] h-[50px] rounded-full border border-[#E2DDD4] bg-white text-[#101E1C] hover:bg-[#F8F5EF] active:scale-[0.98] transition-all text-[15px] font-semibold shadow-xs"
           >
             <span className="material-symbols-outlined text-[18px] text-[#8E4E14]">movie</span>
             <span>Reel</span>
@@ -269,7 +269,7 @@ export const RoomAreaScreen: React.FC = () => {
           <button
             type="button"
             onClick={() => alert('Clustering settings: Calibrate thresholds, review clusters, or purge vectors.')}
-            className="w-11 h-11 flex items-center justify-center rounded-xl border border-[#E2DDD4] bg-white text-[#101E1C] hover:bg-[#F8F5EF] active:scale-[0.98] transition-all shadow-xs"
+            className="w-[50px] h-[50px] min-h-[48px] flex items-center justify-center rounded-full border border-[#E2DDD4] bg-white text-[#101E1C] hover:bg-[#F8F5EF] active:scale-[0.98] transition-all shadow-xs"
           >
             <span className="material-symbols-outlined text-[19px]">tune</span>
           </button>

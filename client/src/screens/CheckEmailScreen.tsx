@@ -157,10 +157,10 @@ export const CheckEmailScreen: React.FC = () => {
           </p>
         </div>
 
-        {/* Primary CTA Button: Open Email App */}
+        {/* Primary CTA Button: Open Email App (48-52px min-height, 16px semi-bold, rounded-full) */}
         <a
           href="mailto:"
-          className="w-full bg-[#0F766E] text-white py-3.5 px-5 rounded-full font-semibold text-[14px] shadow-sm hover:bg-[#005C55] transition-all duration-150 flex items-center justify-center gap-2 active:scale-[0.98]"
+          className="w-full min-h-[48px] h-[50px] bg-[#0F766E] text-white px-6 rounded-full font-semibold text-[16px] tracking-wide shadow-sm hover:bg-[#005C55] transition-all duration-150 flex items-center justify-center gap-2 active:scale-[0.98]"
         >
           <span>Open Email App</span>
           <span className="material-symbols-outlined text-[18px]">open_in_new</span>

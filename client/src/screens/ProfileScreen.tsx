@@ -338,12 +338,12 @@ export const ProfileScreen: React.FC = () => {
             </div>
           </div>
 
-          {/* SECTION: Privacy & Account Danger Zone */}
-          <div className="pt-2 space-y-2">
+          {/* SECTION: Privacy & Account Danger Zone (Standardized 48-52px height, rounded-full) */}
+          <div className="pt-2 space-y-2.5">
             <button
               type="button"
               onClick={() => setShowDeleteModal(true)}
-              className="w-full py-3 px-4 rounded-xl border border-[#BA1A1A]/40 bg-white text-[#BA1A1A] font-semibold text-[13px] hover:bg-[#FFDAD6]/30 transition-all flex items-center justify-center gap-2"
+              className="w-full min-h-[48px] h-[50px] px-6 rounded-full border border-[#BA1A1A]/40 bg-white text-[#BA1A1A] font-semibold text-[15px] hover:bg-[#FFDAD6]/30 transition-all flex items-center justify-center gap-2 active:scale-[0.98]"
             >
               <span className="material-symbols-outlined text-[18px]">delete_sweep</span>
               <span>Purge Room Face Clusters &amp; Vector Vectors</span>
@@ -352,7 +352,7 @@ export const ProfileScreen: React.FC = () => {
             <button
               type="button"
               onClick={logout}
-              className="w-full py-3 px-4 rounded-xl bg-[#0F766E] text-white font-semibold text-[14px] hover:bg-[#005C55] shadow-xs active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+              className="w-full min-h-[48px] h-[50px] px-6 rounded-full bg-[#0F766E] text-white font-semibold text-[16px] hover:bg-[#005C55] shadow-xs active:scale-[0.98] transition-all flex items-center justify-center gap-2"
             >
               <span className="material-symbols-outlined text-[18px]">logout</span>
               <span>Log Out</span>
