@@ -7,7 +7,7 @@ import { Button } from '../components/Button';
 import { Input } from '../components/Input';
 
 export const SignupScreen: React.FC = () => {
-  const { setScreen, signup, isLoading, errorMessage, clearError } = useAuth();
+  const { setScreen, signup, loginWithGoogle, isLoading, errorMessage, clearError } = useAuth();
 
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
@@ -28,12 +28,7 @@ export const SignupScreen: React.FC = () => {
 
   const handleGoogleSignup = async () => {
     clearError();
-    await signup({
-      fullName: 'Google Traveler',
-      email: 'google.traveler@example.com',
-      password: 'SamplePassword123!',
-      biometricConsent: true,
-    });
+    await loginWithGoogle();
   };
 
   return (
