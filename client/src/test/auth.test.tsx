@@ -1,0 +1,107 @@
+import { describe, it, expect } from 'vitest';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { AuthProvider } from '../context/AuthContext';
+import App from '../App';
+import { LoginScreen } from '../screens/LoginScreen';
+import { SignupScreen } from '../screens/SignupScreen';
+import { ForgotPasswordScreen } from '../screens/ForgotPasswordScreen';
+import { CheckEmailScreen } from '../screens/CheckEmailScreen';
+
+describe('ChobiDeh Authentication Suite', () => {
+  it('renders LoginScreen with email, password inputs, and toggles password visibility', () => {
+    render(
+      <AuthProvider>
+        <LoginScreen />
+      </AuthProvider>
+    );
+
+    expect(screen.getByRole('heading', { name: /welcome back/i })).toBeInTheDocument();
+    expect(screen.getByLabelText(/email address/i)).toBeInTheDocument();
+
+    const pwdInput = screen.getByLabelText(/^password/i) as HTMLInputElement;
+    expect(pwdInput).toBeInTheDocument();
+    expect(pwdInput.type).toBe('password');
+
+    const toggleBtn = screen.getByLabelText(/show password/i);
+    fireEvent.click(toggleBtn);
+    expect(pwdInput.type).toBe('text');
+
+    fireEvent.click(screen.getByLabelText(/hide password/i));
+    expect(pwdInput.type).toBe('password');
+  });
+
+  it('renders SignupScreen with name, email, password, and explicit biometric consent toggle', () => {
+    render(
+      <AuthProvider>
+        <SignupScreen />
+      </AuthProvider>
+    );
+
+    expect(screen.getByRole('heading', { name: /create your account/i })).toBeInTheDocument();
+    expect(screen.getByLabelText(/full name/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/email address/i)).toBeInTheDocument();
+
+    const consentCheckbox = screen.getByRole('checkbox', {
+      name: /enable 3-level ai face clustering/i,
+    }) as HTMLInputElement;
+    expect(consentCheckbox).toBeInTheDocument();
+    expect(consentCheckbox.checked).toBe(true);
+
+    // Toggle consent off
+    fireEvent.click(consentCheckbox);
+    expect(consentCheckbox.checked).toBe(false);
+  });
+
+  it('renders ForgotPasswordScreen and allows sending a reset link', async () => {
+    render(
+      <AuthProvider>
+        <ForgotPasswordScreen />
+      </AuthProvider>
+    );
+
+    expect(screen.getByRole('heading', { name: /forgot password\?/i })).toBeInTheDocument();
+    const emailInput = screen.getByLabelText(/email address/i);
+    fireEvent.change(emailInput, { target: { value: 'traveler@example.com' } });
+
+    const sendBtn = screen.getByRole('button', { name: /send reset link/i });
+    fireEvent.click(sendBtn);
+
+    await waitFor(() => {
+      expect(screen.getByText(/verification link sent/i)).toBeInTheDocument();
+    });
+  });
+
+  it('renders CheckEmailScreen with destination email and open email app link', () => {
+    render(
+      <AuthProvider>
+        <CheckEmailScreen />
+      </AuthProvider>
+    );
+
+    expect(screen.getByRole('heading', { name: /check your email/i })).toBeInTheDocument();
+    expect(screen.getByText(/tim.jennings@example.com/i)).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /open email app/i })).toHaveAttribute('href', 'mailto:');
+  });
+
+  it('allows navigating between auth screens using the switcher in App', () => {
+    render(<App />);
+
+    // Initially at Login
+    expect(screen.getByRole('heading', { name: /welcome back/i })).toBeInTheDocument();
+
+    // Click Sign Up tab in switcher
+    const signupTabs = screen.getAllByRole('button', { name: /sign up/i });
+    fireEvent.click(signupTabs[0]);
+    expect(screen.getByRole('heading', { name: /create your account/i })).toBeInTheDocument();
+
+    // Click Forgot Password tab
+    const forgotTab = screen.getByRole('button', { name: /forgot password/i });
+    fireEvent.click(forgotTab);
+    expect(screen.getByRole('heading', { name: /forgot password\?/i })).toBeInTheDocument();
+
+    // Click Check Email tab
+    const checkEmailTab = screen.getByRole('button', { name: /check email/i });
+    fireEvent.click(checkEmailTab);
+    expect(screen.getByRole('heading', { name: /check your email/i })).toBeInTheDocument();
+  });
+});

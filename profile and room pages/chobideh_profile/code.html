@@ -1,0 +1,441 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>ChobiDeh - Profile &amp; Account Settings</title>
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "on-tertiary-fixed": "#002113",
+            "inverse-surface": "#253331",
+            "secondary-fixed-dim": "#ffb780",
+            "primary-fixed-dim": "#80d5cb",
+            "on-primary-container": "#a3faef",
+            "inverse-on-surface": "#e4f4f1",
+            "on-tertiary-fixed-variant": "#005236",
+            "surface-container-highest": "#d6e6e2",
+            "surface-tint": "#006a63",
+            "surface-container-lowest": "#ffffff",
+            "inverse-primary": "#80d5cb",
+            "secondary-container": "#ffab69",
+            "secondary-fixed": "#ffdcc4",
+            "on-secondary": "#ffffff",
+            "surface-container-low": "#e7f7f4",
+            "on-primary-fixed": "#00201d",
+            "primary": "#005c55",
+            "tertiary-container": "#007952",
+            "secondary": "#8e4e14",
+            "error-container": "#ffdad6",
+            "tertiary": "#005e3f",
+            "primary-container": "#0f766e",
+            "on-tertiary": "#ffffff",
+            "on-primary-fixed-variant": "#00504a",
+            "surface-variant": "#d6e6e2",
+            "surface-container": "#e1f1ee",
+            "outline": "#6e7977",
+            "on-surface": "#101e1c",
+            "on-tertiary-container": "#99ffcd",
+            "on-surface-variant": "#3e4947",
+            "on-secondary-fixed": "#2f1400",
+            "on-background": "#101e1c",
+            "primary-fixed": "#9cf2e8",
+            "surface": "#edfdf9",
+            "on-secondary-container": "#783d01",
+            "on-error": "#ffffff",
+            "on-primary": "#ffffff",
+            "outline-variant": "#bdc9c6",
+            "on-error-container": "#93000a",
+            "tertiary-fixed": "#6ffbbe",
+            "error": "#ba1a1a",
+            "surface-dim": "#cdddda",
+            "background": "#edfdf9",
+            "surface-container-high": "#dcece8",
+            "tertiary-fixed-dim": "#4edea3",
+            "surface-bright": "#edfdf9",
+            "on-secondary-fixed-variant": "#6f3800"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "space-3xl": "3rem",
+            "margin-tablet": "1.5rem",
+            "space-xs": "0.25rem",
+            "gutter": "0.75rem",
+            "space-lg": "1rem",
+            "margin": "1rem",
+            "space-sm": "0.5rem",
+            "gutter-mobile": "0.5rem",
+            "space-md": "0.75rem",
+            "space-xl": "1.5rem",
+            "space-2xl": "2rem"
+          },
+          "fontFamily": {
+            "label-lg": ["Manrope"],
+            "headline-xl": ["Manrope"],
+            "display-lg": ["Manrope"],
+            "headline-md": ["Manrope"],
+            "caption": ["Manrope"],
+            "body-lg": ["Manrope"],
+            "label-md": ["Manrope"],
+            "headline-sm": ["Manrope"],
+            "label-sm": ["Manrope"],
+            "headline-lg": ["Manrope"],
+            "body-md": ["Manrope"],
+            "body-sm": ["Manrope"]
+          },
+          "fontSize": {
+            "label-lg": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+            "headline-xl": ["30px", { "lineHeight": "38px", "letterSpacing": "-0.025em", "fontWeight": "700" }],
+            "display-lg": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.03em", "fontWeight": "800" }],
+            "headline-md": ["20px", { "lineHeight": "28px", "letterSpacing": "-0.015em", "fontWeight": "600" }],
+            "caption": ["12px", { "lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "500" }],
+            "body-lg": ["16px", { "lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "400" }],
+            "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600" }],
+            "headline-sm": ["18px", { "lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.03em", "fontWeight": "600" }],
+            "headline-lg": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+            "body-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.005em", "fontWeight": "400" }],
+            "body-sm": ["13px", { "lineHeight": "18px", "letterSpacing": "0.01em", "fontWeight": "400" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-family: 'Material Symbols Outlined';
+      font-weight: normal;
+      font-style: normal;
+      font-size: 22px;
+      line-height: 1;
+      letter-spacing: normal;
+      text-transform: none;
+      display: inline-block;
+      white-space: nowrap;
+      word-wrap: normal;
+      direction: ltr;
+      -webkit-font-feature-settings: 'liga';
+      -webkit-font-smoothing: antialiased;
+    }
+    /* Touch target transitions */
+    .tap-effect {
+      transition: transform 0.15s ease, background-color 0.15s ease;
+    }
+    .tap-effect:active {
+      transform: scale(0.97);
+    }
+  </style>
+</head>
+<body class="bg-background text-on-surface antialiased min-h-screen pb-28 selection:bg-primary-fixed selection:text-on-primary-fixed">
+<!-- TOP APP BAR (Shared Component Anchor) -->
+<header class="fixed top-0 left-0 w-full z-40 flex items-center justify-between px-margin py-space-sm h-14 bg-surface/85 backdrop-blur-md shadow-sm border-b border-outline-variant/30">
+<div class="flex items-center gap-space-sm">
+<button aria-label="Go back" class="w-9 h-9 rounded-full flex items-center justify-center text-primary hover:bg-surface-container transition-colors duration-150 active:scale-95">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+</button>
+<div class="flex flex-col">
+<h1 class="font-headline-sm text-headline-sm font-bold text-primary tracking-tight">ChobiDeh</h1>
+<span class="font-caption text-caption text-on-surface-variant -mt-0.5">Profile &amp; Settings</span>
+</div>
+</div>
+<div class="flex items-center gap-space-xs">
+<button class="w-9 h-9 rounded-full flex items-center justify-center text-primary hover:bg-surface-container transition-colors duration-150 active:scale-95 relative" title="AI Memory Assistant">
+<span class="material-symbols-outlined" data-icon="auto_awesome">auto_awesome</span>
+<span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-secondary"></span>
+</button>
+</div>
+</header>
+<!-- MAIN SCROLLABLE CONTENT CANVAS -->
+<main class="pt-16 max-w-lg mx-auto px-margin space-y-space-lg">
+<!-- 1. PROFILE HEADER CARD (Bento Accent) -->
+<section class="mt-space-md p-space-lg bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-[0px_2px_8px_rgba(37,51,49,0.04)] relative overflow-hidden">
+<!-- Subtle Archival Watermark Corner -->
+<div class="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-primary-fixed/20 pointer-events-none blur-xl"></div>
+<div class="flex items-start gap-space-md relative z-10">
+<!-- Avatar with micro edit trigger -->
+<div class="relative shrink-0">
+<div class="w-20 h-20 rounded-full ring-2 ring-primary/20 overflow-hidden shadow-inner bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="Warm natural portrait photograph of Tasnim Rahman, a young South Asian traveler with warm golden afternoon light across their face, holding a vintage film camera strap, soft textured bokeh backdrop in warm olive and ivory tones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDjDxKnJI_lzaHbWuodGA9ZD1etukufXXJJGPbe1chtc25iJcBSIBqXgMkeIS40lnS_ri-ZV7ZcYTmklBi_lzMVF0gdJR4ic_zsjbAtsrddUv59UQouipxSWh7Yn6fDOidsd-UrffxZZyJz2ztOHZwmBQI-prmQqnVFux88W9o1hlhUeq4hGFa6Dw8UO-8bMObMV5SJjIWBld2QOIjMvMYLILbhQ6WxZtYszTQ2JSKY8FIa49rx9cTp">
+</div>
+<button aria-label="Change Profile Photo" class="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-primary-container text-on-primary flex items-center justify-center shadow-md active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-[15px]" data-icon="edit">edit</span>
+</button>
+</div>
+<!-- Name & Badges -->
+<div class="flex-1 min-w-0 pt-0.5">
+<div class="flex items-center gap-space-xs flex-wrap">
+<h2 class="font-headline-md text-headline-md text-on-surface font-bold truncate">Tasnim Rahman</h2>
+<span class="material-symbols-outlined text-primary text-[18px]" data-icon="verified" style="font-variation-settings: 'FILL' 1;" title="Identity Verified Locally">verified</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant truncate mt-0.5">tasnim.rahman@example.com</p>
+<div class="mt-space-sm flex items-center gap-space-xs flex-wrap">
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-secondary-fixed/50 text-secondary font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[13px]" data-icon="workspace_premium" style="font-variation-settings: 'FILL' 1;">workspace_premium</span>
+              Founding Traveler
+            </span>
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-surface-container-high text-on-surface-variant font-caption text-caption">
+              Room Admin
+            </span>
+</div>
+</div>
+</div>
+</section>
+<!-- 2. QUICK STATS ROW (Archival metrics) -->
+<section class="grid grid-cols-3 gap-gutter-mobile">
+<div class="bg-surface-container-lowest p-space-md rounded-xl border border-outline-variant/30 shadow-[0px_2px_8px_rgba(37,51,49,0.04)] flex flex-col items-center justify-center text-center">
+<span class="font-headline-lg text-headline-lg font-bold text-primary">3</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant mt-0.5">Active Rooms</span>
+</div>
+<div class="bg-surface-container-lowest p-space-md rounded-xl border border-outline-variant/30 shadow-[0px_2px_8px_rgba(37,51,49,0.04)] flex flex-col items-center justify-center text-center">
+<span class="font-headline-lg text-headline-lg font-bold text-primary">615</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant mt-0.5">Shared Photos</span>
+</div>
+<div class="bg-surface-container-lowest p-space-md rounded-xl border border-outline-variant/30 shadow-[0px_2px_8px_rgba(37,51,49,0.04)] flex flex-col items-center justify-center text-center">
+<span class="font-headline-lg text-headline-lg font-bold text-secondary">42</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant mt-0.5">Face Clusters</span>
+</div>
+</section>
+<!-- 3. STORAGE & ON-DEVICE AI STATUS CARD -->
+<section class="bg-surface-container-lowest p-space-lg rounded-xl border border-outline-variant/30 shadow-[0px_2px_8px_rgba(37,51,49,0.04)] space-y-space-md">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<div class="w-8 h-8 rounded-lg bg-primary-fixed/40 text-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-[18px]" data-icon="lock" style="font-variation-settings: 'FILL' 1;">lock</span>
+</div>
+<div>
+<h3 class="font-label-lg text-label-lg font-bold text-on-surface">On-Device Photo Vault</h3>
+<p class="font-caption text-caption text-on-surface-variant">Private neural clustering active</p>
+</div>
+</div>
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-tertiary-container/15 text-tertiary font-label-sm text-label-sm font-semibold">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary animate-pulse"></span>
+          Biometrics Local &amp; Safe
+        </span>
+</div>
+<!-- Storage Bar & Metadata -->
+<div class="space-y-space-xs pt-1">
+<div class="flex justify-between items-baseline font-body-sm text-body-sm">
+<span class="font-label-md text-label-md text-on-surface">1.8 GB used</span>
+<span class="text-on-surface-variant font-caption text-caption">5.0 GB free sync allocation</span>
+</div>
+<!-- Progress bar track -->
+<div class="w-full h-2.5 bg-surface-container-high rounded-full overflow-hidden p-0.5 flex">
+<div class="h-full bg-primary rounded-full transition-all duration-500" style="width: 36%;"></div>
+</div>
+<div class="flex items-center justify-between pt-1 text-on-surface-variant font-caption text-caption">
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[13px] text-primary" data-icon="cloud_done">cloud_done</span>
+            Synced 12 mins ago
+          </span>
+<button class="text-primary font-label-sm text-label-sm hover:underline font-semibold">Manage Vault</button>
+</div>
+</div>
+</section>
+<!-- 4. PROFILE MENU SECTIONS -->
+<div class="space-y-space-md">
+<!-- SECTION: Account Details & Security -->
+<div class="space-y-space-xs">
+<h4 class="font-label-md text-label-md text-on-surface-variant px-space-xs font-semibold uppercase tracking-wider">Account &amp; Security</h4>
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-[0px_2px_8px_rgba(37,51,49,0.04)] divide-y divide-outline-variant/20 overflow-hidden">
+<button class="w-full flex items-center justify-between p-space-md tap-effect hover:bg-surface-container-low text-left">
+<div class="flex items-center gap-space-md">
+<span class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined text-[19px]" data-icon="mail">mail</span>
+</span>
+<div>
+<p class="font-label-lg text-label-lg text-on-surface">Primary Email Address</p>
+<p class="font-caption text-caption text-on-surface-variant">tasnim.rahman@example.com</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline text-[20px]" data-icon="chevron_right">chevron_right</span>
+</button>
+<button class="w-full flex items-center justify-between p-space-md tap-effect hover:bg-surface-container-low text-left">
+<div class="flex items-center gap-space-md">
+<span class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined text-[19px]" data-icon="key">key</span>
+</span>
+<div>
+<p class="font-label-lg text-label-lg text-on-surface">Change Password</p>
+<p class="font-caption text-caption text-on-surface-variant">Last updated 3 months ago</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline text-[20px]" data-icon="chevron_right">chevron_right</span>
+</button>
+<button class="w-full flex items-center justify-between p-space-md tap-effect hover:bg-surface-container-low text-left">
+<div class="flex items-center gap-space-md">
+<span class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined text-[19px]" data-icon="security">security</span>
+</span>
+<div>
+<p class="font-label-lg text-label-lg text-on-surface">Two-Factor Authentication</p>
+<p class="font-caption text-caption text-primary font-semibold">Enabled (Authenticator App)</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline text-[20px]" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- SECTION: Privacy & Facial Recognition -->
+<div class="space-y-space-xs">
+<h4 class="font-label-md text-label-md text-on-surface-variant px-space-xs font-semibold uppercase tracking-wider">Privacy &amp; Intelligence</h4>
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-[0px_2px_8px_rgba(37,51,49,0.04)] divide-y divide-outline-variant/20 overflow-hidden">
+<div class="p-space-md flex items-center justify-between gap-space-md">
+<div class="flex items-center gap-space-md">
+<span class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-on-surface-variant shrink-0">
+<span class="material-symbols-outlined text-[19px]" data-icon="face">face</span>
+</span>
+<div>
+<p class="font-label-lg text-label-lg text-on-surface">On-Device Face Grouping</p>
+<p class="font-caption text-caption text-on-surface-variant">Never transmits facial embeddings to cloud</p>
+</div>
+</div>
+<!-- Toggle Active -->
+<label class="relative inline-flex items-center cursor-pointer shrink-0">
+<input checked="" class="sr-only peer" type="checkbox">
+<div class="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-outline-variant after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-container"></div>
+</label>
+</div>
+<button class="w-full flex items-center justify-between p-space-md tap-effect hover:bg-surface-container-low text-left">
+<div class="flex items-center gap-space-md">
+<span class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined text-[19px]" data-icon="groups">groups</span>
+</span>
+<div>
+<p class="font-label-lg text-label-lg text-on-surface">Recognized People Collections</p>
+<p class="font-caption text-caption text-on-surface-variant">42 named clusters, 3 hidden</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline text-[20px]" data-icon="chevron_right">chevron_right</span>
+</button>
+<button class="w-full flex items-center justify-between p-space-md tap-effect hover:bg-surface-container-low text-left">
+<div class="flex items-center gap-space-md">
+<span class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined text-[19px]" data-icon="visibility_off">visibility_off</span>
+</span>
+<div>
+<p class="font-label-lg text-label-lg text-on-surface">Selective Metadata Sharing</p>
+<p class="font-caption text-caption text-on-surface-variant">GPS location stripped from export</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline text-[20px]" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- SECTION: Room Preferences & Notifications -->
+<div class="space-y-space-xs">
+<h4 class="font-label-md text-label-md text-on-surface-variant px-space-xs font-semibold uppercase tracking-wider">Rooms &amp; Sync</h4>
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-[0px_2px_8px_rgba(37,51,49,0.04)] divide-y divide-outline-variant/20 overflow-hidden">
+<div class="p-space-md flex items-center justify-between gap-space-md">
+<div class="flex items-center gap-space-md">
+<span class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-on-surface-variant shrink-0">
+<span class="material-symbols-outlined text-[19px]" data-icon="wifi">wifi</span>
+</span>
+<div>
+<p class="font-label-lg text-label-lg text-on-surface">Auto-Download Over Wi-Fi</p>
+<p class="font-caption text-caption text-on-surface-variant">Saves cellular data during trips</p>
+</div>
+</div>
+<!-- Toggle Active -->
+<label class="relative inline-flex items-center cursor-pointer shrink-0">
+<input checked="" class="sr-only peer" type="checkbox">
+<div class="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-outline-variant after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-container"></div>
+</label>
+</div>
+<div class="p-space-md flex items-center justify-between gap-space-md">
+<div class="flex items-center gap-space-md">
+<span class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-on-surface-variant shrink-0">
+<span class="material-symbols-outlined text-[19px]" data-icon="notifications">notifications</span>
+</span>
+<div>
+<p class="font-label-lg text-label-lg text-on-surface">New Photo Alerts</p>
+<p class="font-caption text-caption text-on-surface-variant">Notify when friends drop travel rolls</p>
+</div>
+</div>
+<!-- Toggle Inactive -->
+<label class="relative inline-flex items-center cursor-pointer shrink-0">
+<input class="sr-only peer" type="checkbox">
+<div class="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-outline-variant after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-container"></div>
+</label>
+</div>
+</div>
+</div>
+<!-- SECTION: App Support & About -->
+<div class="space-y-space-xs">
+<h4 class="font-label-md text-label-md text-on-surface-variant px-space-xs font-semibold uppercase tracking-wider">Support &amp; Manifesto</h4>
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-[0px_2px_8px_rgba(37,51,49,0.04)] divide-y divide-outline-variant/20 overflow-hidden">
+<button class="w-full flex items-center justify-between p-space-md tap-effect hover:bg-surface-container-low text-left">
+<div class="flex items-center gap-space-md">
+<span class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined text-[19px]" data-icon="help">help</span>
+</span>
+<div>
+<p class="font-label-lg text-label-lg text-on-surface">Help Center &amp; Community</p>
+<p class="font-caption text-caption text-on-surface-variant">Guides on collaborative rooms &amp; privacy</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline text-[20px]" data-icon="chevron_right">chevron_right</span>
+</button>
+<button class="w-full flex items-center justify-between p-space-md tap-effect hover:bg-surface-container-low text-left">
+<div class="flex items-center gap-space-md">
+<span class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined text-[19px]" data-icon="policy">policy</span>
+</span>
+<div>
+<p class="font-label-lg text-label-lg text-on-surface">Privacy Policy &amp; Terms</p>
+<p class="font-caption text-caption text-on-surface-variant">Zero-ad, zero-data-harvesting guarantee</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline text-[20px]" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+<!-- 5. DESTRUCTIVE ACTIONS & FOOTER VERSION -->
+<div class="pt-space-sm space-y-space-md pb-4">
+<button class="w-full py-3 px-space-md rounded-xl border border-error/30 text-error hover:bg-error-container/30 font-label-lg text-label-lg font-semibold flex items-center justify-center gap-2 tap-effect transition-colors duration-150">
+<span class="material-symbols-outlined text-[19px]" data-icon="logout">logout</span>
+        Log Out
+      </button>
+<div class="text-center space-y-0.5">
+<p class="font-label-sm text-label-sm text-on-surface-variant font-medium">ChobiDeh v1.2.0 (Privacy-first)</p>
+<p class="font-caption text-caption text-outline">Handcrafted for archival memory preservation</p>
+</div>
+</div>
+</main>
+<!-- BOTTOM NAVIGATION BAR (Shared Component Anchor) -->
+<!-- Contextual lock: Primary destination is 'Profile', thus destination index 3 is styled active -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-margin pt-space-xs pb-safe min-h-[64px] bg-surface-container-lowest/90 backdrop-blur-lg shadow-[0px_-2px_12px_rgba(37,51,49,0.06)] border-t border-outline-variant/30">
+<!-- Tab 0: Rooms -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant py-1.5 px-3 hover:text-primary transition-colors duration-150 active:scale-95" href="#rooms">
+<span class="material-symbols-outlined" data-icon="meeting_room">meeting_room</span>
+<span class="font-label-sm text-label-sm mt-0.5">Rooms</span>
+</a>
+<!-- Tab 1: Gallery -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant py-1.5 px-3 hover:text-primary transition-colors duration-150 active:scale-95" href="#gallery">
+<span class="material-symbols-outlined" data-icon="photo_library">photo_library</span>
+<span class="font-label-sm text-label-sm mt-0.5">Gallery</span>
+</a>
+<!-- Tab 2: People -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant py-1.5 px-3 hover:text-primary transition-colors duration-150 active:scale-95" href="#people">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span class="font-label-sm text-label-sm mt-0.5">People</span>
+</a>
+<!-- Tab 3: Profile (ACTIVE MATCH) -->
+<a class="flex flex-col items-center justify-center text-primary font-semibold py-1.5 px-3 rounded-full bg-primary-fixed/40 transition-colors duration-150 active:scale-95" href="#profile">
+<span class="material-symbols-outlined" data-icon="person" style="font-variation-settings: 'FILL' 1;">person</span>
+<span class="font-label-sm text-label-sm mt-0.5">Profile</span>
+</a>
+</nav>
+</body></html>

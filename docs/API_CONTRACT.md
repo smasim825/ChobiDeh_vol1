@@ -9,12 +9,10 @@ Status: Proposed route map only. Do not implement blindly; finalize request/resp
 - `GET /me`
 - `PATCH /me`
 
-## Consent and enrollment
-- `GET /me/biometric-consent`
-- `POST /me/biometric-consent`
-- `DELETE /me/biometric-enrollment`
-
-Consent endpoints must require authentication and record policy version and timestamp. Exact schema is an open decision.
+## Preferences and cluster controls
+- `GET /me/preferences`
+- `PATCH /me/preferences`
+- `DELETE /rooms/:roomId/clusters` (purge generated face clusters and vectors for a room)
 
 ## Rooms
 - `POST /rooms`
@@ -33,14 +31,15 @@ Consent endpoints must require authentication and record policy version and time
 
 Upload authorization and completion must validate membership, limits, storage object ownership, and expected content. Never trust client-supplied storage paths.
 
-## Collections and review
-- `GET /rooms/:roomId/collections`
-- `GET /rooms/:roomId/people/:personId/photos`
-- `GET /rooms/:roomId/unsorted`
-- `GET /rooms/:roomId/match-suggestions`
-- `POST /rooms/:roomId/photos/:photoId/assignments`
-- `PATCH /rooms/:roomId/assignments/:assignmentId`
-- `DELETE /rooms/:roomId/assignments/:assignmentId`
+## Collections and 3-Level Review
+- `GET /rooms/:roomId/clusters` (Level 1: list anonymous & named person collections)
+- `PATCH /rooms/:roomId/clusters/:clusterId` (rename/edit anonymous cluster label)
+- `GET /rooms/:roomId/clusters/:clusterId/photos` (get photos for a specific cluster)
+- `GET /rooms/:roomId/uncertain-matches` (Level 2: list suggested candidate merges)
+- `POST /rooms/:roomId/uncertain-matches/:id/resolve` (body: `{ action: "merge" | "dismiss" }`)
+- `GET /rooms/:roomId/unsorted` (Level 3: list unsorted/unmatched photos)
+- `POST /rooms/:roomId/photos/:photoId/assignments` (manual assignment to a cluster)
+- `DELETE /rooms/:roomId/photos/:photoId/assignments/:clusterId` (remove photo from a cluster)
 
 ## Error conventions
 Choose a consistent JSON error shape with a stable error code, safe user-facing message, and request/correlation ID. Never return stack traces, secrets, or internal storage details.

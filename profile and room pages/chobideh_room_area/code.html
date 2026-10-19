@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Cox's Bazar Trip — Room Area | ChobiDeh</title>
+<!-- Google Fonts: Manrope -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS with Forms and Container Queries -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "secondary-fixed-dim": "#ffb780",
+            "on-tertiary": "#ffffff",
+            "on-secondary-fixed-variant": "#6f3800",
+            "surface-dim": "#cdddda",
+            "surface-container-low": "#e7f7f4",
+            "outline": "#6e7977",
+            "outline-variant": "#bdc9c6",
+            "tertiary-fixed-dim": "#4edea3",
+            "secondary-container": "#ffab69",
+            "on-surface-variant": "#3e4947",
+            "surface-container-lowest": "#ffffff",
+            "tertiary-container": "#007952",
+            "inverse-primary": "#80d5cb",
+            "tertiary": "#005e3f",
+            "background": "#edfdf9",
+            "surface-variant": "#d6e6e2",
+            "on-tertiary-fixed": "#002113",
+            "surface-bright": "#edfdf9",
+            "tertiary-fixed": "#6ffbbe",
+            "secondary": "#8e4e14",
+            "on-primary-container": "#a3faef",
+            "primary": "#005c55",
+            "on-tertiary-container": "#99ffcd",
+            "on-primary-fixed": "#00201d",
+            "surface": "#edfdf9",
+            "primary-container": "#0f766e",
+            "secondary-fixed": "#ffdcc4",
+            "inverse-on-surface": "#e4f4f1",
+            "on-error-container": "#93000a",
+            "on-primary-fixed-variant": "#00504a",
+            "on-secondary": "#ffffff",
+            "surface-container-high": "#dcece8",
+            "error-container": "#ffdad6",
+            "primary-fixed-dim": "#80d5cb",
+            "on-secondary-container": "#783d01",
+            "inverse-surface": "#253331",
+            "on-surface": "#101e1c",
+            "surface-tint": "#006a63",
+            "on-secondary-fixed": "#2f1400",
+            "error": "#ba1a1a",
+            "surface-container": "#e1f1ee",
+            "on-error": "#ffffff",
+            "surface-container-highest": "#d6e6e2",
+            "on-background": "#101e1c",
+            "primary-fixed": "#9cf2e8",
+            "on-primary": "#ffffff",
+            "on-tertiary-fixed-variant": "#005236"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "margin-tablet": "1.5rem",
+            "margin": "1rem",
+            "space-lg": "1rem",
+            "space-xs": "0.25rem",
+            "gutter-mobile": "0.5rem",
+            "gutter": "0.75rem",
+            "space-2xl": "2rem",
+            "space-3xl": "3rem",
+            "space-sm": "0.5rem",
+            "space-md": "0.75rem",
+            "space-xl": "1.5rem"
+          },
+          "fontFamily": {
+            "label-md": ["Manrope"],
+            "display-lg": ["Manrope"],
+            "headline-md": ["Manrope"],
+            "headline-lg": ["Manrope"],
+            "body-lg": ["Manrope"],
+            "body-md": ["Manrope"],
+            "caption": ["Manrope"],
+            "label-lg": ["Manrope"],
+            "headline-xl": ["Manrope"],
+            "headline-sm": ["Manrope"],
+            "label-sm": ["Manrope"],
+            "body-sm": ["Manrope"]
+          },
+          "fontSize": {
+            "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600" }],
+            "display-lg": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.03em", "fontWeight": "800" }],
+            "headline-md": ["20px", { "lineHeight": "28px", "letterSpacing": "-0.015em", "fontWeight": "600" }],
+            "headline-lg": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+            "body-lg": ["16px", { "lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "400" }],
+            "body-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.005em", "fontWeight": "400" }],
+            "caption": ["12px", { "lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "500" }],
+            "label-lg": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+            "headline-xl": ["30px", { "lineHeight": "38px", "letterSpacing": "-0.025em", "fontWeight": "700" }],
+            "headline-sm": ["18px", { "lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.03em", "fontWeight": "600" }],
+            "body-sm": ["13px", { "lineHeight": "18px", "letterSpacing": "0.01em", "fontWeight": "400" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+    .fill-icon {
+      font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24;
+    }
+  </style>
+</head>
+<body class="bg-[#F8F5EF] text-on-surface antialiased selection:bg-primary-fixed selection:text-primary min-h-screen pb-28">
+<!-- ========================================================================= -->
+<!-- 1. TOP APP BAR (Shared Component: TopAppBar docked mobile with room state) -->
+<!-- ========================================================================= -->
+<header class="fixed top-0 left-0 w-full z-40 flex items-center justify-between px-margin py-space-sm h-14 bg-surface/85 backdrop-blur-md border-b border-outline-variant/30 shadow-sm">
+<div class="flex items-center gap-space-sm">
+<button aria-label="Go back to dashboard" class="w-9 h-9 flex items-center justify-center rounded-full hover:bg-surface-container active:scale-95 transition-all text-on-surface" type="button">
+<span class="material-symbols-outlined text-[22px]">arrow_back</span>
+</button>
+<div class="flex flex-col text-left">
+<h1 class="font-headline-sm text-headline-sm text-primary tracking-tight leading-tight">Cox's Bazar Trip</h1>
+<div class="flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+<span class="font-caption text-caption text-on-surface-variant">Shared Room • 4 Members</span>
+</div>
+</div>
+</div>
+<!-- Trailing Icon Cluster -->
+<div class="flex items-center gap-1">
+<button aria-label="Share Room Access" class="w-9 h-9 flex items-center justify-center rounded-full hover:bg-surface-container active:scale-95 transition-all text-on-surface-variant hover:text-primary" type="button">
+<span class="material-symbols-outlined text-[20px]">share</span>
+</button>
+<button aria-label="Room Settings &amp; More Options" class="w-9 h-9 flex items-center justify-center rounded-full hover:bg-surface-container active:scale-95 transition-all text-on-surface-variant hover:text-primary" type="button">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</div>
+</header>
+<!-- Main Content Canvas (Archival Warm Ivory Flow) -->
+<main class="pt-16 max-w-md mx-auto px-margin">
+<!-- ========================================================================= -->
+<!-- 2. HERO ROOM BANNER & METADATA -->
+<!-- ========================================================================= -->
+<section class="mt-space-sm relative rounded-2xl overflow-hidden border border-[#E6E1D8] shadow-[0px_4px_16px_rgba(37,51,49,0.06)] bg-surface-container-lowest">
+<!-- Cover Banner Container -->
+<div class="relative h-56 w-full overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Cinematic wide-angle view of the golden sandy coast in Cox's Bazar during sunset. Warm amber, deep gold, and coral tones reflect over gently breaking sea foam. The sky blends warm coral with deep teal shadows along the distant horizon, embodying an archival editorial travel photograph with rich tactile contrast." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBzojraIgnwYYJUyWueHrN95QbxkrbXTLY-WTpB_xLiCahMXrru09AoDtv5KhbtHuKApIGDrACXBfYT-UU2G0OYhUdy0WH1_zeMaZMczYxXmKYTqkmB4ZAwBj7k9m1Xjr0_ex-8mWPLwMU5GNxhhKmKemJhMpHoJz4xgBzWybXRU9noz-ECL3OdP6d9wFuxVU2s308tRek8pg9YkynCRZGm-ydaa6v0rZJvhbfkh55Vlop4L7qqEr-I"/>
+<!-- Editorial Gradient Protection Overlays -->
+<div class="absolute inset-0 bg-gradient-to-t from-inverse-surface/90 via-inverse-surface/30 to-transparent"></div>
+<div class="absolute inset-0 bg-gradient-to-r from-inverse-surface/40 to-transparent"></div>
+<!-- Top Status Pill Badges -->
+<div class="absolute top-3 left-3 flex flex-wrap gap-1.5 items-center">
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-surface-container-lowest/90 backdrop-blur-md text-on-surface font-label-sm text-label-sm shadow-sm border border-[#E2DDD4]">
+<span class="material-symbols-outlined text-[13px] text-primary">calendar_today</span>
+            Dec 12 - 16, 2024
+          </span>
+<span class="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-surface-container-lowest/90 backdrop-blur-md text-on-surface font-label-sm text-label-sm shadow-sm border border-[#E2DDD4]">
+<span class="material-symbols-outlined text-[13px] text-secondary">photo_camera</span>
+            142 Photos
+          </span>
+</div>
+<!-- Room Key Badge -->
+<div class="absolute top-3 right-3">
+<button class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-inverse-surface/75 backdrop-blur-md text-on-primary font-label-sm text-label-sm border border-outline-variant/30 active:scale-95 transition-all" type="button">
+<span class="material-symbols-outlined text-[12px] text-secondary-container">key</span>
+<span>CB-9821</span>
+<span class="material-symbols-outlined text-[13px] text-on-surface-variant ml-0.5">content_copy</span>
+</button>
+</div>
+<!-- Banner Bottom Identity Text -->
+<div class="absolute bottom-3 left-3 right-3 text-surface-bright">
+<div class="flex items-center gap-1.5 mb-0.5">
+<span class="material-symbols-outlined text-[14px] text-tertiary-fixed">verified_user</span>
+<span class="font-caption text-caption tracking-wide text-surface-variant uppercase font-semibold">End-to-End Vault</span>
+</div>
+<h2 class="font-headline-lg text-headline-lg tracking-tight text-white drop-shadow-sm">Cox's Bazar Winter Escape</h2>
+</div>
+</div>
+<!-- Contributor Avatars & Invite Control Row -->
+<div class="p-space-md bg-surface-container-lowest flex items-center justify-between">
+<div class="flex items-center gap-2">
+<!-- Overlapping Face Pile -->
+<div class="flex -space-x-2.5 overflow-hidden">
+<div class="relative inline-block w-8 h-8 rounded-full ring-2 ring-surface-container-lowest overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Close-up portrait of a cheerful young woman wearing a woven sunhat against a soft ocean backdrop, bathed in soft afternoon natural lighting with clean modern editorial tones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDl_SQ8pneTzpohsuvYqyNm2mdJIYo6wNQbm4W8-kD2uUCvDYWc_j8LMjK3oOMiLCXX7fRG6giOoIeePr5MG-j038JIErktfGDh1h8uVLgkFYITZY2w8AFTLU1rFj2UnGmNF2qwo5plzgCNE_VAsiA83pd65KAWvbBXzBbTLYj0Hy3-_JRDLfv6Oo5c3VlSCqJ-ALPH4pC2oAPaxcZ-qZ-BBOb39eEcA41baynSdNnWZn7Dxtjw4-e1"/>
+</div>
+<div class="relative inline-block w-8 h-8 rounded-full ring-2 ring-surface-container-lowest overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Portrait of a smiling young Bengali man in a linen casual shirt with warm golden sunlight catching his features against an ivory sandy beach." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD8vkjxKuox5mk6_XRiHykq3TfeVUTldFU-1Dhr5EH9bWgvv0x-jNQ1V5QHdU9wTbO3m775PhZhWUS1PyTusP2OQ1rV9scmJIikpXENB0fypOo0HbYgp5sxVBpNontKdbh-3iEkOKNE4_Nt0OgyWi87GjaTuaR2ajrmEfRDZGMwqekvEGeD6coX-h98Q4BAZE2MNsT9Dep3m8OdS3U7N340IkXJ4nSiaRNPrW0nkNETXs95GaRx52-r"/>
+</div>
+<div class="relative inline-block w-8 h-8 rounded-full ring-2 ring-surface-container-lowest overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Portrait of a young creative professional woman with spectacles looking happily at the camera in outdoor daylight with serene neutral surroundings." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAjmGREbyUUk9keYQOmoofhDTmRw7aRRnAYZCbQsDF2G3uGKcPRezMTIfnjHW31fpBnDWLEXX6W1lb1c3izhkLq2mvs_jx_zXBJY-myMgNFnaBHKZhYzHAnl4c9_Vf_KcneKT-eSUQO6vq_B0c11VJIB2OhdRSfOkFc4LbtZ0ghqfdvO_oKNv5UmfT6TcHpTmVIG54BYkmksyv1eu70KO3eph_TXiZaFH_5VckTd8wU5QGqwiOI7MtM"/>
+</div>
+<div class="relative inline-block w-8 h-8 rounded-full ring-2 ring-surface-container-lowest overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Candid outdoor portrait of a young man laughing with a camera strap across his shoulder, soft bokeh greenery and sandy textures behind him." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAbIQMBavWnTf-UjhzQ-l2imNI78YJpz3ZmOhREryhXfE9n6qVKLNRa2_R7o8gJYsNZrCtm5g3NiGCe6FAeoM7z0cEhgrXMGHeomangkjSZ7l7lubTvzwJOznJZ2Cu2qOwwWI1ANMSTN_hkOVF_vnloKvIcWQ9i_h1oQbI873bqFoH4Wv12hZyWTXq4G1GyWtmRBsKQYBUCKZuGFdctTaAr8vgdtg-vkXhl1ZZ4nzYMp6Z0rbCvQupw"/>
+</div>
+</div>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface font-semibold">Tasnim (Admin) + 3 others</span>
+<span class="font-caption text-[10px] text-on-surface-variant">Active syncing enabled</span>
+</div>
+</div>
+<!-- Invite Pill Button -->
+<button class="inline-flex items-center gap-1 px-3 py-1.5 rounded-full border border-[#E2DDD4] bg-[#F8F5EF] text-on-surface hover:bg-surface-container active:scale-95 transition-all font-label-md text-label-md" type="button">
+<span class="material-symbols-outlined text-[15px] text-primary">person_add</span>
+<span>Invite</span>
+</button>
+</div>
+</section>
+<!-- ========================================================================= -->
+<!-- 3. QUICK ACTION BAR -->
+<!-- ========================================================================= -->
+<section class="mt-space-lg flex items-center gap-space-sm">
+<!-- Prominent Deep Teal Upload Button -->
+<button class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-primary-container text-on-primary font-label-lg text-label-lg shadow-sm hover:bg-[#0D645E] active:scale-[0.98] transition-all" type="button">
+<span class="material-symbols-outlined text-[18px]">upload_file</span>
+<span>Upload Photos</span>
+</button>
+<!-- Memory Reel Button -->
+<button class="inline-flex items-center gap-1.5 px-3.5 py-3 rounded-xl border border-[#E2DDD4] bg-surface-container-lowest text-on-surface hover:bg-[#F8F5EF] active:scale-[0.98] transition-all font-label-md text-label-md shadow-sm" type="button">
+<span class="material-symbols-outlined text-[18px] text-secondary">movie</span>
+<span class="hidden xs:inline">Reel</span>
+</button>
+<!-- Filter Pill Button -->
+<button class="w-11 h-11 flex items-center justify-center rounded-xl border border-[#E2DDD4] bg-surface-container-lowest text-on-surface hover:bg-[#F8F5EF] active:scale-[0.98] transition-all shadow-sm" type="button">
+<span class="material-symbols-outlined text-[19px]">tune</span>
+</button>
+</section>
+<!-- ========================================================================= -->
+<!-- 4. ON-DEVICE AI INTELLIGENCE & PEOPLE CLUSTERS -->
+<!-- ========================================================================= -->
+<section class="mt-space-xl">
+<!-- AI Transparency Pill -->
+<div class="flex items-center justify-between px-3.5 py-2 rounded-xl bg-[#0F766E]/10 border border-[#0F766E]/20 text-primary mb-space-md">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[17px] text-primary">auto_awesome</span>
+<span class="font-label-sm text-label-sm leading-tight text-primary">Organized with On-Device AI • No biometrics leave your phone</span>
+</div>
+<span class="material-symbols-outlined text-[16px] text-primary/70">lock</span>
+</div>
+<!-- People Recognition Horizontal Strip -->
+<div class="flex items-center justify-between mb-2">
+<h3 class="font-headline-sm text-headline-sm text-on-surface tracking-tight">People in this Room</h3>
+<button class="font-label-sm text-label-sm text-primary hover:underline" type="button">Manage</button>
+</div>
+<div class="flex items-center gap-2.5 overflow-x-auto no-scrollbar py-1 -mx-margin px-margin">
+<!-- 'All' Filter Pill -->
+<button class="flex-shrink-0 flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary text-white shadow-sm font-label-md text-label-md active:scale-95 transition-all" type="button">
+<span class="material-symbols-outlined text-[15px]">select_all</span>
+<span>All</span>
+<span class="px-1.5 py-0.5 rounded-full bg-white/20 font-caption text-[10px]">142</span>
+</button>
+<!-- Tasnim -->
+<button class="flex-shrink-0 flex items-center gap-2 px-2.5 py-1.5 rounded-full bg-surface-container-lowest border border-[#E2DDD4] hover:border-primary text-on-surface active:scale-95 transition-all" type="button">
+<div class="w-6 h-6 rounded-full overflow-hidden ring-1 ring-[#0F766E]">
+<img class="w-full h-full object-cover" data-alt="Portrait of Tasnim smiling outdoors against the sunset ocean light in warm natural film colors." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAm09clfOASVHPTgkOdwCcIIk1-r_WdJe1GPldyHAA9263Lb6TgS8g4gl9Q1AuqBtFd9h6ae2mj8WNiFyvu7FTZ2_6wp6m6Q4j04hL01Px37oGxk2IjHztsS7RBIi4HADiJl62jm2BcQmqG-_65NhfWlNo8LyoiBM4IqWVq-QAdzTSBER1Mh873fo9BAgydqh_dxXkz4DE_iOKZdHlfjUHxbxd8ws7tJRlHNO8qmrHiDUAXYaxyd0ve"/>
+</div>
+<span class="font-label-md text-label-md">Tasnim</span>
+<span class="px-1.5 py-0.2 rounded-full bg-surface-container-high text-on-surface-variant font-caption text-[10px]">48</span>
+</button>
+<!-- Rafiqul -->
+<button class="flex-shrink-0 flex items-center gap-2 px-2.5 py-1.5 rounded-full bg-surface-container-lowest border border-[#E2DDD4] hover:border-primary text-on-surface active:scale-95 transition-all" type="button">
+<div class="w-6 h-6 rounded-full overflow-hidden ring-1 ring-[#0F766E]">
+<img class="w-full h-full object-cover" data-alt="Portrait of Rafiqul with warm sunlight on sandy beach dunes in serene travel atmosphere." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAlnfQKzTYLDga2FfwhzR6g8aZvDTZ0BD4FHTxs6htokkrNtfxZV9xqd4pe0dau_b2M7-LLDqbEA9trYrhJDOxHbnFVyxIUuqjLvLkjiEohzYPc-rXfAbNLJltMcw0ukzQZgRc0reh11btVjGeE0LZ-R1Y8DyJcWgZS0Twt5zUUtaAduUsSqV__XV1fc6kQZQH6e11ueB8HuKnYtA4y5Otr-UnSyc6zZz09x2muHy-bIHzGHEezhLN1"/>
+</div>
+<span class="font-label-md text-label-md">Rafiqul</span>
+<span class="px-1.5 py-0.2 rounded-full bg-surface-container-high text-on-surface-variant font-caption text-[10px]">36</span>
+</button>
+<!-- Samira -->
+<button class="flex-shrink-0 flex items-center gap-2 px-2.5 py-1.5 rounded-full bg-surface-container-lowest border border-[#E2DDD4] hover:border-primary text-on-surface active:scale-95 transition-all" type="button">
+<div class="w-6 h-6 rounded-full overflow-hidden ring-1 ring-[#0F766E]">
+<img class="w-full h-full object-cover" data-alt="Portrait of Samira smiling in front of sea breeze horizon on a sunny coastal afternoon." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA7qxW27ORxwyx4McgWcZGHIkrXd2ZwIbF1dbTaOAcR3hJHd83aRPT-P5FpM71uT8oRbtoFes_m6XpHOz_moPbfg1kzO_uvv9DqCzaGKJcX7a_ysmpAaNdEE1PGCMQUxxRYNYXNaC5yk_LtjGFo5n5SuGIkfjYfJkDlP7_AftN6rROmqkdd2p_k5a4dcf853Z3lG6wbq-2QoGAlFn9E1_QrgR0U8oN1BgFO0s7PJ1nMFVnm3L88eAxg"/>
+</div>
+<span class="font-label-md text-label-md">Samira</span>
+<span class="px-1.5 py-0.2 rounded-full bg-surface-container-high text-on-surface-variant font-caption text-[10px]">29</span>
+</button>
+<!-- Tanvir -->
+<button class="flex-shrink-0 flex items-center gap-2 px-2.5 py-1.5 rounded-full bg-surface-container-lowest border border-[#E2DDD4] hover:border-primary text-on-surface active:scale-95 transition-all" type="button">
+<div class="w-6 h-6 rounded-full overflow-hidden ring-1 ring-[#0F766E]">
+<img class="w-full h-full object-cover" data-alt="Portrait of Tanvir laughing during an evening coastal road trip with cinematic ambient warmth." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC9vs8HraHWrOZE-GT8_Nn0ENWPDHTsiKpaBjWe1Yq0p5HizrYHQ7xuB6cfjEk5pffqxzFyqAddOZIdsG5YWkvPo1kd09LwlOEuYQQxoToZ47AchIVY_4ajbnkCgjWnN9CjrKmzjpTMYcrZN6MBsIRf21v4SyqBukKTF6roX1kb_XaStDDrHxyiXuTVEIFZw_WccajqByBGbbWF7ZE8liVxJSt1FVwWsD9LsqRR7IUDMqKPcGy3z9wK"/>
+</div>
+<span class="font-label-md text-label-md">Tanvir</span>
+<span class="px-1.5 py-0.2 rounded-full bg-surface-container-high text-on-surface-variant font-caption text-[10px]">18</span>
+</button>
+<!-- Uncategorized AI Pill -->
+<button class="flex-shrink-0 flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-[#F4A261]/15 border border-[#F4A261]/30 text-[#8E4E14] active:scale-95 transition-all" type="button">
+<span class="material-symbols-outlined text-[14px]">help_outline</span>
+<span class="font-label-md text-label-md">Review</span>
+<span class="px-1.5 py-0.2 rounded-full bg-[#F4A261]/30 text-[#783D01] font-caption text-[10px] font-bold">11</span>
+</button>
+</div>
+</section>
+<!-- ========================================================================= -->
+<!-- 5. CURATED PHOTO GALLERY GRID (Tactile Masonry & Editorial Cards) -->
+<!-- ========================================================================= -->
+<section class="mt-space-xl">
+<!-- Section Header with Grouping / Timeline -->
+<div class="flex items-center justify-between mb-space-sm">
+<div class="flex items-center gap-2">
+<span class="font-headline-sm text-headline-sm text-on-surface">Curated Feed</span>
+<span class="font-caption text-caption text-on-surface-variant">• Inani Beach Day</span>
+</div>
+<div class="flex items-center gap-1 text-on-surface-variant font-caption text-caption">
+<span class="material-symbols-outlined text-[15px]">schedule</span>
+<span>Timeline</span>
+</div>
+</div>
+<!-- Bento Masonry Layout (Mobile 2-Column Asymmetric) -->
+<div class="grid grid-cols-2 gap-gutter-mobile">
+<!-- Photo 1: Tall Feature Sunset Silhouette -->
+<div class="relative group rounded-xl overflow-hidden bg-surface-container-lowest border border-[#E6E1D8] shadow-[0px_2px_8px_rgba(37,51,49,0.04)] aspect-[3/4]">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" data-alt="Stunning vertical travel photo of silhouetted figures walking along the tranquil tide pools of Inani Beach during a fiery red and warm gold sunset in Cox's Bazar. Soft reflections on damp sand evoke archival analog warmth." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBZ2Oyarct3zts76pL3ykl25TXxM5aBCWVe2w5cxMWrNgR3038PsQaqGstDb7wMM5FQkP1se4inxWUFzUkgjK623pdc9nhCnyPh0dWtEuwojTBw-tucH7PhrRmreE1d3qtOSj2YkR4hnZxs5KgUt9VUr0x3WxOksjR8sTCsC5sqrvX_vCLl_k7BodYbfAw5gxlA8rmnjVdB6d3t4aT9-sEIGkbUIL_yQ77I9XtsZI6aLmk37QYpnHUB"/>
+<div class="absolute inset-0 bg-gradient-to-t from-inverse-surface/75 via-transparent to-transparent pointer-events-none"></div>
+<!-- Top Badges -->
+<div class="absolute top-2 left-2 flex items-center gap-1">
+<span class="px-2 py-0.5 rounded-full bg-surface-container-lowest/85 backdrop-blur-md text-primary font-label-sm text-[10px] font-bold shadow-sm">
+              AI Curated
+            </span>
+</div>
+<!-- Bottom Meta Bar -->
+<div class="absolute bottom-2 left-2 right-2 flex items-center justify-between text-white">
+<div class="flex items-center gap-1.5">
+<div class="w-5 h-5 rounded-full overflow-hidden border border-white">
+<img class="w-full h-full object-cover" data-alt="Mini avatar of contributor Tasnim outdoors." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBVViFT1n5h0a_zSLk4Zz9bXOPtywRq_Gt7-ljJE67Hk0GzoaJoTIlWyPaWBuhFM46uzawOVZYS67edanUZhrx0CLJpxb7He3zo2ktrFTHowQluZEDYuq-24cN3UTrhbLeCx3cUJ57csg3Gmblc901d8mivBIJHuqXVqMM47CplsrZPkpykCBCUhSjB3Ev43EVvtFp09QDz01c2B4bhoNFkTQCH7rx-IGdS9YIu4o1F-oTKrT2hSSlL"/>
+</div>
+<span class="font-caption text-[11px] font-medium text-white/90">2h ago</span>
+</div>
+<div class="flex items-center gap-1 bg-black/35 backdrop-blur-sm px-1.5 py-0.5 rounded-full">
+<span class="material-symbols-outlined text-[13px] text-secondary-container fill-icon">favorite</span>
+<span class="font-caption text-[10px] font-semibold">12</span>
+</div>
+</div>
+</div>
+<!-- Photo 2: Fresh Seafood Group Dinner -->
+<div class="relative group rounded-xl overflow-hidden bg-surface-container-lowest border border-[#E6E1D8] shadow-[0px_2px_8px_rgba(37,51,49,0.04)] aspect-square">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" data-alt="Top-down editorial photo of a shared seafood dinner feast with roasted pomfret, curried prawns, and warm flatbreads arranged on a rustic wooden dining table lit by warm candle lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAeu5woqbEgTcOUX1K1XVI3vwgseUlgkAFzAA9H6M0yBg-cdZnxPYZ5ncrT5AMm_4oY9e0wUFaNquxRC_w2BvIwlUfyR4HsxAuUzSZBfGYr47FHU7wOYeC80ni4ePVVyGSGy9AFsS7EXd6zukG9LE327D2hys1F6QzVbR7yne1ol6iI30urqWWlKNST0WaRGXwaVQRhiq3R6JY7rDZ5l91o_-glY13qOSEawuKntTeNJA5uXfbqy1lg"/>
+<div class="absolute inset-0 bg-gradient-to-t from-inverse-surface/70 via-transparent to-transparent pointer-events-none"></div>
+<div class="absolute bottom-2 left-2 right-2 flex items-center justify-between text-white">
+<div class="flex items-center gap-1.5">
+<div class="w-5 h-5 rounded-full overflow-hidden border border-white">
+<img class="w-full h-full object-cover" data-alt="Mini avatar of contributor Rafiqul smiling." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB9DpIe5ik78TczkLghpcR7M2WeNYeztBgtaEdOg2025NcOtea69qeQYJgRsstG9dyO6-JAw5d9wtjLBA-2gpmPwH4ypc1sHfGkMXX35xLdZmty6MB3RpQ_0KI5gZwzV04m0f8_ZyPRBnAlI1gb7lQupicSGHxq65VjFxtQi3PSG9aaWuTwBepRSg0JtciAssqDiikyls3ZzM_L1J_Vc-TkmetSma2d5oCiqhyAsXwPBXqRiL2xX1jH"/>
+</div>
+<span class="font-caption text-[11px] font-medium text-white/90">Yesterday</span>
+</div>
+<div class="flex items-center gap-1 bg-black/35 backdrop-blur-sm px-1.5 py-0.5 rounded-full">
+<span class="material-symbols-outlined text-[13px] text-white">favorite_border</span>
+<span class="font-caption text-[10px]">6</span>
+</div>
+</div>
+</div>
+<!-- Photo 3: Coastal Marine Drive Jeep Roadtrip -->
+<div class="relative group rounded-xl overflow-hidden bg-surface-container-lowest border border-[#E6E1D8] shadow-[0px_2px_8px_rgba(37,51,49,0.04)] aspect-square">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" data-alt="Dynamic shot from an open-top green jeep driving along Cox's Bazar Marine Drive, with lush emerald hills on the left and crashing blue ocean waves under clear azure skies on the right." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAPoQoAxQ2yBEgHH-iVblF765Y-ZChDGWYgIZPiCTja2n2pysd8mrdGfwTYn1mpq3r0eEzTPTvi2zGforWQ4xYC0cjYdVjvU1bJ54BdQFMReqFNvPdpJLu-H1SOh2H9pMc6G4r2AQbUk3TfrYHqzBKSLSybX1fGDuLqaJPGypzzrPXkv1E7n6al9rmU-MFOvbJjyWZymwBKuzkPMXa8A7DFUKi6Dxwi_dis0qGgSMZZwuObDf-xik4R"/>
+<div class="absolute inset-0 bg-gradient-to-t from-inverse-surface/70 via-transparent to-transparent pointer-events-none"></div>
+<div class="absolute bottom-2 left-2 right-2 flex items-center justify-between text-white">
+<div class="flex items-center gap-1.5">
+<div class="w-5 h-5 rounded-full overflow-hidden border border-white">
+<img class="w-full h-full object-cover" data-alt="Mini avatar of contributor Samira." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAW2v3BhVgygwPmoBS87wuIdQ_5_ag4SHXTJsb8H5uLU2wvHI9UHtHuTwsY014xNaYNrDvO_X43YXgfn7WbKuWhmuD2UDtapFoLZseJ7P1qAixjThKPQVR3g4qAKaiEca25wc2O0uNZ3vZhQgC3OVNFDUTnHlLR2MFVvxOUbmCsMwh5bWyr9EH1YwFo3xrb0V0XBaoltmGRDB2BHGIy7ttfMzxsFk6LQrRs5Ij1wkgJow2aV6OuSe01"/>
+</div>
+<span class="font-caption text-[11px] font-medium text-white/90">Dec 14</span>
+</div>
+<div class="flex items-center gap-1 bg-black/35 backdrop-blur-sm px-1.5 py-0.5 rounded-full">
+<span class="material-symbols-outlined text-[13px] text-secondary-container fill-icon">favorite</span>
+<span class="font-caption text-[10px]">9</span>
+</div>
+</div>
+</div>
+<!-- Photo 4: Tall Ocean Wave and Surfer Shot -->
+<div class="relative group rounded-xl overflow-hidden bg-surface-container-lowest border border-[#E6E1D8] shadow-[0px_2px_8px_rgba(37,51,49,0.04)] aspect-[3/4]">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" data-alt="Artistic medium shot of a local youth surfing a sparkling cyan ocean wave near Laboni Beach, with sea spray caught in bright high-contrast morning light and ivory foam details." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC7x-UfGRp2MdGaZGAZ852uBV65JxEoi25jaf3Y0_m4IRTXNNJ0vqbTFU3lqx7nTFz_76jZgFXPlmT7b-SpDBsACE_XoJR31h4KVNeK5lC5utfXvwYt7Y4wqzs89u4uI9yfWGTlJT_znrFXI8FI0H5QDEO0Sdo9sazlbTpYukK1KpFad9QeARvXEoqEejq5WzAzExTgaC9ZBbeipEo1ZWeFKg_0YvjHaCXA35Nu6hBazqRkrjMmO5ip"/>
+<div class="absolute inset-0 bg-gradient-to-t from-inverse-surface/75 via-transparent to-transparent pointer-events-none"></div>
+<div class="absolute top-2 right-2">
+<span class="px-2 py-0.5 rounded-full bg-inverse-surface/75 backdrop-blur-md text-white font-label-sm text-[10px] flex items-center gap-1">
+<span class="material-symbols-outlined text-[11px] text-primary-fixed">auto_fix_high</span>
+              Enhanced
+            </span>
+</div>
+<div class="absolute bottom-2 left-2 right-2 flex items-center justify-between text-white">
+<div class="flex items-center gap-1.5">
+<div class="w-5 h-5 rounded-full overflow-hidden border border-white">
+<img class="w-full h-full object-cover" data-alt="Mini avatar of contributor Tanvir." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA0WdQStRGQrkajsqBFZ0s21zOb2z-Y7C3UW-p6uCIqREV5z2tUBNj-k2Nfue_NL-iT273tExp61793zfJftIfKc_qXfj5dSqwPyTiNgDk9zB_FGXfrOKamRQ4loRwNK4ampDueO2BVXRQ1-LvWZ8CcYp12yISoA0PDd9OFVu9hrVe6XteAIQbgFqYNx_uBgQhV7Nnv378zXqr8Jw55DNarQ8gDVF00jft4lMNEapVZv0iF28ArFyda"/>
+</div>
+<span class="font-caption text-[11px] font-medium text-white/90">Dec 13</span>
+</div>
+<div class="flex items-center gap-1 bg-black/35 backdrop-blur-sm px-1.5 py-0.5 rounded-full">
+<span class="material-symbols-outlined text-[13px] text-secondary-container fill-icon">favorite</span>
+<span class="font-caption text-[10px]">15</span>
+</div>
+</div>
+</div>
+<!-- Photo 5: Wide Group Selfie on Sampan Boat (Spanning 2 columns) -->
+<div class="col-span-2 relative group rounded-xl overflow-hidden bg-surface-container-lowest border border-[#E6E1D8] shadow-[0px_2px_8px_rgba(37,51,49,0.04)] aspect-[16/9]">
+<img class="w-full h-full object-cover group-hover:scale-102 transition-transform duration-300" data-alt="Joyful wide candid group selfie of four diverse Bangladeshi friends laughing together aboard a traditional crescent-shaped wooden Sampan fishing boat near the gentle shoreline during twilight." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDwWZcon9ZAaM5mu3NlmndRJiW6tm8Fgx9GTojn_UJN2IvieZTrwFyrcVv0KqucmLUd53G-06Tc-aNmV8B5n3WFQBk4bX0YgJeRxpyw5_4k-DQEGDnPvIMnstNQ8l4ZCkV3K8jraDm-M9HdDwG57o1impYZhOulTsEkldOLwBXrWX_MW8F5P6ZTw50Ac2ayhYuNKj6Hsnakoy1tu7OAhtEi057s0rjbDwwDOX4Dp1OeCnmYTL3kJ4rS"/>
+<div class="absolute inset-0 bg-gradient-to-t from-inverse-surface/80 via-transparent to-transparent pointer-events-none"></div>
+<!-- Room Admin Pick Pill -->
+<div class="absolute top-2.5 left-2.5">
+<span class="px-2.5 py-1 rounded-full bg-primary/90 text-white font-label-sm text-[11px] flex items-center gap-1 shadow-sm">
+<span class="material-symbols-outlined text-[13px]">star</span>
+<span>Trip Highlight</span>
+</span>
+</div>
+<div class="absolute bottom-2.5 left-3 right-3 flex items-center justify-between text-white">
+<div class="flex items-center gap-2">
+<div class="flex -space-x-1.5">
+<div class="w-6 h-6 rounded-full overflow-hidden border border-white">
+<img class="w-full h-full object-cover" data-alt="Contributor mini portrait." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA_u-VEsvH-0s7f-Pi6zHnoTez19p-0vMyyQ8nigG6kalBwcNSLAXr95p389mb80AkbIKicCOAkUijWIqg5QnQl-iJ6OJfSlT2KbFzfT14alZBJ9ZNyuSljm-tXMx84hiTwpHT8wu6Cid_GiScVWCT08uVMBPp5jhhLz4VIvQCDZ2p_27kINqIe42Q_t8cUk3jNDzg8h6klRFDvY_xz1LLvpWYf-0KRAh-WRAuZcRkvC5e4lcKQAPHi"/>
+</div>
+<div class="w-6 h-6 rounded-full overflow-hidden border border-white">
+<img class="w-full h-full object-cover" data-alt="Contributor mini portrait." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCf4Iy7P_lO1AfYYz3R5H5AUZR3q-5WgdLLDBADrQP3FUbTkOHFfA8w5O2FUzYHFk1xhKiv6PpjU9-Ksr1AZ-tj5j52w72XAv-vBp026G1HgNrQmhnveG8xkjWOxm_CJMlmNFYRmaqir4RZiavDFLMqA3lvEfPO81WWqZaid5QPDuyL8o5wADj8GyGuq4MO75vJYd2zKpyjrDvO91JyqOwYu7tliH5mhKbmsGZy1tfsg8yggvC65u_S"/>
+</div>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-white font-semibold leading-none">Sampan Harbor Sunset</p>
+<span class="font-caption text-[10px] text-white/80">Captured by Tasnim &amp; Rafiqul</span>
+</div>
+</div>
+<div class="flex items-center gap-1.5 bg-black/40 backdrop-blur-md px-2.5 py-1 rounded-full border border-white/10">
+<span class="material-symbols-outlined text-[15px] text-secondary-container fill-icon">favorite</span>
+<span class="font-label-sm text-label-sm font-bold text-white">28</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Load More / End of Trip Archive Signal -->
+<div class="mt-space-lg text-center pb-4">
+<button class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full border border-[#E2DDD4] bg-surface-container-lowest text-on-surface hover:bg-[#F8F5EF] active:scale-95 transition-all font-label-md text-label-md shadow-sm" type="button">
+<span class="material-symbols-outlined text-[16px] text-primary">sync</span>
+<span>Sync Remaining 84 Photos</span>
+</button>
+<p class="mt-1.5 font-caption text-caption text-on-surface-variant">Archived in original lossless RAW + JPEG</p>
+</div>
+</section>
+</main>
+<!-- ========================================================================= -->
+<!-- FLOATING SELECTION / DOCK PILL (Style Guidance Tier 2) -->
+<!-- ========================================================================= -->
+<aside class="fixed bottom-20 left-1/2 -translate-x-1/2 z-40 w-11/12 max-w-sm pointer-events-auto">
+<div class="bg-surface-container-lowest/95 backdrop-blur-lg border border-[#E2DDD4] rounded-full px-4 py-2.5 shadow-[0px_8px_24px_rgba(37,51,49,0.12),0px_2px_6px_rgba(37,51,49,0.06)] flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-tertiary animate-pulse"></span>
+<span class="font-label-sm text-label-sm text-on-surface font-semibold">142 photos synced</span>
+</div>
+<div class="flex items-center gap-2">
+<button aria-label="Select photos for batch action" class="px-2.5 py-1 rounded-full text-on-surface-variant hover:text-primary font-label-sm text-label-sm active:scale-95 transition-all" type="button">
+          Select
+        </button>
+<button aria-label="Quick Camera Add" class="w-8 h-8 rounded-full bg-primary-container text-white flex items-center justify-center shadow-sm active:scale-90 transition-transform" type="button">
+<span class="material-symbols-outlined text-[18px]">add_a_photo</span>
+</button>
+</div>
+</div>
+</aside>
+<!-- ========================================================================= -->
+<!-- 6. BOTTOM NAVIGATION BAR (Shared Component: BottomNavBar with exact JSON) -->
+<!-- Destination: Rooms is active for Room Area experience                    -->
+<!-- ========================================================================= -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-margin pt-space-xs pb-safe min-h-[64px] bg-surface-container-lowest/90 backdrop-blur-lg border-t border-outline-variant/30 shadow-[0px_-2px_12px_rgba(37,51,49,0.06)]">
+<!-- Item 0: Rooms (Active for this Room Area Screen) -->
+<a class="flex flex-col items-center justify-center text-primary font-semibold py-1.5 px-3 rounded-full bg-primary-fixed/40 transition-colors duration-150 active:scale-95" href="#">
+<span class="material-symbols-outlined text-[22px] fill-icon">meeting_room</span>
+<span class="text-label-sm font-label-sm mt-0.5">Rooms</span>
+</a>
+<!-- Item 1: Gallery -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary py-1.5 px-3 transition-colors duration-150 active:scale-95" href="#">
+<span class="material-symbols-outlined text-[22px]">photo_library</span>
+<span class="text-label-sm font-label-sm mt-0.5">Gallery</span>
+</a>
+<!-- Item 2: People -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary py-1.5 px-3 transition-colors duration-150 active:scale-95" href="#">
+<span class="material-symbols-outlined text-[22px]">group</span>
+<span class="text-label-sm font-label-sm mt-0.5">People</span>
+</a>
+<!-- Item 3: Profile -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary py-1.5 px-3 transition-colors duration-150 active:scale-95" href="#">
+<span class="material-symbols-outlined text-[22px]">person</span>
+<span class="text-label-sm font-label-sm mt-0.5">Profile</span>
+</a>
+</nav>
+</body></html>

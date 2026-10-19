@@ -1,14 +1,12 @@
 # System Flow
 
-## 1. Account and consent flow
+## 1. Account and preferences flow
 
-1. User registers or signs in.
+1. User registers or signs in (no selfie or face registration required).
 2. Backend creates/loads the profile and returns a session.
 3. Dashboard shows rooms and available actions.
-4. Face enrollment is offered as an optional feature with a clear explanation.
-5. If the user consents, the enrollment flow asks for an appropriate reference image or images and processes them securely.
-6. Store only the data required for the approved matching design; document retention and deletion behavior.
-7. If the user declines, account and ordinary room/photo features remain available.
+4. AI face clustering is enabled as an optional photo organization feature.
+5. If the user opts out of clustering, ordinary photo sharing and rooms remain fully available.
 
 ## 2. Room creation and joining
 
@@ -33,36 +31,42 @@ Security note: room ID is an identifier, not a secret. Store joining secrets as 
 7. API records media metadata and queues an AI processing job.
 8. Gallery shows upload complete and processing pending/complete separately.
 
-## 4. AI processing flow
+## 4. AI processing flow (3-Level Architecture)
 
 1. Worker claims a queued job.
-2. Worker checks consent and room policy before biometric processing.
-3. Validate and decode image safely; create a temporary working copy if needed.
-4. Detect faces and compute embeddings only under the approved consent policy.
-5. Compare candidate embeddings only with people eligible for matching in that room.
-6. If a match passes a calibrated high-confidence threshold, create an automatic assignment.
-7. If face evidence is weak but contextual clues suggest a candidate, create a review suggestion.
-8. If no suitable candidate exists, keep the photo/person instance Unsorted.
-9. Store processing status and minimal diagnostic metadata.
-10. Notify/update the client when processing is complete.
-11. On failure, retry safely with backoff and send exhausted jobs to a failure queue for investigation.
+2. Worker verifies room clustering policy and settings.
+3. Validate and decode image safely; create temporary working copy.
+4. Detect faces and compute facial embeddings within the room boundary.
+5. **Level 1 — Confident Clustering:**
+   - Compare face embeddings with existing anonymous person clusters in the room.
+   - If distance is below the calibrated confident threshold, assign the photo to that person collection automatically.
+   - If a confident face does not match existing clusters, spawn a new anonymous person collection (e.g., "Person 1").
+6. **Level 2 — Uncertain Matches:**
+   - If distance or similarity between clusters/faces falls in an uncertain margin, generate an Uncertain Match suggestion for user review.
+   - Never merge person collections automatically.
+7. **Level 3 — Unsorted:**
+   - If no face is detected, or image quality is too low, or embeddings fail confidence thresholds, assign the photo to the "Unsorted" collection.
+8. Store processing status and diagnostic metadata (model/version, cluster IDs).
+9. Notify/update the client when processing is complete.
+10. On failure, retry safely with backoff and send exhausted jobs to a failure queue for investigation.
 
-## 5. Match correction flow
+## 5. Cluster naming & match review flow
 
-1. Member opens a suggestion or photo.
-2. UI shows the proposed person and lets the user confirm/reject or choose another person.
-3. API verifies membership and permission to edit the assignment.
-4. API records the correction and updates collection membership.
-5. If the correction changes future matching, update the room's person reference carefully.
-6. Do not silently train or alter a global identity model from corrections.
+1. Member opens a room and views anonymous collections (e.g., "Person 1", "Person 2").
+2. User can rename an anonymous collection to a human name (e.g., "Samira" or "Rafiqul").
+3. Member opens the "Uncertain Matches" section (Level 2).
+4. UI presents side-by-side thumbnails of the two suggested groups.
+5. Member chooses **Confirm Merge** (merging them into a single collection) or **Keep Separate** (dismissing the suggestion).
+6. API records the decision and updates cluster memberships atomically.
+7. Member can view the "Unsorted" collection (Level 3) and manually drag/assign photos to a collection.
 
 ## 6. Deletion flow
 
-1. User requests deletion of a photo, enrollment, or account.
-2. API verifies identity and scope.
+1. User or room owner requests deletion of a photo, room, or cluster data.
+2. API verifies identity and room permissions.
 3. Mark the resource as pending deletion to prevent new processing.
 4. Cancel or invalidate queued jobs where possible.
-5. Delete associated embeddings, assignments, derived files, and stored media according to policy.
+5. Delete associated cluster mappings, vector embeddings, derived thumbnails, and stored media according to policy.
 6. Record a non-sensitive audit event.
 7. Confirm completion only after the required deletion steps succeed; explain any backup expiry period.
 

@@ -15,20 +15,20 @@
 - Retry does not create duplicate media records.
 - EXIF/location metadata policy is applied consistently.
 
-## AI pipeline
+## AI pipeline (3-Level Architecture)
 - Job retry is idempotent.
-- Level 1 threshold is validated on a held-out test set.
-- Level 2 contextual matches require review.
-- Level 3 uncertain cases remain Unsorted.
-- Group photos can map to multiple people without duplicating the original.
-- False matches can be corrected and undone.
-- No biometric processing occurs after consent withdrawal.
-- Deletion handles queued jobs and derived records.
+- Level 1: Confident clustering correctly groups visually similar faces into anonymous person collections without mandatory face registration.
+- Level 2: Uncertain matches generate review suggestions and are never merged automatically.
+- Level 3: Unmatched faces and photos without usable faces remain in the Unsorted collection.
+- Group photos can map to multiple person clusters without duplicating the original photo.
+- Clusters can be named, edited, merged, and manual assignments can be undone.
+- Face clustering can be toggled per room.
+- Deletion handles queued jobs and derived cluster records.
 
 ## Privacy and deletion
-- Consent is recorded with policy version and timestamp.
-- Declining enrollment does not block ordinary app use.
-- Deletion requests prevent new processing and trigger cleanup.
+- No mandatory face registration or selfie requirements.
+- Opting out of AI clustering does not block ordinary room photo sharing.
+- Cluster purge requests remove vectors and assignments cleanly.
 - Logs do not contain passwords, tokens, raw embeddings, or photo bytes.
 
 ## Reliability and usability

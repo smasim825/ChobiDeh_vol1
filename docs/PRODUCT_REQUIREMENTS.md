@@ -6,8 +6,8 @@ Status: Initial requirements draft. Validate with real users before treating as 
 
 - Users can register, log in, log out, and manage a basic profile.
 - The dashboard lists rooms the user belongs to and provides create/join actions.
-- Face enrollment is optional for general account use and requires explicit informed consent before biometric processing.
-- Users can see enrollment status and request withdrawal/deletion.
+- No mandatory face registration or selfie enrollment is required. AI face clustering is an optional feature for organizing room photos.
+- Users can view and manage their room cluster preferences and purge cluster data.
 
 Acceptance:
 - Unauthenticated users cannot access private room content.
@@ -44,41 +44,43 @@ Acceptance:
 
 ## Person collections
 
-- A room may have collections for people recognized or manually identified in that room.
-- A photo may be associated with multiple people.
-- A face match in one room must not automatically reveal a person's photos in another room.
+- A room organizes photos into person collections based on unsupervised AI visual clustering.
+- Collections start as anonymous clusters (e.g. "Person 1", "Person 2"). Room members can name, rename, or edit them.
+- A photo may be associated with multiple people if multiple faces are present.
+- Face clusters are strictly room-scoped and never shared across different rooms.
 - Users can confirm, reject, correct, or remove a person assignment.
-- Users can leave a photo Unsorted.
+- Photos with no confident cluster remain in an Unsorted collection.
 
 Acceptance:
-- Correcting a match updates all affected collection views consistently.
+- Correcting or merging a cluster updates all affected collection views consistently.
 - No duplicate original image is created merely because multiple people appear in it.
 
-## AI organization
+## AI organization (3-Level Architecture)
 
-- Processing runs asynchronously.
-- Level 1: high-confidence face match may be assigned automatically after validation.
-- Level 2: contextual clues produce suggestions for review, not definitive identity claims.
-- Level 3: uncertain or unidentified media remains Unsorted.
+- Processing runs asynchronously via background worker jobs.
+- **Level 1 — Confident Clustering:** Automatically group visually similar faces from uploaded photos into anonymous person collections. Users can name and edit these collections.
+- **Level 2 — Uncertain Matches:** Suggest potentially similar person groups for user review. Never merge them automatically.
+- **Level 3 — Unsorted:** Keep unmatched faces and photos without usable faces in an Unsorted collection for manual organization.
 - Thresholds must be calibrated against a representative validation dataset.
 - System records model/version and decision status sufficient for debugging, while minimizing retained sensitive data.
 
 Acceptance:
 - Failed processing can be retried safely.
-- A job is idempotent; retries do not create duplicate assignments.
-- A user can undo an incorrect match.
+- A job is idempotent; retries do not create duplicate assignments or clusters.
+- Uncertain matches require explicit user confirmation to merge.
+- A user can undo an incorrect cluster assignment.
 
 ## Privacy and deletion
 
-- Explain what biometric data is processed and why before enrollment.
-- Provide opt-out without blocking ordinary photo sharing.
-- Support deletion requests for embeddings, face templates, derived match records, and related data, with clearly documented backups/retention limitations.
+- Explain that face clustering groups visual similarities anonymously within the room.
+- No mandatory face registration, selfie enrollment, or account-linked identity profiles.
+- Support deletion requests for room clusters, vector embeddings, derived match records, and related data.
 - Provide room/photo deletion behavior and communicate its effects to members.
 - Do not use user photos to train unrelated models by default.
 
 Acceptance:
-- Deletion is auditable and propagated to derived records and storage according to the retention policy.
-- Consent status is checked before biometric processing.
+- Deletion of room clusters/vectors is auditable and propagated to derived records according to retention policy.
+- Clustering preferences can be toggled without blocking standard room photo sharing.
 
 ## Future features (not MVP)
 

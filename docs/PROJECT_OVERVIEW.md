@@ -21,17 +21,18 @@ After a group event or trip, photos are scattered across different phones and me
 2. A user can create a room and share its room ID and joining credential.
 3. Authorized members can join and upload photos they select.
 4. Photos remain private to authorized room members.
-5. Consenting users can enroll for face-based matching.
-6. The system provides automatic matches, contextual suggestions, and an Unsorted collection.
-7. Users can correct assignments and request deletion of their data.
+5. The system organizes room photos using a 3-Level AI Face Clustering workflow (Level 1: Confident Clustering, Level 2: Uncertain Matches, Level 3: Unsorted).
+6. Users can name, edit, and review anonymous person collections without mandatory face registration or selfie enrollment.
+7. Users can correct assignments, review merge suggestions, and request deletion of their data/clusters.
 8. The system is testable, observable, and deployable without unnecessary infrastructure.
 
 ## Non-goals for MVP
 
+- Mandatory face registration, selfie enrollment, or linking faces to user accounts.
+- Automatic scanning of the entire phone gallery.
 - Full travel booking or destination marketplace.
 - Expense splitting or money transfers.
 - Messaging or social feed.
-- Automatic scanning of the entire phone gallery.
 - Guaranteed recognition of every person in every photo.
 - Public photo links or public-by-default rooms.
 - Microservices, Kubernetes, or multi-region infrastructure without demonstrated need.

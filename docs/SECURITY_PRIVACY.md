@@ -20,16 +20,17 @@ This is a working checklist, not a legal opinion. Before public launch, assess a
 - Do not expose internal object keys or permanent public URLs.
 - Apply quotas and rate limits to prevent storage abuse.
 
-## Biometric data
-- Explicit, informed opt-in before creating face embeddings.
-- Provide a clear purpose and retention policy.
-- Minimize what is collected and stored.
-- Encrypt data in transit and at rest; tightly restrict access.
-- Never place raw embeddings in application logs or analytics.
-- Support withdrawal and deletion, including derived match records and queued jobs.
+## Biometric data & Face Clustering
+- No mandatory face registration, selfie enrollment, or account-linked face templates.
+- AI face clustering operates solely on photos explicitly uploaded to a shared room.
+- Clear user transparency and controls for room clustering.
+- Minimize what is collected and stored: only anonymous cluster assignments and ephemeral vectors.
+- Encrypt data in transit and at rest; tightly restrict access to room members only.
+- Never place raw embeddings or face crops in application logs or analytics.
+- Support withdrawal and deletion, including room-level cluster purges and queued jobs.
 - Define how backups expire and explain any unavoidable delay.
 - Do not use uploaded photos or embeddings to train unrelated models by default.
-- Provide an alternative experience for users who decline enrollment.
+- Provide a full standard room experience for users who disable AI clustering.
 
 ## Multi-tenant isolation
 - All media, person records, jobs, and collections must include or resolve to an authorized room scope.

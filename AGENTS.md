@@ -51,11 +51,11 @@ Then inspect the relevant source files and tests. Do not assume documentation de
 - Never commit secrets, API keys, passwords, private URLs, credentials, or real user photos/biometric data.
 - Never use production user data for experiments without explicit authorization and documented safeguards.
 - Never collect or analyze a user's entire device gallery. Process only photos the user explicitly selects and uploads.
-- Never enroll a face or create a biometric template without clear, explicit consent.
-- Provide a documented path to withdraw consent and delete biometric data and related derived records, subject to legally required retention.
+- Never require mandatory face registration or selfie enrollment.
+- Never automatically merge uncertain face clusters or low-confidence matches without explicit user confirmation.
+- Provide a documented path to disable face clustering and purge generated clusters, embeddings, and related derived records.
 - Never expose room photos through public buckets or permanent public URLs.
 - Never trust a client-provided user ID, room ID, role, match label, or storage path without server-side authorization.
-- Never automatically confirm low-confidence or contextual-only person matches.
 - Never add a new dependency, paid service, cloud resource, database migration, or architecture component without explaining why in the issue or PR.
 - Never make destructive changes, rewrite unrelated modules, or reformat the entire codebase for a small task.
 - Never edit another contributor's active work without coordinating first.

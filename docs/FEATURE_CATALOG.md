@@ -5,8 +5,8 @@ Status values: `MVP`, `LATER`, `OPEN`.
 ## Identity
 - [MVP] Signup, login, logout.
 - [MVP] User profile and dashboard.
-- [MVP] Optional face enrollment with explicit consent.
-- [MVP] Consent withdrawal and biometric deletion request.
+- [MVP] Room-scoped AI face clustering toggle (no mandatory selfies or face registration).
+- [MVP] Cluster vector deletion / purge request.
 - [LATER] Social sign-in providers, if needed.
 
 ## Rooms
@@ -25,12 +25,12 @@ Status values: `MVP`, `LATER`, `OPEN`.
 - [MVP] Photo deletion.
 - [LATER] Duplicate detection, quality ranking, video support, bulk export.
 
-## AI organization
-- [MVP] Face detection and consent-gated embeddings.
-- [MVP] High-confidence automatic assignment.
-- [MVP] Contextual match suggestions for review.
-- [MVP] Unsorted collection.
-- [MVP] Manual tagging and correction.
+## AI organization (3-Level Architecture)
+- [MVP] Face detection and room-scoped embedding computation.
+- [MVP] Level 1: Confident Clustering into anonymous person collections (e.g., Person 1, Person 2).
+- [MVP] Level 2: Uncertain Match suggestions between similar person groups for user review (never auto-merged).
+- [MVP] Level 3: Unsorted collection for unmatched faces or photos without usable faces.
+- [MVP] User naming, editing, and manual assignment of person collections.
 - [MVP] Job retries and processing status.
 - [LATER] Semantic photo search and smart album summaries.
 

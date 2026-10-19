@@ -1,0 +1,432 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Join a Room - ChobiDeh</title>
+<!-- Google Fonts: Manrope -->
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<!-- Tailwind CSS CDN -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "on-tertiary-fixed": "#002113",
+            "inverse-surface": "#253331",
+            "secondary-fixed-dim": "#ffb780",
+            "primary-fixed-dim": "#80d5cb",
+            "on-primary-container": "#a3faef",
+            "inverse-on-surface": "#e4f4f1",
+            "on-tertiary-fixed-variant": "#005236",
+            "surface-container-highest": "#d6e6e2",
+            "surface-tint": "#006a63",
+            "surface-container-lowest": "#ffffff",
+            "inverse-primary": "#80d5cb",
+            "secondary-container": "#ffab69",
+            "secondary-fixed": "#ffdcc4",
+            "on-secondary": "#ffffff",
+            "surface-container-low": "#e7f7f4",
+            "on-primary-fixed": "#00201d",
+            "primary": "#005c55",
+            "tertiary-container": "#007952",
+            "secondary": "#8e4e14",
+            "error-container": "#ffdad6",
+            "tertiary": "#005e3f",
+            "primary-container": "#0f766e",
+            "on-tertiary": "#ffffff",
+            "on-primary-fixed-variant": "#00504a",
+            "surface-variant": "#d6e6e2",
+            "surface-container": "#e1f1ee",
+            "outline": "#6e7977",
+            "on-surface": "#101e1c",
+            "on-tertiary-container": "#99ffcd",
+            "on-surface-variant": "#3e4947",
+            "on-secondary-fixed": "#2f1400",
+            "on-background": "#101e1c",
+            "primary-fixed": "#9cf2e8",
+            "surface": "#edfdf9",
+            "on-secondary-container": "#783d01",
+            "on-error": "#ffffff",
+            "on-primary": "#ffffff",
+            "outline-variant": "#bdc9c6",
+            "on-error-container": "#93000a",
+            "tertiary-fixed": "#6ffbbe",
+            "error": "#ba1a1a",
+            "surface-dim": "#cdddda",
+            "background": "#edfdf9",
+            "surface-container-high": "#dcece8",
+            "tertiary-fixed-dim": "#4edea3",
+            "surface-bright": "#edfdf9",
+            "on-secondary-fixed-variant": "#6f3800"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "space-3xl": "3rem",
+            "margin-tablet": "1.5rem",
+            "space-xs": "0.25rem",
+            "gutter": "0.75rem",
+            "space-lg": "1rem",
+            "margin": "1rem",
+            "space-sm": "0.5rem",
+            "gutter-mobile": "0.5rem",
+            "space-md": "0.75rem",
+            "space-xl": "1.5rem",
+            "space-2xl": "2rem"
+          },
+          "fontFamily": {
+            "label-lg": ["Manrope"],
+            "headline-xl": ["Manrope"],
+            "display-lg": ["Manrope"],
+            "headline-md": ["Manrope"],
+            "caption": ["Manrope"],
+            "body-lg": ["Manrope"],
+            "label-md": ["Manrope"],
+            "headline-sm": ["Manrope"],
+            "label-sm": ["Manrope"],
+            "headline-lg": ["Manrope"],
+            "body-md": ["Manrope"],
+            "body-sm": ["Manrope"]
+          },
+          "fontSize": {
+            "label-lg": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+            "headline-xl": ["30px", { "lineHeight": "38px", "letterSpacing": "-0.025em", "fontWeight": "700" }],
+            "display-lg": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.03em", "fontWeight": "800" }],
+            "headline-md": ["20px", { "lineHeight": "28px", "letterSpacing": "-0.015em", "fontWeight": "600" }],
+            "caption": ["12px", { "lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "500" }],
+            "body-lg": ["16px", { "lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "400" }],
+            "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600" }],
+            "headline-sm": ["18px", { "lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.03em", "fontWeight": "600" }],
+            "headline-lg": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+            "body-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.005em", "fontWeight": "400" }],
+            "body-sm": ["13px", { "lineHeight": "18px", "letterSpacing": "0.01em", "fontWeight": "400" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    body {
+      background-color: #F8F5EF; /* Archival Warm Ivory Canvas */
+      color: #101e1c;
+      font-family: 'Manrope', sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .custom-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    /* Subtle camera scanline effect */
+    @keyframes scanline {
+      0% { transform: translateY(-100%); }
+      100% { transform: translateY(220%); }
+    }
+    .animate-scanline {
+      animation: scanline 2.8s ease-in-out infinite;
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="min-h-screen pb-28 pt-16 flex flex-col items-center">
+<!-- ================= TOP APP BAR ================= -->
+<!-- Generated based on Shared Components TopAppBar with style_* execution -->
+<header class="fixed top-0 left-0 w-full z-40 flex items-center justify-between px-margin py-space-sm h-14 bg-surface/85 backdrop-blur-md shadow-sm border-b border-outline-variant/30">
+<div class="flex items-center gap-space-sm">
+<button aria-label="Go back to Dashboard" class="w-10 h-10 rounded-full flex items-center justify-center text-primary hover:bg-surface-container active:scale-95 transition-all duration-150" type="button">
+<span class="material-symbols-outlined text-[24px]" data-icon="arrow_back">arrow_back</span>
+</button>
+<div class="flex flex-col">
+<h1 class="font-headline-sm text-headline-sm text-primary tracking-tight font-bold">Join a Room</h1>
+</div>
+</div>
+<div class="flex items-center gap-1">
+<button aria-label="AI Assist Suggestion" class="w-9 h-9 rounded-full flex items-center justify-center text-primary hover:bg-surface-container active:scale-95 transition-all" type="button">
+<span class="material-symbols-outlined text-[20px]" data-icon="auto_awesome">auto_awesome</span>
+</button>
+</div>
+</header>
+<!-- ================= MAIN CONTENT WRAPPER ================= -->
+<main class="w-full max-w-md px-margin flex flex-col gap-space-xl mt-space-sm">
+<!-- 1. HERO ARCHIVAL CARD BANNER -->
+<section class="relative overflow-hidden rounded-[20px] bg-surface-container-lowest p-space-xl border border-outline-variant/40 shadow-[0px_4px_16px_rgba(37,51,49,0.04)]">
+<!-- Background subtle archival gradient watermark -->
+<div class="absolute -top-12 -right-12 w-36 h-36 rounded-full bg-primary-fixed/30 blur-2xl pointer-events-none"></div>
+<div class="absolute -bottom-8 -left-8 w-28 h-28 rounded-full bg-secondary-container/20 blur-xl pointer-events-none"></div>
+<div class="relative z-10 flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-primary-container bg-primary-fixed/50 font-label-sm text-label-sm uppercase tracking-wider font-semibold">
+<span class="material-symbols-outlined text-[14px]" data-icon="meeting_room">meeting_room</span>
+            Collective Canvas
+          </span>
+<span class="flex items-center gap-1 font-caption text-caption text-outline">
+<span class="material-symbols-outlined text-[15px]" data-icon="lock">lock</span>
+            Encrypted
+          </span>
+</div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface font-bold tracking-tight mt-1">
+          Enter Room Code or Scan QR
+        </h2>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+          Ask the room host for the 6-character room code or invite link to join shared memories.
+        </p>
+</div>
+</section>
+<!-- 2. 6-CHARACTER ROOM CODE INPUT -->
+<section class="flex flex-col gap-space-md">
+<div class="flex items-center justify-between px-0.5">
+<label class="font-label-md text-label-md text-on-surface font-semibold tracking-wide" for="room-char-1">
+          Room Access Key
+        </label>
+<button class="inline-flex items-center gap-1 text-primary hover:text-primary-container font-label-md text-label-md font-semibold transition-colors" type="button">
+<span class="material-symbols-outlined text-[16px]" data-icon="content_paste">content_paste</span>
+          Paste code
+        </button>
+</div>
+<!-- Segmented Input Boxes (C H B - 7 8 2) -->
+<div class="grid grid-cols-6 gap-2 w-full">
+<!-- Box 1 -->
+<div class="relative">
+<input class="w-full h-14 text-center font-headline-lg text-headline-lg font-bold text-primary bg-surface-container-lowest border-2 border-primary-container rounded-xl focus:outline-none focus:ring-4 focus:ring-primary/15 shadow-sm transition-all" id="room-char-1" maxlength="1" type="text" value="C">
+</div>
+<!-- Box 2 -->
+<div class="relative">
+<input class="w-full h-14 text-center font-headline-lg text-headline-lg font-bold text-primary bg-surface-container-lowest border-2 border-primary-container rounded-xl focus:outline-none focus:ring-4 focus:ring-primary/15 shadow-sm transition-all" maxlength="1" type="text" value="H">
+</div>
+<!-- Box 3 -->
+<div class="relative">
+<input class="w-full h-14 text-center font-headline-lg text-headline-lg font-bold text-primary bg-surface-container-lowest border-2 border-primary-container rounded-xl focus:outline-none focus:ring-4 focus:ring-primary/15 shadow-sm transition-all" maxlength="1" type="text" value="B">
+</div>
+<!-- Box 4 -->
+<div class="relative">
+<input class="w-full h-14 text-center font-headline-lg text-headline-lg font-bold text-on-surface bg-surface-container-lowest border border-outline-variant/60 rounded-xl focus:border-primary-container focus:outline-none focus:ring-4 focus:ring-primary/15 shadow-sm placeholder:text-outline-variant transition-all" maxlength="1" placeholder="•" type="text">
+</div>
+<!-- Box 5 -->
+<div class="relative">
+<input class="w-full h-14 text-center font-headline-lg text-headline-lg font-bold text-on-surface bg-surface-container-lowest border border-outline-variant/60 rounded-xl focus:border-primary-container focus:outline-none focus:ring-4 focus:ring-primary/15 shadow-sm placeholder:text-outline-variant transition-all" maxlength="1" placeholder="•" type="text">
+</div>
+<!-- Box 6 -->
+<div class="relative">
+<input class="w-full h-14 text-center font-headline-lg text-headline-lg font-bold text-on-surface bg-surface-container-lowest border border-outline-variant/60 rounded-xl focus:border-primary-container focus:outline-none focus:ring-4 focus:ring-primary/15 shadow-sm placeholder:text-outline-variant transition-all" maxlength="1" placeholder="•" type="text">
+</div>
+</div>
+<div class="flex items-center gap-1.5 px-1 font-caption text-caption text-outline">
+<span class="material-symbols-outlined text-[15px] text-tertiary-container" data-icon="check_circle">check_circle</span>
+<span>Prefix verified: <strong class="text-on-surface font-semibold">ChobiDeh Verified Node</strong></span>
+</div>
+</section>
+<!-- 3. SECONDARY ACTION DIVIDER 'OR' -->
+<div class="flex items-center gap-space-md py-1">
+<div class="flex-1 h-[1px] bg-outline-variant/40"></div>
+<span class="font-label-sm text-label-sm font-bold text-outline px-2 py-0.5 rounded-full bg-surface-container-highest/60 tracking-widest">OR</span>
+<div class="flex-1 h-[1px] bg-outline-variant/40"></div>
+</div>
+<!-- 4. SCAN HOST QR CODE (INTERACTIVE VIEWFINDER CARD) -->
+<section class="group relative rounded-2xl bg-surface-container-lowest border border-outline-variant/50 p-space-lg shadow-[0px_2px_8px_rgba(37,51,49,0.04)] hover:shadow-md transition-all cursor-pointer">
+<div class="flex flex-col sm:flex-row items-center gap-space-lg">
+<!-- Viewfinder Preview Graphic -->
+<div class="relative w-28 h-28 rounded-xl bg-inverse-surface flex items-center justify-center overflow-hidden flex-shrink-0 shadow-inner">
+<!-- Subtle Grid texture -->
+<div class="absolute inset-0 opacity-15 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:8px_8px]"></div>
+<!-- Viewfinder Frame Corners -->
+<div class="absolute top-2 left-2 w-4 h-4 border-t-2 border-l-2 border-secondary-container"></div>
+<div class="absolute top-2 right-2 w-4 h-4 border-t-2 border-r-2 border-secondary-container"></div>
+<div class="absolute bottom-2 left-2 w-4 h-4 border-b-2 border-l-2 border-secondary-container"></div>
+<div class="absolute bottom-2 right-2 w-4 h-4 border-b-2 border-r-2 border-secondary-container"></div>
+<!-- Animated Scanline Laser -->
+<div class="absolute inset-x-2 h-0.5 bg-secondary-container shadow-[0_0_8px_#ffab69] animate-scanline"></div>
+<!-- Central Icon and Badge -->
+<span class="material-symbols-outlined text-inverse-on-surface text-[34px] opacity-90" data-icon="qr_code_scanner">qr_code_scanner</span>
+</div>
+<!-- Scan Info & Action -->
+<div class="flex flex-col items-center sm:items-start text-center sm:text-left flex-1">
+<div class="inline-flex items-center gap-1 text-secondary font-label-sm text-label-sm font-bold uppercase tracking-wider mb-0.5">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+            Instant Optical Sync
+          </div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-semibold">Scan Host QR Code</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">
+            Point camera at host QR badge or gallery monitor display.
+          </p>
+<button class="mt-space-md inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-surface-container text-on-surface font-label-md text-label-md font-semibold group-hover:bg-primary-container group-hover:text-on-primary transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]" data-icon="photo_camera">photo_camera</span>
+            Launch Scanner
+          </button>
+</div>
+</div>
+</section>
+<!-- 5. RECENT INVITATIONS / DISCOVERED NEARBY ROOMS -->
+<section class="flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<h2 class="font-headline-sm text-headline-sm text-on-surface font-bold">Discovered Nearby</h2>
+<span class="px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant font-label-sm text-label-sm font-bold">2 Found</span>
+</div>
+<button class="text-primary hover:text-primary-container font-label-md text-label-md font-semibold flex items-center gap-0.5" type="button">
+<span class="material-symbols-outlined text-[16px]" data-icon="refresh">refresh</span>
+          Rescan
+        </button>
+</div>
+<!-- Nearby Room Cards -->
+<div class="flex flex-col gap-space-sm">
+<!-- Room Item 1: Saint Martin Island Tour -->
+<article class="p-space-md rounded-2xl bg-surface-container-lowest border border-outline-variant/40 shadow-[0px_2px_8px_rgba(37,51,49,0.04)] hover:border-primary/40 transition-all flex flex-col gap-3">
+<div class="flex items-start justify-between gap-3">
+<div class="flex items-center gap-3">
+<!-- Avatar or Thumbnail with archival rounded corner -->
+<div class="relative w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 bg-surface-container-high border border-outline-variant/30">
+<img class="w-full h-full object-cover" data-alt="A sunlit tropical beach scene with clear turquoise waves hitting golden sands and wooden fishing boats in the background. Photographed in an editorial documentary style with soft warm film grain, glowing natural sunlight, and a rich teal and ivory palette." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBmdH8kX7sf-7LrNBQtJVVaqm-UQODPiiXcGswJaWnSdMGBJfc3XYX0RmV9Cbb-q5qGPG7oOWftJfnUk2dyYU-udjBkxudidRQ7e5cgshDTmmwGu7njvbv0sjw73GTfCpdKSHK7fcWiNGnierF1Zyche71BGWUrSfWIXNry2F10Mo1rpj_Gu40L8mXm10GW8-yR0TgpQEtGYv3JAcw5KiX12faNQnUPLT1-o-EeM21D-ZUzyeVBeN5p">
+<span class="absolute bottom-0.5 right-0.5 w-3.5 h-3.5 rounded-full bg-tertiary border-2 border-surface-container-lowest"></span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-2">
+<h4 class="font-headline-sm text-[16px] text-on-surface font-bold leading-tight">Saint Martin Island Tour</h4>
+</div>
+<div class="flex items-center gap-2 mt-0.5 text-on-surface-variant font-body-sm text-body-sm">
+<span>Hosted by <strong class="text-on-surface font-semibold">Rafiqul</strong></span>
+<span class="w-1 h-1 rounded-full bg-outline"></span>
+<span class="inline-flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[14px]" data-icon="group">group</span>
+                    18 members
+                  </span>
+</div>
+</div>
+</div>
+<!-- AI / Peer Badge -->
+<span class="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-label-sm font-label-sm bg-primary-fixed/40 text-primary-container font-semibold">
+<span class="material-symbols-outlined text-[13px]" data-icon="bluetooth_searching">bluetooth_searching</span>
+              Nearby
+            </span>
+</div>
+<div class="flex items-center justify-between pt-2 border-t border-surface-container-high">
+<span class="font-caption text-caption text-outline flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]" data-icon="schedule">schedule</span>
+              Active 4m ago
+            </span>
+<button class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface-container-low hover:bg-primary-container hover:text-on-primary text-primary font-label-md text-label-md font-semibold transition-all active:scale-95" type="button">
+<span>Tap to Request Join</span>
+<span class="material-symbols-outlined text-[15px]" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</article>
+<!-- Room Item 2: Dhaka Art Summit 2025 -->
+<article class="p-space-md rounded-2xl bg-surface-container-lowest border border-outline-variant/40 shadow-[0px_2px_8px_rgba(37,51,49,0.04)] hover:border-primary/40 transition-all flex flex-col gap-3">
+<div class="flex items-start justify-between gap-3">
+<div class="flex items-center gap-3">
+<!-- Avatar or Room Visual preview -->
+<div class="relative w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 bg-surface-container-high border border-outline-variant/30">
+<img class="w-full h-full object-cover" data-alt="An expansive modern contemporary art exhibition hall displaying large canvas paintings and geometric installations under warm gallery spotlighting. The space feels tactile, refined, and editorial with clean negative space, subtle concrete textures, and deep teal shadow accents." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDHtJyAPXW1Tgyx_6gkUzhmK8anRuBWANElD-Y5DwCYQ90V7fubWN9J2VOz2yIWoQZMLB9rPc2bb41hPCG6L-uYBcJqljhNEWXb6bf_kSVuf-z8M98rOU5ZDea60sMLDKEgH84ZufM2togz7rkv7XYLtDOibq-DjP9UAIpJ9TiuBY_dZgN57jE4BhoYjRCW4dOg4GbpuP0R9HD9vPKtZ2bhGPmhi7wv_794jX_uh-yS-lNwujL24Jun">
+<span class="absolute bottom-0.5 right-0.5 w-3.5 h-3.5 rounded-full bg-secondary-container border-2 border-surface-container-lowest"></span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-2">
+<h4 class="font-headline-sm text-[16px] text-on-surface font-bold leading-tight">Dhaka Art Summit 2025</h4>
+</div>
+<div class="flex items-center gap-2 mt-0.5 text-on-surface-variant font-body-sm text-body-sm">
+<span>Hosted by <strong class="text-on-surface font-semibold">Samira</strong></span>
+<span class="w-1 h-1 rounded-full bg-outline"></span>
+<span class="inline-flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[14px]" data-icon="group">group</span>
+                    32 members
+                  </span>
+</div>
+</div>
+</div>
+<span class="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-label-sm font-label-sm bg-secondary-fixed/50 text-secondary font-semibold">
+<span class="material-symbols-outlined text-[13px]" data-icon="auto_awesome">auto_awesome</span>
+              Shared Event
+            </span>
+</div>
+<div class="flex items-center justify-between pt-2 border-t border-surface-container-high">
+<span class="font-caption text-caption text-outline flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]" data-icon="pin_drop">pin_drop</span>
+              Shilpakala Academy
+            </span>
+<button class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface-container-low hover:bg-primary-container hover:text-on-primary text-primary font-label-md text-label-md font-semibold transition-all active:scale-95" type="button">
+<span>Tap to Request Join</span>
+<span class="material-symbols-outlined text-[15px]" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</article>
+</div>
+</section>
+<!-- 6. PRIMARY CTA BUTTON: 'Join Room' (Deep Teal button) -->
+<div class="pt-space-xs flex flex-col gap-space-sm">
+<button class="w-full py-3.5 px-space-xl rounded-[14px] bg-primary-container hover:bg-primary text-on-primary font-label-lg text-label-lg font-bold tracking-wide shadow-[0px_4px_12px_rgba(15,118,110,0.25)] active:scale-[0.98] transition-all flex items-center justify-center gap-2" type="button">
+<span class="material-symbols-outlined text-[20px]" data-icon="login">login</span>
+<span>Join Room</span>
+</button>
+<!-- 7. PRIVACY ASSURANCE FOOTNOTE -->
+<footer class="flex items-start justify-center gap-2 px-space-sm text-center">
+<span class="material-symbols-outlined text-outline text-[16px] mt-0.5 flex-shrink-0" data-icon="verified_user">verified_user</span>
+<p class="font-caption text-caption text-outline leading-tight">
+          Rooms are end-to-end access controlled. Only confirmed members can view photos.
+        </p>
+</footer>
+</div>
+</main>
+<!-- ================= BOTTOM NAVIGATION BAR ================= -->
+<!-- Generated directly based on Shared Components BottomNavBar with mandatory style_* mapping -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-margin pt-space-xs pb-safe min-h-[64px] bg-surface-container-lowest/90 backdrop-blur-lg shadow-[0px_-2px_12px_rgba(37,51,49,0.06)] border-t border-outline-variant/30">
+<!-- Item 1: Rooms (ACTIVE - Current Intent is Join a Room / Rooms cluster) -->
+<button class="flex flex-col items-center justify-center text-primary font-semibold py-1.5 px-3 rounded-full bg-primary-fixed/40 active:scale-95 transition-transform duration-150" type="button">
+<span class="material-symbols-outlined text-[22px]" data-icon="meeting_room" data-weight="fill" style="font-variation-settings: 'FILL' 1;">meeting_room</span>
+<span class="font-label-sm text-label-sm mt-0.5">Rooms</span>
+</button>
+<!-- Item 2: Gallery -->
+<button class="flex flex-col items-center justify-center text-on-surface-variant py-1.5 px-3 hover:text-primary active:scale-95 transition-colors duration-150" type="button">
+<span class="material-symbols-outlined text-[22px]" data-icon="photo_library">photo_library</span>
+<span class="font-label-sm text-label-sm mt-0.5">Gallery</span>
+</button>
+<!-- Item 3: People -->
+<button class="flex flex-col items-center justify-center text-on-surface-variant py-1.5 px-3 hover:text-primary active:scale-95 transition-colors duration-150" type="button">
+<span class="material-symbols-outlined text-[22px]" data-icon="group">group</span>
+<span class="font-label-sm text-label-sm mt-0.5">People</span>
+</button>
+<!-- Item 4: Profile -->
+<button class="flex flex-col items-center justify-center text-on-surface-variant py-1.5 px-3 hover:text-primary active:scale-95 transition-colors duration-150" type="button">
+<span class="material-symbols-outlined text-[22px]" data-icon="person">person</span>
+<span class="font-label-sm text-label-sm mt-0.5">Profile</span>
+</button>
+</nav>
+<!-- Inline Micro-interactions helper -->
+<script>
+    // Auto-advance cursor logic for segmented inputs
+    const inputs = document.querySelectorAll('input[type="text"][maxlength="1"]');
+    inputs.forEach((input, index) => {
+      input.addEventListener('input', (e) => {
+        if (e.target.value.length === 1 && index < inputs.length - 1) {
+          inputs[index + 1].focus();
+        }
+      });
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Backspace' && e.target.value === '' && index > 0) {
+          inputs[index - 1].focus();
+        }
+      });
+    });
+  </script>
+</body></html>

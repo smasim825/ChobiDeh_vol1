@@ -1,0 +1,262 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>ChobiDeh — Check Your Email</title>
+<!-- Google Fonts: Manrope -->
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<!-- Tailwind CSS CDN -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Configuration verbatim -->
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "surface-container-highest": "#d6e6e2",
+            "on-primary-fixed-variant": "#00504a",
+            "secondary-container": "#ffab69",
+            "on-error-container": "#93000a",
+            "surface-container-lowest": "#ffffff",
+            "surface-tint": "#006a63",
+            "surface-variant": "#d6e6e2",
+            "inverse-on-surface": "#e4f4f1",
+            "surface-container-low": "#e7f7f4",
+            "secondary": "#8e4e14",
+            "tertiary-fixed-dim": "#4edea3",
+            "outline": "#6e7977",
+            "on-primary-fixed": "#00201d",
+            "tertiary": "#005e3f",
+            "tertiary-fixed": "#6ffbbe",
+            "on-tertiary-fixed-variant": "#005236",
+            "error-container": "#ffdad6",
+            "on-secondary-fixed-variant": "#6f3800",
+            "secondary-fixed-dim": "#ffb780",
+            "on-secondary-fixed": "#2f1400",
+            "on-surface-variant": "#3e4947",
+            "on-secondary-container": "#783d01",
+            "on-primary": "#ffffff",
+            "on-secondary": "#ffffff",
+            "on-primary-container": "#a3faef",
+            "error": "#ba1a1a",
+            "background": "#edfdf9",
+            "primary-fixed": "#9cf2e8",
+            "on-tertiary-fixed": "#002113",
+            "secondary-fixed": "#ffdcc4",
+            "surface-bright": "#edfdf9",
+            "tertiary-container": "#007952",
+            "on-error": "#ffffff",
+            "inverse-surface": "#253331",
+            "on-surface": "#101e1c",
+            "outline-variant": "#bdc9c6",
+            "inverse-primary": "#80d5cb",
+            "on-background": "#101e1c",
+            "surface-container": "#e1f1ee",
+            "on-tertiary-container": "#99ffcd",
+            "on-tertiary": "#ffffff",
+            "primary-fixed-dim": "#80d5cb",
+            "surface-container-high": "#dcece8",
+            "primary": "#005c55",
+            "surface-dim": "#cdddda",
+            "primary-container": "#0f766e",
+            "surface": "#edfdf9"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "space-lg": "1rem",
+            "space-xs": "0.25rem",
+            "gutter": "0.75rem",
+            "space-3xl": "3rem",
+            "space-sm": "0.5rem",
+            "margin": "1rem",
+            "space-xl": "1.5rem",
+            "margin-tablet": "1.5rem",
+            "gutter-mobile": "0.5rem",
+            "space-2xl": "2rem",
+            "space-md": "0.75rem"
+          },
+          "fontFamily": {
+            "label-lg": ["Manrope"],
+            "headline-md": ["Manrope"],
+            "headline-sm": ["Manrope"],
+            "display-lg": ["Manrope"],
+            "label-sm": ["Manrope"],
+            "body-lg": ["Manrope"],
+            "headline-xl": ["Manrope"],
+            "body-sm": ["Manrope"],
+            "label-md": ["Manrope"],
+            "body-md": ["Manrope"],
+            "headline-lg": ["Manrope"],
+            "caption": ["Manrope"]
+          },
+          "fontSize": {
+            "label-lg": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+            "headline-md": ["20px", { "lineHeight": "28px", "letterSpacing": "-0.015em", "fontWeight": "600" }],
+            "headline-sm": ["18px", { "lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "display-lg": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.03em", "fontWeight": "800" }],
+            "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.03em", "fontWeight": "600" }],
+            "body-lg": ["16px", { "lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "400" }],
+            "headline-xl": ["30px", { "lineHeight": "38px", "letterSpacing": "-0.025em", "fontWeight": "700" }],
+            "body-sm": ["13px", { "lineHeight": "18px", "letterSpacing": "0.01em", "fontWeight": "400" }],
+            "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600" }],
+            "body-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.005em", "fontWeight": "400" }],
+            "headline-lg": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+            "caption": ["12px", { "lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "500" }]
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-background text-on-surface antialiased min-h-screen flex justify-center selection:bg-primary/20 selection:text-primary">
+<!-- Mobile Screen Container (approx 390px - 412px width) -->
+<main class="w-full max-w-[412px] min-h-screen flex flex-col bg-background relative overflow-x-hidden pb-8 px-4">
+<!-- iOS / Android Status Bar Simulator -->
+
+<!-- Navigation Bar: Back & Security Badge -->
+<nav class="w-full flex items-center justify-between py-2 mb-2">
+<a aria-label="Go back to previous screen" class="w-10 h-10 rounded-full bg-surface-container-lowest border border-outline-variant/40 shadow-sm flex items-center justify-center text-on-surface active:scale-95 hover:bg-surface-container transition-all duration-150" href="#">
+<span class="material-symbols-outlined text-[20px]">arrow_back</span>
+</a>
+<!-- Security Status Badge -->
+<div class="flex items-center gap-1.5 px-3 py-1 bg-surface-container-low border border-outline-variant/30 rounded-full">
+<span class="material-symbols-outlined text-[14px] text-primary" data-weight="fill" style="font-variation-settings: 'FILL' 1;">lock</span>
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-primary font-bold">SECURE VERIFICATION</span>
+</div>
+<div class="w-10 h-10 opacity-0 pointer-events-none"></div>
+</nav>
+<!-- ChobiDeh Brand Header -->
+<section class="flex flex-col items-center justify-center my-3">
+<img alt="ChobiDeh" class="h-9 w-auto object-contain transition-transform duration-200" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCCqjg_DnMJxBn3w3l-c-TpMvb382rl4C4C5mVfJEc2-eewO92jlhABMPlfBqBlMQgc85xRqnb0N8vHnTB3XYnF-lvkxZ1L97rwvom2guW5wVWwn82_dYohdURRBpP0wE8zb7b5JlXVXn2qrFuSXLzCvU-y58cy-eHOeYh_tUEvohwDFDnQPWaAYIt9JT6wXm1dlx1znOyUduu0hGh9zf2vZn8c9Gds4PIDaHkzz6nYU3IGXyPP35YYPU9pii6imc_CoQ">
+</section>
+<!-- Main Content Card: Archival Warmth Tier 1 Elevation -->
+<div class="w-full bg-surface-container-lowest rounded-[28px] border border-outline-variant/40 shadow-sm p-6 flex flex-col items-center text-center relative overflow-hidden mt-1 mb-4">
+<!-- Subtle Archival Top Border Glow Accent -->
+<div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-primary/30 to-transparent"></div>
+<!-- Envelope / Sent Illustration Badge -->
+<div class="relative my-2">
+<div class="w-20 h-20 rounded-full bg-surface-container-low flex items-center justify-center border border-outline-variant/30 shadow-inner">
+<span class="material-symbols-outlined text-[38px] text-primary" data-weight="fill" style="font-variation-settings: 'FILL' 1;">mark_email_read</span>
+</div>
+<div class="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-primary text-on-primary flex items-center justify-center shadow-md border-2 border-surface-container-lowest">
+<span class="material-symbols-outlined text-[16px] font-bold">check</span>
+</div>
+</div>
+<!-- Headline -->
+<h1 class="font-headline-lg text-headline-lg text-on-surface mt-4 mb-2 tracking-tight">Check Your Email</h1>
+<!-- Explanatory Copy -->
+<p class="font-body-md text-body-md text-on-surface-variant max-w-[280px] leading-relaxed mb-4">
+        We have sent password recovery instructions and a secure reset link to:
+      </p>
+<!-- Highlighted Email Address Pill with Edit/Change Trigger -->
+<div class="w-full bg-surface-container-low border border-outline-variant/50 rounded-full py-2.5 px-4 flex items-center justify-between mb-5 group">
+<div class="flex items-center gap-2 overflow-hidden">
+<span class="material-symbols-outlined text-[18px] text-primary shrink-0">alternate_email</span>
+<span class="font-label-lg text-label-lg text-on-surface truncate font-semibold">tim.jennings@example.com</span>
+</div>
+<button aria-label="Edit email address" class="w-7 h-7 rounded-full flex items-center justify-center text-on-surface-variant hover:text-primary hover:bg-surface-container-highest/60 transition-colors shrink-0" type="button">
+<span class="material-symbols-outlined text-[16px]">edit</span>
+</button>
+</div>
+<!-- Expiry Notice / Security Timer Alert Pill -->
+<div class="w-full bg-surface-container/60 border border-outline-variant/30 rounded-xl p-3 flex items-start gap-2.5 text-left mb-6">
+<span class="material-symbols-outlined text-[18px] text-primary shrink-0 mt-0.5">schedule</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant leading-snug">
+          Link valid for <span class="font-semibold text-on-surface">15 minutes</span>. For security, old links expire immediately upon issuing.
+        </p>
+</div>
+<!-- Primary Action CTA Button: Open Email App -->
+<a class="w-full bg-primary-container text-on-primary py-3.5 px-5 rounded-full font-label-lg text-label-lg shadow-sm hover:bg-primary transition-all duration-150 flex items-center justify-center gap-2 active:scale-[0.98]" href="mailto:">
+<span class="">Open Email App</span>
+<span class="material-symbols-outlined text-[18px]">open_in_new</span>
+</a>
+<!-- Resend Counter Section -->
+<div class="mt-5 flex flex-col items-center gap-1.5">
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+          Didn't receive the email?
+        </p>
+<div class="flex items-center gap-1.5 text-outline">
+<span class="material-symbols-outlined text-[16px]">history</span>
+<span class="font-label-md text-label-md font-semibold text-outline hidden" id="countdown-text">Resend in <span id="timer" class="">1</span>s</span>
+<button class="text-primary font-label-md text-label-md font-bold hover:underline transition-all" id="resend-btn" type="button">Resend Email</button>
+</div>
+</div>
+<div class="w-full my-5 border-t border-outline-variant/30"></div>
+<!-- Back to Login Navigation -->
+<a class="inline-flex items-center gap-1.5 font-label-lg text-label-lg text-primary hover:text-on-primary-fixed-variant transition-colors group" href="#">
+<span class="material-symbols-outlined text-[18px] group-hover:-translate-x-0.5 transition-transform">arrow_back</span>
+<span class="">Back to Login</span>
+</a>
+</div>
+<!-- Need Help / Support Helper -->
+<div class="w-full flex items-center justify-center mb-4">
+<p class="font-body-sm text-body-sm text-on-surface-variant flex items-center gap-1.5">
+<span class="">Need help?</span>
+<a class="font-label-md text-label-md text-primary font-semibold hover:underline flex items-center gap-0.5" href="#">
+<span class="">Contact ChobiDeh Support</span>
+<span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+</a>
+</p>
+</div>
+<!-- Bottom Privacy Callout Card -->
+<div class="w-full bg-surface-container-low rounded-2xl border border-outline-variant/40 p-4 mb-4 flex items-start gap-3">
+<div class="w-8 h-8 rounded-full bg-surface-container-lowest border border-outline-variant/30 flex items-center justify-center shrink-0 text-primary">
+<span class="material-symbols-outlined text-[18px]" data-weight="fill" style="font-variation-settings: 'FILL' 1;">verified_user</span>
+</div>
+<div class="flex-1">
+<p class="font-label-md text-label-md font-bold text-on-surface mb-0.5">Privacy-first architecture</p>
+<p class="font-caption text-caption text-on-surface-variant leading-relaxed">
+          Password reset tokens are end-to-end encrypted, single-use, and automatically sanitized from collective room access logs.
+        </p>
+</div>
+</div>
+<!-- Legal Terms & Privacy Footer -->
+<footer class="mt-auto pt-2 text-center">
+<p class="font-caption text-caption text-outline leading-tight max-w-[320px] mx-auto">
+        By continuing, you agree to ChobiDeh's <a class="underline hover:text-on-surface" href="#">Terms of Service</a> and <a class="underline hover:text-on-surface" href="#">Privacy Policy</a>.
+      </p>
+<div class="w-32 h-1 bg-on-surface/20 rounded-full mx-auto mt-4"></div>
+</footer>
+</main>
+<!-- Interactive Lightweight Micro-interaction for Countdown -->
+<script>
+    (function() {
+      let seconds = 54;
+      const timerElement = document.getElementById('timer');
+      const resendBtn = document.getElementById('resend-btn');
+      const countdownWrapper = document.getElementById('countdown-text');
+
+      if (timerElement && resendBtn && countdownWrapper) {
+        const interval = setInterval(() => {
+          seconds--;
+          if (seconds > 0) {
+            timerElement.textContent = seconds;
+          } else {
+            clearInterval(interval);
+            countdownWrapper.classList.add('hidden');
+            resendBtn.classList.remove('hidden');
+          }
+        }, 1000);
+
+        resendBtn.addEventListener('click', () => {
+          seconds = 60;
+          timerElement.textContent = seconds;
+          resendBtn.classList.add('hidden');
+          countdownWrapper.classList.remove('hidden');
+        });
+      }
+    })();
+  </script>
+
+
+</body></html>

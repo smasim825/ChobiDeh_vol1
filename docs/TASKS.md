@@ -3,7 +3,8 @@
 Keep this file current, but GitHub Issues should be the canonical tracker once the repository is connected.
 
 ## Backlog
-- [ ] Confirm client platform: Flutter or React web.
+- [x] Confirm client platform: React web.
+- [x] Implement authentication pages (Login, Sign Up, Forgot Password, Check Email).
 - [ ] Interview target users and validate the room workflow.
 - [ ] Finalize MVP acceptance criteria.
 - [ ] Choose authentication approach.
@@ -12,12 +13,12 @@ Keep this file current, but GitHub Issues should be the canonical tracker once t
 - [ ] Finalize API request/response contracts.
 - [ ] Finalize database schema and migrations.
 - [ ] Create project skeleton and CI checks.
-- [ ] Implement account/profile/dashboard.
-- [ ] Implement room creation and joining.
+- [x] Implement account/profile/dashboard (Home Page with rooms, background AI banner, and modals).
+- [ ] Implement room creation and joining backend integration.
 - [ ] Implement secure photo upload and gallery.
 - [ ] Implement asynchronous AI job processing.
 - [ ] Evaluate face detection/embedding models.
-- [ ] Implement three-level matching and manual correction.
+- [x] Update specifications and UI to reflect 3-Level AI Face Clustering architecture (Confident Clustering, Uncertain Matches, Unsorted, no selfies required).
 - [ ] Add security, privacy, and deletion tests.
 - [ ] Run private beta and review metrics.
 

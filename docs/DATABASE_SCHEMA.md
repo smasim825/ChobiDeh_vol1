@@ -11,14 +11,11 @@ This is a logical starting point, not a final migration. Review relationships, c
 - `avatar_object_key` (optional)
 - `created_at`, `updated_at`, `deleted_at`
 
-### `biometric_consents`
+### `user_preferences`
 - `id`
 - `user_id`
-- `purpose`
-- `policy_version`
-- `consented_at`
-- `withdrawn_at`
-- Avoid storing more consent data than needed.
+- `face_clustering_enabled` (boolean)
+- `updated_at`
 
 ### `rooms`
 - `id`
@@ -46,41 +43,43 @@ This is a logical starting point, not a final migration. Review relationships, c
 - `processing_status`
 - `created_at`, `deleted_at`
 
-### `room_people`
+### `room_person_clusters` (Level 1 Confident Clustering)
 - `id`
 - `room_id`
-- `display_label` or member reference when confirmed
-- `created_by` / confirmation metadata
+- `cluster_code` (e.g. "person-1", "person-2")
+- `display_name` (optional user-assigned name e.g. "Rafiqul", "Samira")
 - `created_at`, `deleted_at`
-- Keep identity scope room-specific initially.
-
-### `face_templates` (sensitive)
-- `id`
-- `room_person_id`
-- `user_id` or consent subject reference
-- encrypted embedding representation or protected reference
-- `model_version`
-- `created_at`, `deleted_at`
-- Strictly restrict access; decide whether to store embeddings or recompute them.
+- Scoped strictly to the room.
 
 ### `face_instances`
 - `id`
 - `media_id`
-- face bounding box and minimal processing metadata
-- `room_person_id` nullable
-- `match_status`
+- `cluster_id` nullable (null indicates Level 3 Unsorted)
+- bounding box coordinates
+- `embedding_vector` (protected/encrypted vector or reference)
+- `confidence_score`
 - `model_version`
-- Avoid storing unnecessary crops or raw biometric data.
+- `created_at`
+
+### `uncertain_matches` (Level 2 Suggestions)
+- `id`
+- `room_id`
+- `source_cluster_id`
+- `target_cluster_id` (or `face_instance_id`)
+- `similarity_score`
+- `status` (`pending_review`, `merged`, `dismissed`)
+- `reviewed_by` nullable
+- `reviewed_at` nullable
+- `created_at`
 
 ### `photo_assignments`
 - `id`
 - `media_id`
-- `room_person_id`
-- `decision_source` (`automatic`, `suggested_confirmed`, `manual`)
-- `confidence_band` or validated score metadata
-- `created_by` nullable for automatic assignments
+- `cluster_id` nullable (nullable = Level 3 Unsorted)
+- `assignment_level` (`level_1_confident`, `level_2_confirmed_merge`, `level_3_manual`)
+- `assigned_by` nullable (null for automatic Level 1 clustering)
 - `created_at`, `updated_at`
-- unique constraint appropriate to `(media_id, room_person_id)`
+- unique constraint on `(media_id, cluster_id)`
 
 ### `processing_jobs`
 - `id`

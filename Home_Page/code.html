@@ -1,0 +1,408 @@
+<!DOCTYPE html><html class="h-full bg-surface" lang="en" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>ChobiDeh — Home Dashboard</title>
+<!-- Google Fonts: Manrope -->
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<!-- Tailwind CSS v3 with plugins -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config verbatim injection -->
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "tertiary-container": "#007952",
+            "on-tertiary": "#ffffff",
+            "surface-variant": "#d6e6e2",
+            "on-tertiary-container": "#99ffcd",
+            "error-container": "#ffdad6",
+            "inverse-on-surface": "#e4f4f1",
+            "on-tertiary-fixed-variant": "#005236",
+            "primary-fixed": "#9cf2e8",
+            "secondary": "#8e4e14",
+            "outline-variant": "#bdc9c6",
+            "error": "#ba1a1a",
+            "secondary-fixed-dim": "#ffb780",
+            "on-error": "#ffffff",
+            "primary": "#005c55",
+            "on-tertiary-fixed": "#002113",
+            "on-secondary-container": "#783d01",
+            "tertiary-fixed": "#6ffbbe",
+            "surface-container-low": "#e7f7f4",
+            "surface-container": "#e1f1ee",
+            "on-background": "#101e1c",
+            "primary-fixed-dim": "#80d5cb",
+            "surface": "#edfdf9",
+            "tertiary": "#005e3f",
+            "on-surface": "#101e1c",
+            "background": "#edfdf9",
+            "inverse-primary": "#80d5cb",
+            "secondary-fixed": "#ffdcc4",
+            "surface-container-lowest": "#ffffff",
+            "on-error-container": "#93000a",
+            "tertiary-fixed-dim": "#4edea3",
+            "surface-container-highest": "#d6e6e2",
+            "on-primary": "#ffffff",
+            "on-secondary": "#ffffff",
+            "inverse-surface": "#253331",
+            "on-primary-container": "#a3faef",
+            "outline": "#6e7977",
+            "on-primary-fixed": "#00201d",
+            "on-secondary-fixed-variant": "#6f3800",
+            "on-primary-fixed-variant": "#00504a",
+            "on-secondary-fixed": "#2f1400",
+            "surface-dim": "#cdddda",
+            "surface-container-high": "#dcece8",
+            "primary-container": "#0f766e",
+            "surface-tint": "#006a63",
+            "on-surface-variant": "#3e4947",
+            "secondary-container": "#ffab69",
+            "surface-bright": "#edfdf9"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "gutter-mobile": "0.5rem",
+            "space-sm": "0.5rem",
+            "margin": "1rem",
+            "space-xs": "0.25rem",
+            "space-xl": "1.5rem",
+            "margin-tablet": "1.5rem",
+            "gutter": "0.75rem",
+            "space-3xl": "3rem",
+            "space-2xl": "2rem",
+            "space-md": "0.75rem",
+            "space-lg": "1rem"
+          },
+          "fontFamily": {
+            "body-sm": ["Manrope"],
+            "caption": ["Manrope"],
+            "headline-lg": ["Manrope"],
+            "display-lg": ["Manrope"],
+            "label-lg": ["Manrope"],
+            "headline-md": ["Manrope"],
+            "headline-xl": ["Manrope"],
+            "body-md": ["Manrope"],
+            "headline-sm": ["Manrope"],
+            "label-md": ["Manrope"],
+            "body-lg": ["Manrope"],
+            "label-sm": ["Manrope"]
+          },
+          "fontSize": {
+            "body-sm": ["13px", { "lineHeight": "18px", "letterSpacing": "0.01em", "fontWeight": "400" }],
+            "caption": ["12px", { "lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "500" }],
+            "headline-lg": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+            "display-lg": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.03em", "fontWeight": "800" }],
+            "label-lg": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+            "headline-md": ["20px", { "lineHeight": "28px", "letterSpacing": "-0.015em", "fontWeight": "600" }],
+            "headline-xl": ["30px", { "lineHeight": "38px", "letterSpacing": "-0.025em", "fontWeight": "700" }],
+            "body-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.005em", "fontWeight": "400" }],
+            "headline-sm": ["18px", { "lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600" }],
+            "body-lg": ["16px", { "lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "400" }],
+            "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.03em", "fontWeight": "600" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .custom-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+</head>
+<body class="bg-surface text-on-surface font-body-md min-h-screen flex flex-col selection:bg-primary selection:text-on-primary antialiased pb-24">
+<!-- Top App Bar (Shared Component Anchor) -->
+<header class="bg-surface/85 backdrop-blur-md text-primary docked full-width top-0 sticky z-40 shadow-sm">
+<div class="flex justify-between items-center w-full px-4 h-14 max-w-lg mx-auto">
+<!-- Leading Brand & Logo Anchor -->
+<div class="flex items-center gap-2">
+<!-- Brand Emblem with Aperture ring inspired by ChobiDeh logo -->
+<div class="w-8 h-8 rounded-xl bg-primary-container flex items-center justify-center text-on-primary shadow-xs relative">
+<div class="w-5 h-5 rounded-full border-2 border-white/90 border-dashed flex items-center justify-center">
+<div class="w-2 h-2 rounded-full bg-secondary-container"></div>
+</div>
+</div>
+<span class="text-headline-md font-headline-md font-bold text-primary tracking-tight">Chobi<span class="text-primary-container">Deh</span></span>
+</div>
+<!-- Trailing Action Icons -->
+<div class="flex items-center gap-2">
+<button aria-label="Notifications" class="relative w-9 h-9 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container active:scale-95 transition-all" type="button">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-secondary"></span>
+</button>
+<button aria-label="User Profile" class="relative pl-1" type="button">
+<div class="w-8 h-8 rounded-full ring-2 ring-primary/20 overflow-hidden bg-surface-variant flex items-center justify-center">
+<img class="w-full h-full object-cover" data-alt="High-resolution warm close-up portrait photograph of an energetic South Asian traveler with glasses and a friendly open smile against soft morning natural sunlight, editorial photography style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBOywiE7V8t1qbeeXpXX6gvjcINY4_kmN-zdjgJvvP1hXImASFvuTOFsRkiHZWFlA3PVsZanagfSZuBuf0KUkaw0hxUedCOLenmHwF-qw2uNb4Z-VeBclVtL0XyAXnmbcSCMUtnwp7VchVrs2ByLde60XhJe1cdhCgAsMywV-uDbPqIwEApa-hT4ExnW1mvbv54XLy2DE6IOmtKkWtXlAAldMBpNKtzedQQ48UCGGM6PzgmAn5oVnuL">
+</div>
+<span class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-tertiary-container ring-2 ring-surface-container-lowest"></span>
+</button>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="w-full max-w-lg mx-auto px-4 pt-3 flex flex-col gap-5">
+<!-- Subtle AI Activity Banner -->
+<div class="w-full bg-surface-container-low rounded-xl p-3 flex items-center justify-between shadow-sm border border-outline-variant/30 transition-all hover:bg-surface-container">
+<div class="flex items-center gap-2.5 min-w-0">
+<div class="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[18px]" data-icon="auto_awesome" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+</div>
+<div class="min-w-0">
+<div class="flex items-center gap-1.5">
+<span class="inline-block w-2 h-2 rounded-full bg-secondary-container animate-pulse"></span>
+<p class="text-caption font-caption text-primary font-semibold tracking-wide">ORGANIZING IN BACKGROUND</p>
+</div>
+<p class="text-body-sm font-body-sm text-inverse-surface font-medium truncate">12 new photos from Cox's Bazar</p>
+</div>
+</div>
+<div class="flex items-center gap-2 pl-2 shrink-0">
+<button class="text-label-md font-label-md text-primary font-bold hover:underline active:scale-95 transition-transform">View</button>
+<button aria-label="Dismiss banner" class="text-on-surface-variant hover:text-on-surface p-1">
+<span class="material-symbols-outlined text-[16px]" data-icon="close">close</span>
+</button>
+</div>
+</div>
+<!-- Hero Greeting & Core Room Actions -->
+<section class="flex flex-col gap-3.5 pt-1">
+<div>
+<h1 class="text-headline-lg font-headline-lg text-inverse-surface tracking-tight">Ready for your next memory?</h1>
+<p class="text-body-md font-body-md text-on-surface-variant">All your favorite moments, together.</p>
+</div>
+<!-- Action Buttons Row -->
+<div class="grid grid-cols-2 gap-3 pt-1">
+<!-- Primary CTA: Create a Room -->
+<button class="flex items-center justify-center gap-2 bg-primary-container text-on-primary py-3 px-4 rounded-xl font-label-lg text-label-lg shadow-sm hover:opacity-95 active:scale-98 transition-all">
+<span class="material-symbols-outlined text-[20px]" data-icon="add">add</span>
+<span class="">Create a Room</span>
+</button>
+<!-- Secondary CTA: Join a Room -->
+<button class="flex items-center justify-center gap-2 bg-surface-container-lowest text-primary border border-primary/30 py-3 px-4 rounded-xl font-label-lg text-label-lg shadow-xs hover:bg-surface-container-low active:scale-98 transition-all">
+<span class="material-symbols-outlined text-[20px]" data-icon="group_add">group_add</span>
+<span class="">Join a Room</span>
+</button>
+</div>
+</section>
+<!-- Section 1: "Your Memories" (Shared Rooms) -->
+<section class="flex flex-col gap-3">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<h2 class="text-headline-sm font-headline-sm text-inverse-surface">Your Memories</h2>
+<span class="text-label-sm font-label-sm bg-surface-container text-on-surface-variant px-2 py-0.5 rounded-full">3 active</span>
+</div>
+<button class="text-label-md font-label-md text-primary font-semibold hover:text-primary-container transition-colors">See all (3)</button>
+</div>
+<!-- Shared Rooms List / Cards -->
+<div class="flex flex-col gap-4">
+<!-- Room 1: Cox's Bazar Trip -->
+<div class="relative bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm border border-outline-variant/30 hover:shadow-md transition-shadow group">
+<!-- Room Cover Image with Gradient -->
+<div class="relative h-44 w-full overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Vibrant panoramic view of Cox's Bazar beach at golden sunset with warm orange and teal reflections on ocean tides, soft gentle sea spray, and distant silhouettes of travelers walking along the endless sandbar in cinematic warm tone photography." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBf-dFHqUJzS6AsGnsObKvM1ZSYPEdqaqwLfEuSU-KzRO7pCyUQdPC46ziMPT-Goedt16W0YlOfRn2_oGkrNBzp2iBxNtmiroEhqFkiWTCpZCk25vrJ5UiwMpdfS7-Udoz3ItUatALRG2r49VR26O_qimwtia7lBupaZf3r4OIZtleDm4yZ5nqS4f1vj63pd2EcODsRTI37gyioFoeiLReYSG09_cfUlcjUH8XyjtgirYLX2VTI4UuK">
+<div class="absolute inset-0 bg-gradient-to-t from-inverse-surface/90 via-inverse-surface/30 to-transparent"></div>
+<!-- Badges overlay Top -->
+<div class="absolute top-3 left-3 right-3 flex items-center justify-between">
+<span class="bg-secondary text-on-secondary text-label-sm font-label-sm px-2.5 py-0.5 rounded-full shadow-xs flex items-center gap-1 font-bold">
+<span class="w-1.5 h-1.5 rounded-full bg-white"></span>
+                New
+              </span>
+<span class="bg-inverse-surface/60 backdrop-blur-md text-white text-caption font-caption px-2.5 py-1 rounded-full flex items-center gap-1 border border-white/20">
+<span class="material-symbols-outlined text-[14px]" data-icon="photo_camera">photo_camera</span>
+                142 photos
+              </span>
+</div>
+<!-- Content overlay Bottom -->
+<div class="absolute bottom-3 left-3 right-3 flex items-end justify-between">
+<div>
+<p class="text-caption font-caption text-secondary-fixed font-semibold tracking-wide uppercase">Coastal Trip</p>
+<h3 class="text-headline-sm font-headline-sm text-white font-bold tracking-tight">Cox's Bazar Trip</h3>
+</div>
+<span class="text-caption font-caption text-surface-variant font-medium">Updated 2h ago</span>
+</div>
+</div>
+<!-- Bottom Room Card Tray: Members & Actions -->
+<div class="p-3 flex items-center justify-between bg-surface-container-lowest">
+<!-- Member Avatars Stack -->
+<div class="flex items-center">
+<div class="flex -space-x-2 overflow-hidden items-center pr-2">
+<div class="inline-block h-7 w-7 rounded-full ring-2 ring-white overflow-hidden">
+<img class="h-full w-full object-cover" data-alt="Portrait photo of a young smiling woman wearing a yellow linen shirt against soft coastal daylight with warm ivory tones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCfxRNFQFSdCj8iajZ62oVX4SzJqF2lhS2YNhkfQbV8UYwhsNa2-t6lCzChqYPq9MeqNFCBgZQjUh9GYMRxWzDoi4xE2bkdLiimgBum4O66sc20BGnqGfJEEhKwalnxiOK2LOW5vegS5ipMDSoqGaKpB3Oa9AN3Tkyk3zV1xN12JqJfhaG3Qi8tfE-Vaz2yMcML30r2HJoV2DFVtM9cSVJXU6h0mTIknIi19BBT3d7Zl-g161ja1OOw">
+</div>
+<div class="inline-block h-7 w-7 rounded-full ring-2 ring-white overflow-hidden">
+<img class="h-full w-full object-cover" data-alt="Portrait photo of a joyful friend wearing a navy travel cap outdoors in golden afternoon light, candid and authentic style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuApXnDbtVFoEwAchXY_hbVn8VDdvzDVun56ckDau44eZSmzj392ziJg5IJ9JPyglfnzirgdIFF_QC0EUl6OLEfDMUrPXGFLmJrUZdqFbzDladGN11KOGc7be5nuWPglidOcH3hocefXHts6rYn3EbrWXK3brvBEa-tvZmiZryKBunm_QSsmOMkFqiyuKho7uiRPXjrKf7P1MxAMmsAXGKz0kYlFpFeodwnEnc6PdAZii4wzSkzlgegf">
+</div>
+<div class="inline-block h-7 w-7 rounded-full ring-2 ring-white overflow-hidden">
+<img class="h-full w-full object-cover" data-alt="Portrait photo of a cheerful man laughing against a scenic nature backdrop in natural sunlight." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBnYUB5z27Eyd8l0DH3XRN5UquaQn-xAmk3vj7JZ7guMNIS77HdALDvLjrxjOY8GonHWFIKTz3GgSp99UZD1snjSOrwQrVVmGemeAoFmDruBXI3jLsj7it00YrNfIwvMCOjQSGXeCLtA2Etd8XrrYEoQHwv8hK9EuEHwh4PWAPpEU_D7KnOixbVvX1-Jelx4zn_knuiJ1uCpBThkZbiSajIumDjMVM3KGdZ7gohe4GMnWFA7_rBi7SV">
+</div>
+<div class="inline-block h-7 w-7 rounded-full ring-2 ring-white bg-surface-variant text-on-surface-variant text-label-sm font-label-sm flex items-center justify-center font-bold">
+                  +1
+                </div>
+</div>
+<span class="text-caption font-caption text-on-surface-variant font-medium">4 members</span>
+</div>
+<!-- Contextual Quick Action -->
+<button class="flex items-center gap-1 text-primary hover:text-primary-container text-label-md font-label-md font-bold pl-2">
+<span class="">Open</span>
+<span class="material-symbols-outlined text-[18px]" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- Room 2: University Memories -->
+<div class="relative bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm border border-outline-variant/30 hover:shadow-md transition-shadow group">
+<div class="relative h-44 w-full overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A candid group photograph of university friends laughing together outdoors on a lush green campus lawn with collegiate brick architecture in the soft background, warm ambient daylight and documentary photography feeling." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDdJdzXVsQtdt0p7Z3fxxQljYRzkC9roaddOH9O8yIuw3fJJ0ywNlh4saos6JE7Esv_CnuIboB6fKPp2IsIK9V0V7qQxqLwI9KsJZtOvpuo-QNTtli7iRSBNgNimvAiEQar4XP_4V3A8Yp_jm6RuRDeyxVgLw3yzV6EG-c2Lzc5eNq3c9IyP38ZUssSEr8W9OTNjxUm6hryfMXzRGNDwfDZf04JKpORjyc8CKOBukBUYAs8fjWwp8X-">
+<div class="absolute inset-0 bg-gradient-to-t from-inverse-surface/90 via-inverse-surface/30 to-transparent"></div>
+<div class="absolute top-3 left-3 right-3 flex items-center justify-between">
+<span class="bg-primary/80 backdrop-blur-md text-white text-caption font-caption px-2.5 py-0.5 rounded-full flex items-center gap-1">
+<span class="material-symbols-outlined text-[13px]" data-icon="lock_open">lock_open</span>
+                Shared Room
+              </span>
+<span class="bg-inverse-surface/60 backdrop-blur-md text-white text-caption font-caption px-2.5 py-1 rounded-full flex items-center gap-1 border border-white/20">
+<span class="material-symbols-outlined text-[14px]" data-icon="photo_camera">photo_camera</span>
+                384 photos
+              </span>
+</div>
+<div class="absolute bottom-3 left-3 right-3 flex items-end justify-between">
+<div>
+<p class="text-caption font-caption text-primary-fixed-dim font-semibold tracking-wide uppercase">Campus &amp; Reunion</p>
+<h3 class="text-headline-sm font-headline-sm text-white font-bold tracking-tight">University Memories</h3>
+</div>
+<span class="text-caption font-caption text-surface-variant font-medium">Updated yesterday</span>
+</div>
+</div>
+<div class="p-3 flex items-center justify-between bg-surface-container-lowest">
+<div class="flex items-center">
+<div class="flex -space-x-2 overflow-hidden items-center pr-2">
+<div class="inline-block h-7 w-7 rounded-full ring-2 ring-white overflow-hidden">
+<img class="h-full w-full object-cover" data-alt="Warm natural light portrait of a smiling female student wearing a maroon scarf against soft greenery." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDLbCkor7zMroWonKzYox9MoSGxAl0oIbaGqYNt71b0Uknf8eveKuu5aB8V8MPH1hDkWEeD46SFuzG6oj-UvcH13bFztZGw174yknVLSEJLdXROnzfcJcOepDttb-f-k6YSdeDwfGWROrrdUpiYsKz8DXvk1EEFmrRROEdLjikEjbzQbI5xDRiZlfpFuBp_pK7EGF29HGcO3tl9Z4bicrAfA9j7WZIdUa2DkufIWaOlY4_spKwdMS2G">
+</div>
+<div class="inline-block h-7 w-7 rounded-full ring-2 ring-white overflow-hidden">
+<img class="h-full w-full object-cover" data-alt="Candid portrait of a young man smiling with headphones around neck in soft outdoor morning light." src="https://lh3.googleusercontent.com/aida-public/AB6AXuANhsWKZ-sHTy0UQYhOXtbTPJKBtufrzj_QszII2UYQOfEAnjA5cgISeBtvO_0udvwBbhrylvqtnoIGfrp7Mx23F99C9Z-74ENa8ajf5NMvANwFaXWKpowyd6U-sOu_uBVG2hgnpppqprc9k6RrX1210ivFI9aJ9CFIvQ0lPIHPnHEa2zSr9Ninjpa0ahpQN-jdVWiyOx_bCPB_nqblPIQy5ZP6ml7epdKz2snt81BejS9MdImYllfN">
+</div>
+<div class="inline-block h-7 w-7 rounded-full ring-2 ring-white bg-surface-variant text-on-surface-variant text-label-sm font-label-sm flex items-center justify-center font-bold">
+                  +4
+                </div>
+</div>
+<span class="text-caption font-caption text-on-surface-variant font-medium">6 members</span>
+</div>
+<button class="flex items-center gap-1 text-primary hover:text-primary-container text-label-md font-label-md font-bold pl-2">
+<span class="">Open</span>
+<span class="material-symbols-outlined text-[18px]" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- Room 3: Sylhet Weekend -->
+<div class="relative bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm border border-outline-variant/30 hover:shadow-md transition-shadow group">
+<div class="relative h-44 w-full overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Breathtaking landscape photo of undulating lush emerald green tea gardens in Sylhet shrouded in morning mist with morning sunbeams piercing through tall shade trees, serene travel photography aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAWYrfftPQsdshkkzfF_31E5qQ1tB9MUONyujMzgYasT3aImHUzFnNEMpa8ir_rloshsfk8-3pRCE2pVoBrWsrWgx9zT30rR-D72VIEbGjZSICEbjNj8Yq3flbktTvz1P8b1Iy2eCYYmpQvcSigPmMZiV3TBovDwmwN_5NVJs9WU1oLkuRwGqq2xt-cAiJZKFQRvpIzq-o3Y5BtaJ1hQYq1lE0ZCHhAlldSkd5sz1K5U77G6YcyczRv">
+<div class="absolute inset-0 bg-gradient-to-t from-inverse-surface/90 via-inverse-surface/30 to-transparent"></div>
+<div class="absolute top-3 left-3 right-3 flex items-center justify-between">
+<span class="bg-surface/90 backdrop-blur-md text-primary text-caption font-caption px-2.5 py-0.5 rounded-full font-semibold border border-primary/20">
+                Weekend Getaway
+              </span>
+<span class="bg-inverse-surface/60 backdrop-blur-md text-white text-caption font-caption px-2.5 py-1 rounded-full flex items-center gap-1 border border-white/20">
+<span class="material-symbols-outlined text-[14px]" data-icon="photo_camera">photo_camera</span>
+                89 photos
+              </span>
+</div>
+<div class="absolute bottom-3 left-3 right-3 flex items-end justify-between">
+<div>
+<p class="text-caption font-caption text-secondary-fixed font-semibold tracking-wide uppercase">Nature Retreat</p>
+<h3 class="text-headline-sm font-headline-sm text-white font-bold tracking-tight">Sylhet Weekend</h3>
+</div>
+<span class="text-caption font-caption text-surface-variant font-medium">Updated 3 days ago</span>
+</div>
+</div>
+<div class="p-3 flex items-center justify-between bg-surface-container-lowest">
+<div class="flex items-center">
+<div class="flex -space-x-2 overflow-hidden items-center pr-2">
+<div class="inline-block h-7 w-7 rounded-full ring-2 ring-white overflow-hidden">
+<img class="h-full w-full object-cover" data-alt="Portrait photo of an adventurous woman holding a camera in a misty green outdoor landscape." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBvQx4LXY6bkfjaX4VuROHQPRe5jbDlb6Vgkdy8FTQ-4khl9RFG2C2X_y9G2tnt0lBv4x3tQNe0Ll9N9INqVAXtCQSxYyYiGYlifqR-PoWImKblmCgH67VP8hCa6Tf5h3kTopMDGhHv2LNf-fGxLdocgB9_KyTEKdsh9DB3Vkg9nd0CL6uvYZrwyPcEasZTdrAS14ysOZElXUKn--8GapJLkSMtSTKhtKHRfp_nEQ65QYYVul5lBbBI">
+</div>
+<div class="inline-block h-7 w-7 rounded-full ring-2 ring-white overflow-hidden">
+<img class="h-full w-full object-cover" data-alt="Portrait photo of a young man enjoying tea amidst green tea plantations in morning light." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB4z3DUx5EF8_u3QI-ZGkHZwd5Ji3hSRPLBFrN58BmIJyNyd73UDZO3r5GnXvrXtgXwmwarVdHyuKPxk_pMJ52Un6W0rfrMYy54vY09GZ5EHz_mKS2WPejVUJHNi-w2YcNUWpgXOvFn9MKPcDQILYLM1qH32mKVF4jRok7ZI3w119XZ-0G5qmOZDhOC2QkzObwm3acTpxnX6yikhmAp8pJp43SdCil1vgC5O6-xV94AHKgu8jl0SKLW">
+</div>
+<div class="inline-block h-7 w-7 rounded-full ring-2 ring-white bg-surface-variant text-on-surface-variant text-label-sm font-label-sm flex items-center justify-center font-bold">
+                  +1
+                </div>
+</div>
+<span class="text-caption font-caption text-on-surface-variant font-medium">3 members</span>
+</div>
+<button class="flex items-center gap-1 text-primary hover:text-primary-container text-label-md font-label-md font-bold pl-2">
+<span class="">Open</span>
+<span class="material-symbols-outlined text-[18px]" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 2: "Recently Added" Strip -->
+<section class="flex flex-col gap-2.5 pt-2">
+<div>
+
+
+</div>
+<!-- Horizontal Photo Scroll Carousel -->
+<div class="flex gap-3 overflow-x-auto custom-scrollbar -mx-4 px-4 pb-1 pt-1">
+<!-- Photo Thumbnail 1 -->
+
+<!-- Photo Thumbnail 2 -->
+
+<!-- Photo Thumbnail 3 -->
+
+<!-- Photo Thumbnail 4 -->
+
+</div>
+</section>
+<!-- Empty State / Quick AI Tip Banner -->
+
+</main>
+<!-- Bottom Nav Bar (Shared Component Anchor) -->
+<!-- Destination Rule: Top-level Dashboard screen -> Render BottomNavBar -->
+<!-- Active State Logic: Screen is "Rooms / Home Dashboard" -> Pick "Rooms" (Index 0) as Active -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-2 border-t bg-surface-container-lowest/90 backdrop-blur-lg border-outline-variant/40 shadow-lg">
+<div class="w-full max-w-lg mx-auto flex justify-around items-center">
+<!-- Nav Item 1: Rooms (ACTIVE) -->
+<a aria-current="page" class="flex flex-col items-center justify-center text-primary font-semibold py-1 hover:text-primary transition-colors duration-150 active:scale-95" href="#">
+<span class="material-symbols-outlined text-[24px]" data-icon="photo_library" style="font-variation-settings: 'FILL' 1;">photo_library</span>
+<span class="text-label-sm font-label-sm mt-0.5">Rooms</span>
+</a>
+<!-- Nav Item 2: Gallery -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant py-1 hover:text-primary transition-colors duration-150 active:scale-95" href="#">
+<span class="material-symbols-outlined text-[24px]" data-icon="grid_view">grid_view</span>
+<span class="text-label-sm font-label-sm mt-0.5">Gallery</span>
+</a>
+<!-- Nav Item 3: People -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant py-1 hover:text-primary transition-colors duration-150 active:scale-95" href="#">
+<span class="material-symbols-outlined text-[24px]" data-icon="group">group</span>
+<span class="text-label-sm font-label-sm mt-0.5">People</span>
+</a>
+<!-- Nav Item 4: Review -->
+
+</div>
+</nav>
+
+
+</body></html>
