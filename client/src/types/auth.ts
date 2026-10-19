@@ -46,9 +46,11 @@ export interface AuthContextType {
   errorMessage: string | null;
   clearError: () => void;
   login: (data: LoginFormData) => Promise<boolean>;
+  loginWithGoogle: () => Promise<boolean>;
   signup: (data: SignupFormData) => Promise<boolean>;
-  logout: () => void;
+  logout: () => Promise<void> | void;
   sendPasswordReset: (email: string) => Promise<boolean>;
   resendVerificationEmail: () => Promise<boolean>;
   updateBiometricConsent: (consent: boolean) => void;
+  isSupabaseConnected: boolean;
 }

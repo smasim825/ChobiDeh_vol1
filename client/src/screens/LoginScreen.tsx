@@ -7,7 +7,7 @@ import { Button } from '../components/Button';
 import { Input } from '../components/Input';
 
 export const LoginScreen: React.FC = () => {
-  const { login, isLoading, errorMessage, clearError, setScreen } = useAuth();
+  const { login, loginWithGoogle, isLoading, errorMessage, clearError, setScreen } = useAuth();
 
   const [email, setEmail] = useState('tim.jennings@example.com');
   const [password, setPassword] = useState('password123');
@@ -20,7 +20,7 @@ export const LoginScreen: React.FC = () => {
   };
 
   const handleGoogleLogin = async () => {
-    await login({ email: 'tim.jennings@gmail.com', password: 'google-oauth', rememberMe: true });
+    await loginWithGoogle();
   };
 
   return (
