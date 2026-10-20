@@ -27,9 +27,17 @@ Use this format:
 - Compare a managed auth provider with self-managed authentication.
 - Consider cost, security, integration, and user experience.
 
-### DEC-0003 — Object storage
-- Status: Open
-- Compare cost, private access controls, signed URLs, egress, lifecycle policies, and regional availability.
+### DEC-0003 — Object Storage & Media Pipeline
+- Status: Accepted
+- Date: 2026-10-21
+- Context: Shared trip photo platforms can incur heavy egress and storage costs. Users upload large multi-megabyte camera photos. Evaluating options revealed that central storage on Cloudflare R2 with direct presigned URLs and browser-side WebP compression provides zero-cost initial operation.
+- Decision: Adopted Cloudflare R2 (S3-compatible) as central media storage paired with:
+  1. Zero server proxying (direct client-to-storage upload via presigned URLs and direct CDN edge reads).
+  2. Browser Canvas WebP compression (max 2048px, 0.85 quality) reducing 12 MB camera files to ~400–600 KB.
+  3. Strict database quota of 1,000 photos max per room enforced by `check_room_media_cap` trigger in PostgreSQL.
+  4. Dual export capabilities: In-browser parallel ZIP generation (`jszip`) for direct phone/laptop download, and 1-click cloud backup to Google Drive using `drive.file` scope.
+- Alternatives considered: Supabase storage exclusively, AWS S3 with CloudFront (incurs egress charges), Google Drive as primary storage (limited by quota and rate limits).
+- Consequences: 10 GB free tier in Cloudflare R2 supports 20–25 active rooms with zero egress charges. 30-day retention post-trip allows natural turnover while dual export guarantees users keep their memories permanently.
 
 ### DEC-0004 — Face model and execution
 - Status: Open

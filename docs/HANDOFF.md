@@ -3,12 +3,20 @@
 Update this file when starting or handing off a multi-file task. Keep entries short and current.
 
 ## Active work
-- Task: Review Round 1 & Round 2 Hardening + CI Migration Fixes
-  - Owner: Senior Full-Stack Engineer
-  - Status: Completed (Merged into `main`)
-  - Branch: `main`
-  - Scope: Additive security hardening migrations (`20261021000000`, `20261022000000`), isolated `room_passcodes` table with zero client access, non-rollback rate limiting for `join_room`, role-checked purge / member consent withdrawal, safe storage policies, profiles trigger protections, 22 Vitest client tests, 24 pgTAP database security tests, and CI GitHub Actions workflow running on `supabase/setup-cli@v3`.
-  - Tests run: All 22 Vitest tests pass, `oxlint` 0 errors, `tsc -b` 0 errors, `npm run build` succeeds, CI GitHub Actions on `main` passed completely (Client checks + pgTAP 24/24).
+- Task: Cloud Storage Pipeline & Room Quota Implementation (docs/STORAGE_IMPLEMENTATION_PLAN.md)
+  - Owner: Full-Stack Engineer / AI Agent
+  - Status: Completed (Ready for review)
+  - Branch: `feat/cloud-storage-pipeline`
+  - Scope:
+    1. PostgreSQL migration `20261023000000_storage_and_room_cap.sql`: enforces 1,000-photo cap per room via `check_room_media_cap` trigger, updates `create_upload` to validate quota before slot generation, adds `confirm_upload` RPC.
+    2. Client-side WebP compression (`client/src/utils/imageOptimizer.ts`) with native Canvas API downscaling to max 2048px at 0.85 quality (~90% size reduction).
+    3. Direct-to-storage uploader (`client/src/services/photoUploader.ts`) ensuring zero server proxying for binary media.
+    4. Client-side parallel ZIP packager (`client/src/services/downloadManager.ts`) using `jszip` for 1-click device download.
+    5. Google Drive album exporter (`client/src/services/googleDriveExport.ts`) with non-sensitive `drive.file` scope.
+    6. Functional Room UI in `RoomAreaScreen.tsx`: Room storage quota bar, photo upload modal with real-time compression savings, dual export modal (Save to Phone / ZIP & Google Drive backup).
+    7. Unit tests in `client/src/test/storage_pipeline.test.ts`.
+  - Tests run: 33/33 Vitest tests pass, `oxlint` 0 warnings/errors, `tsc -b` 0 errors, `npm run build` succeeds cleanly.
+
 
 ## Handoff template
 

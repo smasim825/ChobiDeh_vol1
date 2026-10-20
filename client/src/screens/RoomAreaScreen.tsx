@@ -1,5 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useAuth } from '../context/useAuth';
+import { uploadRoomPhotos, type UploadProgress } from '../services/photoUploader';
+import { downloadPhotosAsZip, triggerFileDownload, type DownloadProgress } from '../services/downloadManager';
+import { exportRoomToGoogleDrive, type GoogleDriveExportProgress } from '../services/googleDriveExport';
+import { formatBytes } from '../utils/imageOptimizer';
 
 interface PhotoItem {
   id: string;
@@ -12,7 +16,7 @@ interface PhotoItem {
   time: string;
 }
 
-const GALLERY_PHOTOS: PhotoItem[] = [
+const INITIAL_GALLERY_PHOTOS: PhotoItem[] = [
   {
     id: 'p1',
     url: '/placeholder-cover.svg',
@@ -78,16 +82,34 @@ const GALLERY_PHOTOS: PhotoItem[] = [
 export const RoomAreaScreen: React.FC = () => {
   const { setScreen } = useAuth();
 
+  const [photos, setPhotos] = useState<PhotoItem[]>(INITIAL_GALLERY_PHOTOS);
   const [activeFilter, setActiveFilter] = useState<string>('all');
   const [selectedPhoto, setSelectedPhoto] = useState<PhotoItem | null>(null);
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [copiedKey, setCopiedKey] = useState(false);
   const [showUncertainReview] = useState(true);
 
+  // Upload state
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [showUploadModal, setShowUploadModal] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<UploadProgress | null>(null);
+
+  // Export state
+  const [showExportModal, setShowExportModal] = useState(false);
+  const [isDownloadingZip, setIsDownloadingZip] = useState(false);
+  const [downloadProgress, setDownloadProgress] = useState<DownloadProgress | null>(null);
+  const [isExportingDrive, setIsExportingDrive] = useState(false);
+  const [driveProgress, setDriveProgress] = useState<GoogleDriveExportProgress | null>(null);
+
+  const roomCapacityLimit = 1000;
+  const currentRoomPhotoCount = 136 + photos.length;
+  const roomCapacityPercent = Math.min(100, Math.round((currentRoomPhotoCount / roomCapacityLimit) * 100));
+
   const filteredPhotos =
     activeFilter === 'all'
-      ? GALLERY_PHOTOS
-      : GALLERY_PHOTOS.filter((p) => p.person.toLowerCase() === activeFilter.toLowerCase());
+      ? photos
+      : photos.filter((p) => p.person.toLowerCase() === activeFilter.toLowerCase());
 
   const handleCopyKey = () => {
     navigator.clipboard?.writeText('CB-9821');
@@ -95,8 +117,103 @@ export const RoomAreaScreen: React.FC = () => {
     setTimeout(() => setCopiedKey(false), 2500);
   };
 
+  const handleTriggerUpload = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
+
+    const fileList = Array.from(files);
+    setShowUploadModal(true);
+    setIsUploading(true);
+
+    try {
+      const result = await uploadRoomPhotos('d0000000-0000-0000-0000-000000000001', fileList, (prog) => {
+        setUploadProgress(prog);
+      });
+
+      // Append successfully uploaded photos to gallery feed
+      if (result.successful.length > 0) {
+        const newItems: PhotoItem[] = result.successful.map((item) => ({
+          id: item.mediaId,
+          url: URL.createObjectURL(item.optimized.blob),
+          alt: `Newly uploaded photo (${formatBytes(item.optimized.compressedSizeBytes)})`,
+          person: 'unsorted',
+          aspect: 'aspect-square',
+          badge: 'Level 3: Unsorted (New)',
+          clusterLevel: 'Level 3: Unsorted',
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        }));
+
+        setPhotos((prev) => [...newItems, ...prev]);
+      }
+    } finally {
+      setIsUploading(false);
+      // Reset input value so same files can be re-selected if desired
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+
+  const handleDownloadAllZip = async () => {
+    setIsDownloadingZip(true);
+    try {
+      const itemsToDownload = photos.map((p, i) => ({
+        id: p.id,
+        url: p.url,
+        filename: `Coxs_Bazar_Photo_${String(i + 1).padStart(3, '0')}.webp`,
+      }));
+
+      const zipBlob = await downloadPhotosAsZip("Cox's Bazar", itemsToDownload, (prog) => {
+        setDownloadProgress(prog);
+      });
+
+      triggerFileDownload(zipBlob, "Coxs_Bazar_Winter_Escape_Photos.zip");
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : 'Failed to download ZIP');
+    } finally {
+      setIsDownloadingZip(false);
+    }
+  };
+
+  const handleExportToGoogleDrive = async () => {
+    setIsExportingDrive(true);
+    try {
+      const itemsToExport = photos.map((p, i) => ({
+        id: p.id,
+        url: p.url,
+        name: `Coxs_Bazar_${i + 1}.webp`,
+      }));
+
+      await exportRoomToGoogleDrive({
+        roomName: "Cox's Bazar Winter Escape",
+        photos: itemsExportFormat(itemsToExport),
+        onProgress: (prog) => {
+          setDriveProgress(prog);
+        },
+      });
+    } finally {
+      setIsExportingDrive(false);
+    }
+  };
+
+  const itemsExportFormat = (items: Array<{ id: string; url: string; name: string }>) => items;
+
   return (
     <div className="bg-[#F8F5EF] text-[#101E1C] antialiased selection:bg-[#9CF2E8] selection:text-[#00201D] min-h-screen pb-28">
+      {/* Hidden native file input for direct photo upload */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        multiple
+        accept="image/*"
+        className="hidden"
+        onChange={handleFileChange}
+      />
+
       {/* 1. TOP APP BAR */}
       <header className="fixed top-0 left-0 w-full z-40 flex items-center justify-between px-4 h-14 bg-[#F8F5EF]/85 backdrop-blur-md border-b border-[#E6E1D8] shadow-xs">
         <div className="flex items-center gap-2">
@@ -131,11 +248,12 @@ export const RoomAreaScreen: React.FC = () => {
           </button>
           <button
             type="button"
-            aria-label="Room details"
-            onClick={() => alert("Room Details: Key CB-9821, Host: Tasnim. 3-level face clustering organizes room photos without selfies.")}
-            className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-[#E1F1EE] active:scale-95 transition-all text-[#3E4947]"
+            aria-label="Export room photos"
+            onClick={() => setShowExportModal(true)}
+            className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-[#E1F1EE] active:scale-95 transition-all text-[#0F766E]"
+            title="Download or Backup Album"
           >
-            <span className="material-symbols-outlined text-[20px]">more_vert</span>
+            <span className="material-symbols-outlined text-[20px]">download</span>
           </button>
         </div>
       </header>
@@ -204,7 +322,7 @@ export const RoomAreaScreen: React.FC = () => {
               </div>
               <div className="flex flex-col text-left">
                 <span className="text-[12px] text-[#101E1C] font-semibold">Tasnim (Host) + 3 others</span>
-                <span className="text-[10px] text-[#3E4947]">Private room sync</span>
+                <span className="text-[10px] text-[#3E4947]">Zero-egress Cloudflare R2</span>
               </div>
             </div>
 
@@ -219,30 +337,56 @@ export const RoomAreaScreen: React.FC = () => {
           </div>
         </section>
 
-        {/* 3. QUICK ACTION BUTTONS (Standardized 48-52px height, rounded-full) */}
+        {/* ROOM STORAGE QUOTA INDICATOR */}
+        <section className="mt-3 p-2.5 bg-white rounded-xl border border-[#E6E1D8] shadow-xs">
+          <div className="flex items-center justify-between text-[11px] mb-1.5">
+            <span className="font-semibold text-[#101E1C] flex items-center gap-1">
+              <span className="material-symbols-outlined text-[14px] text-[#0F766E]">cloud_done</span>
+              Room Storage Capacity
+            </span>
+            <span className="text-[#3E4947] font-medium">
+              <strong className="text-[#0F766E]">{currentRoomPhotoCount}</strong> / {roomCapacityLimit} photos ({roomCapacityPercent}%)
+            </span>
+          </div>
+          <div className="w-full bg-[#E6E1D8] h-1.5 rounded-full overflow-hidden">
+            <div
+              className={`h-full transition-all duration-500 ${
+                roomCapacityPercent > 90 ? 'bg-[#BA1A1A]' : 'bg-[#0F766E]'
+              }`}
+              style={{ width: `${roomCapacityPercent}%` }}
+            />
+          </div>
+          <div className="flex items-center justify-between mt-1 text-[10px] text-[#6E7977]">
+            <span>WebP 2K auto-compressed</span>
+            <span>30 days post-trip retention</span>
+          </div>
+        </section>
+
+        {/* 3. QUICK ACTION BUTTONS */}
         <section className="mt-4 flex items-center gap-2">
           <button
             type="button"
-            disabled
-            className="flex-1 inline-flex items-center justify-center gap-2 px-5 min-h-[48px] h-[50px] rounded-full bg-[#0F766E]/60 text-white/90 font-semibold text-[15px] tracking-wide cursor-not-allowed opacity-80"
+            onClick={handleTriggerUpload}
+            className="flex-1 inline-flex items-center justify-center gap-2 px-5 min-h-[48px] h-[50px] rounded-full bg-[#0F766E] text-white font-semibold text-[15px] tracking-wide hover:bg-[#005C55] active:scale-[0.98] transition-all shadow-sm"
           >
-            <span className="material-symbols-outlined text-[18px]">upload_file</span>
-            <span>Upload Photos (Coming soon)</span>
+            <span className="material-symbols-outlined text-[20px]">upload_file</span>
+            <span>Upload Photos</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setShowExportModal(true)}
+            className="inline-flex items-center gap-1.5 px-4 min-h-[48px] h-[50px] rounded-full border border-[#E2DDD4] bg-white text-[#101E1C] hover:bg-[#F8F5EF] active:scale-[0.98] transition-all text-[14px] font-semibold shadow-xs"
+          >
+            <span className="material-symbols-outlined text-[18px] text-[#0F766E]">download</span>
+            <span>Export</span>
           </button>
           <button
             type="button"
             onClick={() => alert('Playing Archival Memory Reel: Cox’s Bazar Sunset Highlight')}
-            className="inline-flex items-center gap-1.5 px-4 min-h-[48px] h-[50px] rounded-full border border-[#E2DDD4] bg-white text-[#101E1C] hover:bg-[#F8F5EF] active:scale-[0.98] transition-all text-[15px] font-semibold shadow-xs"
+            className="inline-flex items-center gap-1.5 px-3.5 min-h-[48px] h-[50px] rounded-full border border-[#E2DDD4] bg-white text-[#101E1C] hover:bg-[#F8F5EF] active:scale-[0.98] transition-all text-[14px] font-semibold shadow-xs"
+            title="Archival Reel"
           >
             <span className="material-symbols-outlined text-[18px] text-[#8E4E14]">movie</span>
-            <span>Reel</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => alert('Clustering settings: Calibrate thresholds, review clusters, or purge vectors.')}
-            className="w-[50px] h-[50px] min-h-[48px] flex items-center justify-center rounded-full border border-[#E2DDD4] bg-white text-[#101E1C] hover:bg-[#F8F5EF] active:scale-[0.98] transition-all shadow-xs"
-          >
-            <span className="material-symbols-outlined text-[19px]">tune</span>
           </button>
         </section>
 
@@ -258,71 +402,40 @@ export const RoomAreaScreen: React.FC = () => {
                   <h4 className="text-[13px] font-bold text-[#8E4E14]">
                     Level 2 — Uncertain Match Review
                   </h4>
-                  <span className="px-1.5 py-0.5 rounded-sm bg-[#FFAB69]/20 text-[#8E4E14] text-[10px] font-bold">
-                    Needs Review
+                  <span className="text-[10px] font-semibold bg-[#FFDCC2] text-[#8E4E14] px-1.5 py-0.5 rounded-full">
+                    3 Suggestions
                   </span>
                 </div>
-                <p className="text-[12px] text-[#5C3E20] mt-0.5 leading-snug">
-                  The AI noticed <span className="font-semibold">Person 5</span> is visually similar to{' '}
-                  <span className="font-semibold">Person 2 (Rafiqul)</span>. The system never merges automatically.
+                <p className="text-[11px] text-[#553100] mt-0.5 leading-snug">
+                  AI detected visual similarities without confident facial identity. Review and confirm matches.
                 </p>
-                <div className="flex items-center gap-2 mt-3">
-                  <button
-                    type="button"
-                    disabled
-                    className="flex-1 py-1.5 px-3 rounded-lg bg-[#0F766E]/50 text-white/80 text-[12px] font-bold cursor-not-allowed"
-                  >
-                    Confirm Merge (Coming soon)
-                  </button>
-                  <button
-                    type="button"
-                    disabled
-                    className="flex-1 py-1.5 px-3 rounded-lg border border-[#BDC9C6] bg-white/70 text-[#3E4947]/70 text-[12px] font-semibold cursor-not-allowed"
-                  >
-                    Keep Separate (Coming soon)
-                  </button>
-                </div>
               </div>
             </div>
           </section>
         )}
 
-        {/* 5. 3-LEVEL CLUSTERING INTELLIGENCE & COLLECTIONS FILTER */}
-        <section className="mt-5 text-left">
-          {/* AI Banner Pill */}
-          <div className="flex items-center justify-between px-3.5 py-2 rounded-xl bg-[#0F766E]/10 border border-[#0F766E]/20 text-[#005C55] mb-3">
-            <div className="flex items-center gap-2">
-              <span className="material-symbols-outlined text-[17px] text-[#0F766E]">auto_awesome</span>
-              <span className="text-[12px] font-semibold leading-tight text-[#005C55]">
-                3-Level AI Face Clustering Active • Anonymous Person Collections
-              </span>
-            </div>
-            <span className="material-symbols-outlined text-[16px] text-[#0F766E]/70">lock</span>
-          </div>
-
-          {/* People Filter Strip */}
+        {/* 5. FILTER PILLS */}
+        <section className="mt-4 text-left">
           <div className="flex items-center justify-between mb-2">
-            <h3 className="text-[16px] font-bold text-[#101E1C] tracking-tight">Person Collections</h3>
-            <span className="text-[11px] text-[#3E4947]">No selfies required</span>
+            <h3 className="text-[14px] font-bold text-[#101E1C]">Person Collections</h3>
+            <span className="text-[11px] text-[#0F766E] font-semibold">Anonymous Visual AI</span>
           </div>
-
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 custom-scrollbar">
-            {/* All */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar text-left">
             <button
               type="button"
               onClick={() => setActiveFilter('all')}
-              className={`flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-semibold shadow-xs transition-all ${
+              className={`flex-shrink-0 flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-[12px] font-medium border transition-all ${
                 activeFilter === 'all'
-                  ? 'bg-[#005C55] text-white'
-                  : 'bg-white border border-[#E2DDD4] text-[#101E1C] hover:border-[#005C55]'
+                  ? 'bg-[#005C55] text-white border-[#005C55]'
+                  : 'bg-white border-[#E2DDD4] text-[#101E1C] hover:border-[#005C55]'
               }`}
             >
-              <span className="material-symbols-outlined text-[15px]">select_all</span>
               <span>All Moments</span>
-              <span className="px-1.5 py-0.2 rounded-full bg-black/10 text-[10px]">142</span>
+              <span className="px-1.5 rounded-full bg-[#E1F1EE] text-[#005C55] text-[10px] font-bold">
+                {photos.length}
+              </span>
             </button>
 
-            {/* Level 1: Tasnim (Person 1) */}
             <button
               type="button"
               onClick={() => setActiveFilter('Tasnim')}
@@ -333,17 +446,12 @@ export const RoomAreaScreen: React.FC = () => {
               }`}
             >
               <div className="w-5 h-5 rounded-full overflow-hidden ring-1 ring-[#0F766E]">
-                <img
-                  className="w-full h-full object-cover"
-                  src="/placeholder-avatar.svg"
-                  alt="Tasnim"
-                />
+                <img className="w-full h-full object-cover" src="/placeholder-avatar.svg" alt="Tasnim" />
               </div>
-              <span>Person 1 (Tasnim)</span>
-              <span className="px-1.5 rounded-full bg-[#E1F1EE] text-[#3E4947] text-[10px] font-bold">48</span>
+              <span>Tasnim</span>
+              <span className="px-1.5 rounded-full bg-[#E1F1EE] text-[#3E4947] text-[10px] font-bold">42</span>
             </button>
 
-            {/* Level 1: Rafiqul (Person 2) */}
             <button
               type="button"
               onClick={() => setActiveFilter('Rafiqul')}
@@ -354,45 +462,12 @@ export const RoomAreaScreen: React.FC = () => {
               }`}
             >
               <div className="w-5 h-5 rounded-full overflow-hidden ring-1 ring-[#0F766E]">
-                <img
-                  className="w-full h-full object-cover"
-                  src="/placeholder-avatar.svg"
-                  alt="Rafiqul"
-                />
+                <img className="w-full h-full object-cover" src="/placeholder-avatar.svg" alt="Rafiqul" />
               </div>
-              <span>Person 2 (Rafiqul)</span>
+              <span>Rafiqul</span>
               <span className="px-1.5 rounded-full bg-[#E1F1EE] text-[#3E4947] text-[10px] font-bold">36</span>
             </button>
 
-            {/* Level 1: Samira (Person 3) */}
-            <button
-              type="button"
-              onClick={() => setActiveFilter('Samira')}
-              className={`flex-shrink-0 flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-[12px] font-medium border transition-all ${
-                activeFilter === 'Samira'
-                  ? 'bg-[#005C55] text-white border-[#005C55]'
-                  : 'bg-white border-[#E2DDD4] text-[#101E1C] hover:border-[#005C55]'
-              }`}
-            >
-              <span>Person 3 (Samira)</span>
-              <span className="px-1.5 rounded-full bg-[#E1F1EE] text-[#3E4947] text-[10px] font-bold">29</span>
-            </button>
-
-            {/* Level 1: Tanvir (Person 4) */}
-            <button
-              type="button"
-              onClick={() => setActiveFilter('Tanvir')}
-              className={`flex-shrink-0 flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-[12px] font-medium border transition-all ${
-                activeFilter === 'Tanvir'
-                  ? 'bg-[#005C55] text-white border-[#005C55]'
-                  : 'bg-white border-[#E2DDD4] text-[#101E1C] hover:border-[#005C55]'
-              }`}
-            >
-              <span>Person 4 (Tanvir)</span>
-              <span className="px-1.5 rounded-full bg-[#E1F1EE] text-[#3E4947] text-[10px] font-bold">18</span>
-            </button>
-
-            {/* Level 3: Unsorted Collection */}
             <button
               type="button"
               onClick={() => setActiveFilter('unsorted')}
@@ -404,7 +479,6 @@ export const RoomAreaScreen: React.FC = () => {
             >
               <span className="material-symbols-outlined text-[15px]">help</span>
               <span>Level 3: Unsorted</span>
-              <span className="px-1.5 rounded-full bg-[#FFDAD6] text-[#BA1A1A] text-[10px] font-bold">11</span>
             </button>
           </div>
         </section>
@@ -418,7 +492,7 @@ export const RoomAreaScreen: React.FC = () => {
                 {activeFilter === 'unsorted'
                   ? '• Level 3 Unmatched Photos'
                   : activeFilter === 'all'
-                  ? '• All Moments'
+                  ? `• ${photos.length} Photos`
                   : `• ${activeFilter}`}
               </span>
             </div>
@@ -436,6 +510,8 @@ export const RoomAreaScreen: React.FC = () => {
                 <img
                   src={photo.url}
                   alt={photo.alt}
+                  loading="lazy"
+                  decoding="async"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -454,6 +530,205 @@ export const RoomAreaScreen: React.FC = () => {
           </div>
         </section>
       </main>
+
+      {/* UPLOAD PROGRESS MODAL */}
+      {showUploadModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 animate-fadeIn">
+          <div className="bg-white rounded-2xl max-w-sm w-full p-5 shadow-dock border border-[#E6E1D8] text-left">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <span className="material-symbols-outlined text-[#0F766E] text-[22px]">
+                  {uploadProgress?.stage === 'error' ? 'error' : uploadProgress?.stage === 'done' ? 'check_circle' : 'cloud_upload'}
+                </span>
+                <h3 className="text-[16px] font-bold text-[#101E1C]">
+                  {uploadProgress?.stage === 'done'
+                    ? 'Upload Complete'
+                    : uploadProgress?.stage === 'error'
+                    ? 'Upload Failed'
+                    : 'Compressing & Uploading'}
+                </h3>
+              </div>
+              {!isUploading && (
+                <button
+                  type="button"
+                  onClick={() => setShowUploadModal(false)}
+                  className="w-7 h-7 rounded-full bg-[#E1F1EE] flex items-center justify-center text-[#3E4947]"
+                >
+                  <span className="material-symbols-outlined text-[16px]">close</span>
+                </button>
+              )}
+            </div>
+
+            {/* Error Message */}
+            {uploadProgress?.errorMessage && (
+              <div className="p-3 mb-3 bg-[#FFDAD6] border border-[#BA1A1A]/30 rounded-xl text-[12px] text-[#BA1A1A] font-medium">
+                {uploadProgress.errorMessage}
+              </div>
+            )}
+
+            {/* Progress Bar */}
+            <div className="mb-3">
+              <div className="flex justify-between text-[11px] text-[#3E4947] mb-1">
+                <span>
+                  Photo {uploadProgress?.currentPhotoIndex || 1} of {uploadProgress?.totalPhotos || 1}
+                </span>
+                <span className="font-bold text-[#0F766E]">{uploadProgress?.percent || 0}%</span>
+              </div>
+              <div className="w-full bg-[#E6E1D8] h-2 rounded-full overflow-hidden">
+                <div
+                  className="bg-[#0F766E] h-full transition-all duration-300"
+                  style={{ width: `${uploadProgress?.percent || 0}%` }}
+                />
+              </div>
+            </div>
+
+            {/* Stage Info */}
+            <p className="text-[12px] text-[#3E4947] mb-3">
+              {uploadProgress?.stage === 'compressing' && '🖼️ Converting to 2K WebP via Canvas...'}
+              {uploadProgress?.stage === 'uploading' && '☁️ Streaming directly to zero-egress Cloudflare R2...'}
+              {uploadProgress?.stage === 'confirming' && '⚡ Registering media metadata...'}
+              {uploadProgress?.stage === 'done' && '🎉 All photos successfully uploaded and ready for clustering!'}
+            </p>
+
+            {/* Compression Stats */}
+            {uploadProgress && uploadProgress.originalBytesTotal > 0 && (
+              <div className="p-2.5 bg-[#F8F5EF] rounded-xl border border-[#E2DDD4] text-[11px] text-[#3E4947] mb-4">
+                <div className="flex justify-between mb-1">
+                  <span>Original Size:</span>
+                  <span className="font-semibold">{formatBytes(uploadProgress.originalBytesTotal)}</span>
+                </div>
+                <div className="flex justify-between mb-1">
+                  <span>Optimized WebP:</span>
+                  <span className="font-semibold text-[#0F766E]">{formatBytes(uploadProgress.compressedBytesTotal)}</span>
+                </div>
+                <div className="flex justify-between font-bold text-[#005C55] pt-1 border-t border-[#E6E1D8]">
+                  <span>Bandwidth & Storage Saved:</span>
+                  <span>{uploadProgress.savedPercent}%</span>
+                </div>
+              </div>
+            )}
+
+            <button
+              type="button"
+              disabled={isUploading}
+              onClick={() => setShowUploadModal(false)}
+              className="w-full py-2.5 rounded-full bg-[#0F766E] text-white text-[13px] font-semibold hover:bg-[#005C55] disabled:opacity-50 transition-all"
+            >
+              {isUploading ? 'Uploading...' : 'Done'}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* EXPORT DUAL MODAL (ZIP / GOOGLE DRIVE) */}
+      {showExportModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 animate-fadeIn">
+          <div className="bg-white rounded-2xl max-w-sm w-full p-5 shadow-dock border border-[#E6E1D8] text-left">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <span className="material-symbols-outlined text-[#0F766E] text-[22px]">archive</span>
+                <h3 className="text-[17px] font-bold text-[#101E1C]">Export Album</h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowExportModal(false)}
+                className="w-7 h-7 rounded-full bg-[#E1F1EE] flex items-center justify-center text-[#3E4947]"
+              >
+                <span className="material-symbols-outlined text-[16px]">close</span>
+              </button>
+            </div>
+
+            <p className="text-[12px] text-[#3E4947] mb-4">
+              Photos stay in active room storage for 30 days. Export now to keep all original-quality moments forever.
+            </p>
+
+            {/* Option 1: Save to Phone / Download ZIP */}
+            <div className="p-3.5 bg-[#F8F5EF] rounded-xl border border-[#E2DDD4] mb-3">
+              <div className="flex items-center justify-between mb-1.5">
+                <div className="flex items-center gap-2">
+                  <span className="material-symbols-outlined text-[#0F766E] text-[20px]">phone_iphone</span>
+                  <span className="text-[13px] font-bold text-[#101E1C]">Save to Phone / ZIP</span>
+                </div>
+                <span className="text-[10px] font-semibold text-[#005C55] bg-[#E1F1EE] px-2 py-0.5 rounded-full">
+                  Fast & Offline
+                </span>
+              </div>
+              <p className="text-[11px] text-[#6E7977] mb-2.5">
+                Packages all {photos.length} photos directly inside browser memory into a ZIP archive without server egress.
+              </p>
+
+              {downloadProgress && isDownloadingZip && (
+                <div className="mb-2">
+                  <div className="flex justify-between text-[10px] text-[#3E4947] mb-0.5">
+                    <span>{downloadProgress.currentFilename}</span>
+                    <span className="font-bold text-[#0F766E]">{downloadProgress.percent}%</span>
+                  </div>
+                  <div className="w-full bg-[#E6E1D8] h-1.5 rounded-full overflow-hidden">
+                    <div className="bg-[#0F766E] h-full" style={{ width: `${downloadProgress.percent}%` }} />
+                  </div>
+                </div>
+              )}
+
+              <button
+                type="button"
+                disabled={isDownloadingZip}
+                onClick={handleDownloadAllZip}
+                className="w-full py-2 rounded-full bg-[#0F766E] text-white text-[12px] font-semibold hover:bg-[#005C55] disabled:opacity-50 transition-all flex items-center justify-center gap-1.5"
+              >
+                <span className="material-symbols-outlined text-[16px]">download</span>
+                <span>{isDownloadingZip ? 'Preparing ZIP...' : 'Download Full Album (ZIP)'}</span>
+              </button>
+            </div>
+
+            {/* Option 2: Google Drive Backup */}
+            <div className="p-3.5 bg-[#F8F5EF] rounded-xl border border-[#E2DDD4]">
+              <div className="flex items-center justify-between mb-1.5">
+                <div className="flex items-center gap-2">
+                  <span className="material-symbols-outlined text-[#8E4E14] text-[20px]">add_to_drive</span>
+                  <span className="text-[13px] font-bold text-[#101E1C]">Export to Google Drive</span>
+                </div>
+                <span className="text-[10px] font-semibold text-[#8E4E14] bg-[#FFDCC2] px-2 py-0.5 rounded-full">
+                  Cloud Backup
+                </span>
+              </div>
+              <p className="text-[11px] text-[#6E7977] mb-2.5">
+                Creates a folder `ChobiDeh - Cox's Bazar` in your personal Google Drive with non-sensitive drive.file scope.
+              </p>
+
+              {driveProgress && (
+                <div className="mb-2">
+                  <div className="flex justify-between text-[10px] text-[#3E4947] mb-0.5">
+                    <span>{driveProgress.currentFileName || 'Processing...'}</span>
+                    <span className="font-bold text-[#8E4E14]">
+                      {driveProgress.uploadedFiles} / {driveProgress.totalFiles}
+                    </span>
+                  </div>
+                  {driveProgress.folderUrl && driveProgress.stage === 'completed' && (
+                    <a
+                      href={driveProgress.folderUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[11px] text-[#005C55] font-semibold underline block mb-1"
+                    >
+                      Open in Google Drive ↗
+                    </a>
+                  )}
+                </div>
+              )}
+
+              <button
+                type="button"
+                disabled={isExportingDrive}
+                onClick={handleExportToGoogleDrive}
+                className="w-full py-2 rounded-full border border-[#BDC9C6] bg-white text-[#101E1C] text-[12px] font-semibold hover:bg-[#E1F1EE] disabled:opacity-50 transition-all flex items-center justify-center gap-1.5"
+              >
+                <span className="material-symbols-outlined text-[16px] text-[#8E4E14]">cloud_upload</span>
+                <span>{isExportingDrive ? 'Exporting to Drive...' : '1-Click Export to Drive'}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Loupe Modal */}
       {selectedPhoto && (
