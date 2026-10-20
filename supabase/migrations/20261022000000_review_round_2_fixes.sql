@@ -52,6 +52,7 @@ DROP POLICY IF EXISTS "Authenticated users can create rooms" ON public.rooms;
 -- ============================================================================
 -- 3. CRYPTOGRAPHIC JOIN SLUGS & create_room RPC
 -- ============================================================================
+DROP FUNCTION IF EXISTS public.create_room(text, text);
 CREATE OR REPLACE FUNCTION public.create_room(
   room_name text,
   passcode text DEFAULT NULL
@@ -136,6 +137,7 @@ $$;
 -- ============================================================================
 -- 4. NON-ROLLBACK join_room RPC (RELIABLE RATE LIMITING)
 -- ============================================================================
+DROP FUNCTION IF EXISTS public.join_room(text, text);
 CREATE OR REPLACE FUNCTION public.join_room(
   slug text,
   passcode text DEFAULT NULL
@@ -254,6 +256,7 @@ $$;
 -- ============================================================================
 -- 5. STRICT ROLE CHECK ON purge_room_face_data
 -- ============================================================================
+DROP FUNCTION IF EXISTS public.purge_room_face_data(uuid);
 CREATE OR REPLACE FUNCTION public.purge_room_face_data(target_room_id uuid)
 RETURNS jsonb
 LANGUAGE plpgsql
@@ -323,6 +326,7 @@ $$;
 -- ============================================================================
 -- 6. MEMBER-SCOPED CONSENT WITHDRAWAL RPC
 -- ============================================================================
+DROP FUNCTION IF EXISTS public.withdraw_member_face_consent(uuid);
 CREATE OR REPLACE FUNCTION public.withdraw_member_face_consent(target_room_id uuid)
 RETURNS jsonb
 LANGUAGE plpgsql
@@ -385,6 +389,8 @@ $$;
 -- ============================================================================
 -- 7. FIX assign_photo_to_cluster & resolve_uncertain_match
 -- ============================================================================
+DROP FUNCTION IF EXISTS public.assign_photo_to_cluster(uuid, uuid);
+DROP FUNCTION IF EXISTS public.assign_photo_to_cluster(uuid, uuid, uuid, uuid);
 CREATE OR REPLACE FUNCTION public.assign_photo_to_cluster(
   target_room_id uuid,
   target_media_id uuid,
@@ -459,6 +465,7 @@ BEGIN
 END;
 $$;
 
+DROP FUNCTION IF EXISTS public.resolve_uncertain_match(uuid, text);
 CREATE OR REPLACE FUNCTION public.resolve_uncertain_match(
   match_id uuid,
   action text
@@ -589,6 +596,8 @@ USING (
 -- ============================================================================
 -- 9. TAMPER-PROOF profiles.onboarding_completed VIA TRIGGER
 -- ============================================================================
+DROP TRIGGER IF EXISTS trg_protect_profile_fields ON public.profiles;
+DROP FUNCTION IF EXISTS public.protect_profile_fields() CASCADE;
 CREATE OR REPLACE FUNCTION public.protect_profile_fields()
 RETURNS trigger
 LANGUAGE plpgsql
@@ -613,6 +622,7 @@ FOR EACH ROW
 EXECUTE FUNCTION public.protect_profile_fields();
 
 -- Update complete_onboarding to set session variable
+DROP FUNCTION IF EXISTS public.complete_onboarding(text);
 CREATE OR REPLACE FUNCTION public.complete_onboarding(display_name text)
 RETURNS jsonb
 LANGUAGE plpgsql
@@ -678,8 +688,8 @@ GRANT EXECUTE ON FUNCTION public.resolve_uncertain_match(uuid, text) TO authenti
 REVOKE EXECUTE ON FUNCTION public.assign_photo_to_cluster(uuid, uuid, uuid, uuid) FROM PUBLIC, anon;
 GRANT EXECUTE ON FUNCTION public.assign_photo_to_cluster(uuid, uuid, uuid, uuid) TO authenticated;
 
-REVOKE EXECUTE ON FUNCTION public.unassign_photo_from_cluster(uuid, uuid, uuid) FROM PUBLIC, anon;
-GRANT EXECUTE ON FUNCTION public.unassign_photo_from_cluster(uuid, uuid, uuid) TO authenticated;
+REVOKE EXECUTE ON FUNCTION public.unassign_photo_from_cluster(uuid, uuid) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.unassign_photo_from_cluster(uuid, uuid) TO authenticated;
 
 REVOKE EXECUTE ON FUNCTION public.purge_room_face_data(uuid) FROM PUBLIC, anon;
 GRANT EXECUTE ON FUNCTION public.purge_room_face_data(uuid) TO authenticated;
