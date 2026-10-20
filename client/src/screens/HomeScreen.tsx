@@ -11,8 +11,7 @@ const INITIAL_ROOMS: Room[] = [
     badge: { label: 'New', type: 'new' },
     photoCount: 142,
     updatedAt: 'Updated 2h ago',
-    coverImage:
-      'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80',
+    coverImage: '/placeholder-cover.svg',
     altText:
       "Vibrant panoramic view of Cox's Bazar beach at golden sunset with warm reflections on ocean tides.",
     members: [
@@ -31,8 +30,7 @@ const INITIAL_ROOMS: Room[] = [
     badge: { label: 'Shared Room', type: 'shared' },
     photoCount: 384,
     updatedAt: 'Updated yesterday',
-    coverImage:
-      'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=80',
+    coverImage: '/placeholder-cover.svg',
     altText:
       'Candid group photograph of university friends laughing together outdoors on a lush green campus lawn.',
     members: [
@@ -103,8 +101,7 @@ export const HomeScreen: React.FC = () => {
               badge: { label: rm.role === 'owner' ? 'Host' : 'Member', type: 'shared' },
               photoCount: 0,
               updatedAt: new Date(rm.rooms.created_at).toLocaleDateString(),
-              coverImage:
-                'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80',
+              coverImage: '/placeholder-cover.svg',
               altText: rm.rooms.name,
               members: [
                 {
@@ -148,8 +145,7 @@ export const HomeScreen: React.FC = () => {
             badge: { label: 'New', type: 'new' },
             photoCount: 0,
             updatedAt: 'Just now',
-            coverImage:
-              'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80',
+            coverImage: '/placeholder-cover.svg',
             altText: newRoomTitle.trim(),
             members: [
               {
@@ -204,8 +200,7 @@ export const HomeScreen: React.FC = () => {
             badge: { label: rm.role === 'owner' ? 'Host' : 'Member', type: 'shared' },
             photoCount: 0,
             updatedAt: new Date(rm.rooms.created_at).toLocaleDateString(),
-            coverImage:
-              'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80',
+            coverImage: '/placeholder-cover.svg',
             altText: rm.rooms.name,
             members: [
               {
@@ -275,8 +270,7 @@ export const HomeScreen: React.FC = () => {
             badge: { label: rm.role === 'owner' ? 'Host' : 'Member', type: 'shared' },
             photoCount: 0,
             updatedAt: new Date(rm.rooms.created_at).toLocaleDateString(),
-            coverImage:
-              'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80',
+            coverImage: '/placeholder-cover.svg',
             altText: rm.rooms.name,
             members: [
               {
@@ -337,7 +331,7 @@ export const HomeScreen: React.FC = () => {
                 <img
                   className="w-full h-full object-cover"
                   alt={currentUser?.name || 'User profile'}
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuBOywiE7V8t1qbeeXpXX6gvjcINY4_kmN-zdjgJvvP1hXImASFvuTOFsRkiHZWFlA3PVsZanagfSZuBuf0KUkaw0hxUedCOLenmHwF-qw2uNb4Z-VeBclVtL0XyAXnmbcSCMUtnwp7VchVrs2ByLde60XhJe1cdhCgAsMywV-uDbPqIwEApa-hT4ExnW1mvbv54XLy2DE6IOmtKkWtXlAAldMBpNKtzedQQ48UCGGM6PzgmAn5oVnuL"
+                  src="/placeholder-avatar.svg"
                 />
               </div>
               <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-[#007952] ring-2 ring-white" />

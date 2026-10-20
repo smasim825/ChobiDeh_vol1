@@ -16,8 +16,7 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({ className = '', size = 'md
   }[size];
 
   // Official logo hosted asset
-  const logoUrl =
-    'https://lh3.googleusercontent.com/aida-public/AB6AXuA6HpuZh56gmI12uVprPzpOfjSDxqqaab7SBXpxA7BloKyp6SwBFCDSpnZLxjUqRvHe6Ln9ocvduGwx5UjnrkxRLVstxHrUR789LYW5TNMjnaRFJCwaX-RpeolWEO3l-N6lqxxOYke0I6jFdV5zd0Muspmdx8wTOvKvluSFYVP8eXXjBX_BV1RWXQ3uN1S_ZIA6tPHLYbexOh8ARjGdrD9STsMutqWF-zcSmStSihpTkTWKTfTd8wyHH6o1e6m_aq0ZsQ';
+  const logoUrl = '/chobideh-logo.svg';
 
   return (
     <div className={`flex items-center justify-center ${className}`}>

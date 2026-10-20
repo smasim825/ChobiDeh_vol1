@@ -15,7 +15,7 @@ interface PhotoItem {
 const GALLERY_PHOTOS: PhotoItem[] = [
   {
     id: 'p1',
-    url: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBZ2Oyarct3zts76pL3ykl25TXxM5aBCWVe2w5cxMWrNgR3038PsQaqGstDb7wMM5FQkP1se4inxWUFzUkgjK623pdc9nhCnyPh0dWtEuwojTBw-tucH7PhrRmreE1d3qtOSj2YkR4hnZxs5KgUt9VUr0x3WxOksjR8sTCsC5sqrvX_vCLl_k7BodYbfAw5gxlA8rmnjVdB6d3t4aT9-sEIGkbUIL_yQ77I9XtsZI6aLmk37QYpnHUB',
+    url: '/placeholder-cover.svg',
     alt: 'Stunning vertical travel photo of silhouetted figures walking along tide pools of Inani Beach during sunset.',
     person: 'all',
     aspect: 'aspect-[3/4]',
@@ -25,7 +25,7 @@ const GALLERY_PHOTOS: PhotoItem[] = [
   },
   {
     id: 'p2',
-    url: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDJ6N1eR69g4r-iQ7B7-l6z7mYwHjK1_jL1G7P4a6M3j-kR5g8A-t6m9_Q7B7-l6z7mYwHjK1_jL1G7P4a6M3j-kR5g8A-t6m9_Q7B7-l6z7mYwHjK1_jL1G7P4a6M3j-kR5g8A-t6m9_Q7B7-l6z7mYwHjK1_jL1G7P4a6M3j-kR5g8A-t6m9',
+    url: '/placeholder-cover.svg',
     alt: 'Golden sunset reflections over gentle waves on Inani Beach.',
     person: 'Tasnim',
     aspect: 'aspect-square',
@@ -35,7 +35,7 @@ const GALLERY_PHOTOS: PhotoItem[] = [
   },
   {
     id: 'p3',
-    url: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAlnfQKzTYLDga2FfwhzR6g8aZvDTZ0BD4FHTxs6htokkrNtfxZV9xqd4pe0dau_b2M7-LLDqbEA9trYrhJDOxHbnFVyxIUuqjLvLkjiEohzYPc-rXfAbNLJltMcw0ukzQZgRc0reh11btVjGeE0LZ-R1Y8DyJcWgZS0Twt5zUUtaAduUsSqV__XV1fc6kQZQH6e11ueB8HuKnYtA4y5Otr-UnSyc6zZz09x2muHy-bIHzGHEezhLN1',
+    url: '/placeholder-cover.svg',
     alt: 'Portrait of Rafiqul on sandy beach dunes in serene travel atmosphere.',
     person: 'Rafiqul',
     aspect: 'aspect-[3/4]',
@@ -45,7 +45,7 @@ const GALLERY_PHOTOS: PhotoItem[] = [
   },
   {
     id: 'p4',
-    url: 'https://lh3.googleusercontent.com/aida-public/AB6AXuA7qxW27ORxwyx4McgWcZGHIkrXd2ZwIbF1dbTaOAcR3hJHd83aRPT-P5FpM71uT8oRbtoFes_m6XpHOz_moPbfg1kzO_uvv9DqCzaGKJcX7a_ysmpAaNdEE1PGCMQUxxRYNYXNaC5yk_LtjGFo5n5SuGIkfjYfJkDlP7_AftN6rROmqkdd2p_k5a4dcf853Z3lG6wbq-2QoGAlFn9E1_QrgR0U8oN1BgFO0s7PJ1nMFVnm3L88eAxg',
+    url: '/placeholder-cover.svg',
     alt: 'Portrait of Samira smiling in front of sea breeze horizon.',
     person: 'Samira',
     aspect: 'aspect-square',
@@ -55,7 +55,7 @@ const GALLERY_PHOTOS: PhotoItem[] = [
   },
   {
     id: 'p5',
-    url: 'https://lh3.googleusercontent.com/aida-public/AB6AXuC9vs8HraHWrOZE-GT8_Nn0ENWPDHTsiKpaBjWe1Yq0p5HizrYHQ7xuB6cfjEk5pffqxzFyqAddOZIdsG5YWkvPo1kd09LwlOEuYQQxoToZ47AchIVY_4ajbnkCgjWnN9CjrKmzjpTMYcrZN6MBsIRf21v4SyqBukKTF6roX1kb_XaStDDrHxyiXuTVEIFZw_WccajqByBGbbWF7ZE8liVxJSt1FVwWsD9LsqRR7IUDMqKPcGy3z9wK',
+    url: '/placeholder-cover.svg',
     alt: 'Portrait of Tanvir laughing during coastal road trip.',
     person: 'Tanvir',
     aspect: 'aspect-[4/5]',
@@ -65,7 +65,7 @@ const GALLERY_PHOTOS: PhotoItem[] = [
   },
   {
     id: 'p6',
-    url: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBf-dFHqUJzS6AsGnsObKvM1ZSYPEdqaqwLfEuSU-KzRO7pCyUQdPC46ziMPT-Goedt16W0YlOfRn2_oGkrNBzp2iBxNtmiroEhqFkiWTCpZCk25vrJ5UiwMpdfS7-Udoz3ItUatALRG2r49VR26O_qimwtia7lBupaZf3r4OIZtleDm4yZ5nqS4f1vj63pd2EcODsRTI37gyioFoeiLReYSG09_cfUlcjUH8XyjtgirYLX2VTI4UuK',
+    url: '/placeholder-cover.svg',
     alt: "Wide panoramic landscape of Cox's Bazar coastline.",
     person: 'unsorted',
     aspect: 'aspect-video',
@@ -146,7 +146,7 @@ export const RoomAreaScreen: React.FC = () => {
         <section className="relative rounded-2xl overflow-hidden shadow-card border border-[#E6E1D8] mt-2">
           <div className="relative h-44 w-full">
             <img
-              src="https://lh3.googleusercontent.com/aida-public/AB6AXuBoM794fWcR0WqTsmZ-n_L7y_fB-rL1jH1T7a5M4j_mN1K7_jL1G7P4a6M3j-kR5g8A-t6m9_Q7B7-l6z7mYwHjK1_jL1G7P4a6M3j-kR5g8A-t6m9_Q7B7-l6z7mYwHjK1_jL1G7P4a6M3j-kR5g8A-t6m9_Q7B7-l6z7mYwHjK1_jL1G7P4a6M3j-kR5g8A-t6m9"
+              src="/placeholder-cover.svg"
               alt="Cox's Bazar Sunset"
               className="w-full h-full object-cover"
             />
@@ -188,17 +188,17 @@ export const RoomAreaScreen: React.FC = () => {
               <div className="flex -space-x-2.5 overflow-hidden">
                 <img
                   className="w-8 h-8 rounded-full ring-2 ring-white object-cover"
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuCfxRNFQFSdCj8iajZ62oVX4SzJqF2lhS2YNhkfQbV8UYwhsNa2-t6lCzChqYPq9MeqNFCBgZQjUh9GYMRxWzDoi4xE2bkdLiimgBum4O66sc20BGnqGfJEEhKwalnxiOK2LOW5vegS5ipMDSoqGaKpB3Oa9AN3Tkyk3zV1xN12JqJfhaG3Qi8tfE-Vaz2yMcML30r2HJoV2DFVtM9cSVJXU6h0mTIknIi19BBT3d7Zl-g161ja1OOw"
+                  src="/placeholder-avatar.svg"
                   alt="Tasnim"
                 />
                 <img
                   className="w-8 h-8 rounded-full ring-2 ring-white object-cover"
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuApXnDbtVFoEwAchXY_hbVn8VDdvzDVun56ckDau44eZSmzj392ziJg5IJ9JPyglfnzirgdIFF_QC0EUl6OLEfDMUrPXGFLmJrUZdqFbzDladGN11KOGc7be5nuWPglidOcH3hocefXHts6rYn3EbrWXK3brvBEa-tvZmiZryKBunm_QSsmOMkFqiyuKho7uiRPXjrKf7P1MxAMmsAXGKz0kYlFpFeodwnEnc6PdAZii4wzSkzlgegf"
+                  src="/placeholder-avatar.svg"
                   alt="Rafiq"
                 />
                 <img
                   className="w-8 h-8 rounded-full ring-2 ring-white object-cover"
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuBnYUB5z27Eyd8l0DH3XRN5UquaQn-xAmk3vj7JZ7guMNIS77HdALDvLjrxjOY8GonHWFIKTz3GgSp99UZD1snjSOrwQrVVmGemeAoFmDruBXI3jLsj7it00YrNfIwvMCOjQSGXeCLtA2Etd8XrrYEoQHwv8hK9EuEHwh4PWAPpEU_D7KnOixbVvX1-Jelx4zn_knuiJ1uCpBThkZbiSajIumDjMVM3KGdZ7gohe4GMnWFA7_rBi7SV"
+                  src="/placeholder-avatar.svg"
                   alt="Tanvir"
                 />
               </div>
@@ -335,7 +335,7 @@ export const RoomAreaScreen: React.FC = () => {
               <div className="w-5 h-5 rounded-full overflow-hidden ring-1 ring-[#0F766E]">
                 <img
                   className="w-full h-full object-cover"
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuCfxRNFQFSdCj8iajZ62oVX4SzJqF2lhS2YNhkfQbV8UYwhsNa2-t6lCzChqYPq9MeqNFCBgZQjUh9GYMRxWzDoi4xE2bkdLiimgBum4O66sc20BGnqGfJEEhKwalnxiOK2LOW5vegS5ipMDSoqGaKpB3Oa9AN3Tkyk3zV1xN12JqJfhaG3Qi8tfE-Vaz2yMcML30r2HJoV2DFVtM9cSVJXU6h0mTIknIi19BBT3d7Zl-g161ja1OOw"
+                  src="/placeholder-avatar.svg"
                   alt="Tasnim"
                 />
               </div>
@@ -356,7 +356,7 @@ export const RoomAreaScreen: React.FC = () => {
               <div className="w-5 h-5 rounded-full overflow-hidden ring-1 ring-[#0F766E]">
                 <img
                   className="w-full h-full object-cover"
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuApXnDbtVFoEwAchXY_hbVn8VDdvzDVun56ckDau44eZSmzj392ziJg5IJ9JPyglfnzirgdIFF_QC0EUl6OLEfDMUrPXGFLmJrUZdqFbzDladGN11KOGc7be5nuWPglidOcH3hocefXHts6rYn3EbrWXK3brvBEa-tvZmiZryKBunm_QSsmOMkFqiyuKho7uiRPXjrKf7P1MxAMmsAXGKz0kYlFpFeodwnEnc6PdAZii4wzSkzlgegf"
+                  src="/placeholder-avatar.svg"
                   alt="Rafiqul"
                 />
               </div>

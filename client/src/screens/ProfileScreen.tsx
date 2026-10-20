@@ -146,7 +146,7 @@ export const ProfileScreen: React.FC = () => {
                 <img
                   className="w-full h-full object-cover"
                   alt={currentUser?.name || 'Tasnim Rahman'}
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuDjDxKnJI_lzaHbWuodGA9ZD1etukufXXJJGPbe1chtc25iJcBSIBqXgMkeIS40lnS_ri-ZV7ZcYTmklBi_lzMVF0gdJR4ic_zsjbAtsrddUv59UQouipxSWh7Yn6fDOidsd-UrffxZZyJz2ztOHZwmBQI-prmQqnVFux88W9o1hlhUeq4hGFa6Dw8UO-8bMObMV5SJjIWBld2QOIjMvMYLILbhQ6WxZtYszTQ2JSKY8FIa49rx9cTp"
+                  src="/placeholder-avatar.svg"
                 />
               </div>
               <button
