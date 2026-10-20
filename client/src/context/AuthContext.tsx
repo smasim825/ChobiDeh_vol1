@@ -18,47 +18,61 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const processUserSession = async (user: any, _eventName?: string) => {
     const intent = localStorage.getItem(OAUTH_INTENT_KEY);
     const isProfileCompleted = Boolean(user.user_metadata?.profile_completed);
-    
-    // An account is newly created by OAuth if created_at is within the last 60 seconds and profile is not completed
-    const accountAgeMs = Math.abs(new Date(user.created_at).getTime() - Date.now());
-    const isBrandNewAccount = !isProfileCompleted && accountAgeMs < 60000;
 
-    // 1. Restriction: If user clicked "Login with Google", but this is a brand new account with no profile:
-    if (intent === 'login') {
+    // 1. Restriction: If user clicked "Login with Google", but this account does not have a completed profile/sign up:
+    if (intent === 'login' && !isProfileCompleted) {
       localStorage.removeItem(OAUTH_INTENT_KEY);
-      if (isBrandNewAccount) {
-        if (supabase) {
-          await supabase.auth.signOut();
-        }
-        setCurrentUser(null);
-        setErrorMessage('No ChobiDeh account found with this Google email. Please sign up first.');
-        setScreen('login');
-        if (window.location.hash) {
-          window.history.replaceState(null, '', window.location.pathname);
-        }
-        return;
+      setCurrentUser(null);
+      setErrorMessage('No ChobiDeh account found with this Google email. Please sign up first.');
+      setScreen('login');
+      if (window.location.hash) {
+        window.history.replaceState(null, '', window.location.pathname);
       }
+      if (supabase) {
+        await supabase.auth.signOut();
+      }
+      return;
     }
 
+    // 2. If user clicked "Sign up with Google" and hasn't confirmed profile/name, take them to complete-profile form
+    if (intent === 'signup' && !isProfileCompleted) {
+      localStorage.removeItem(OAUTH_INTENT_KEY);
+      const userObj: User = {
+        id: user.id,
+        name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'Member',
+        email: user.email || '',
+        biometricConsent: user.user_metadata?.biometric_consent ?? true,
+        faceClusteringEnabled: user.user_metadata?.face_clustering_enabled ?? true,
+        profileCompleted: false,
+      };
+      setCurrentUser(userObj);
+      setScreen('complete-profile');
+      if (window.location.hash) {
+        window.history.replaceState(null, '', window.location.pathname);
+      }
+      return;
+    }
+
+    // Under NO circumstances should an uncompleted account reach the Home screen
+    if (!isProfileCompleted) {
+      localStorage.removeItem(OAUTH_INTENT_KEY);
+      setScreen('complete-profile');
+      return;
+    }
+
+    // 3. Normal existing authenticated user with completed profile
+    localStorage.removeItem(OAUTH_INTENT_KEY);
     const userObj: User = {
       id: user.id,
       name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'Member',
       email: user.email || '',
       biometricConsent: user.user_metadata?.biometric_consent ?? true,
       faceClusteringEnabled: user.user_metadata?.face_clustering_enabled ?? true,
-      profileCompleted: isProfileCompleted,
+      profileCompleted: true,
     };
 
     setCurrentUser(userObj);
-
-    // 2. If user clicked "Sign up with Google" and hasn't confirmed profile/name, take them to complete-profile form
-    if (intent === 'signup' && !isProfileCompleted) {
-      localStorage.removeItem(OAUTH_INTENT_KEY);
-      setScreen('complete-profile');
-    } else {
-      localStorage.removeItem(OAUTH_INTENT_KEY);
-      setScreen((prev) => (prev === 'login' || prev === 'signup' ? 'home' : prev));
-    }
+    setScreen((prev) => (prev === 'login' || prev === 'signup' ? 'home' : prev));
 
     if (window.location.hash) {
       window.history.replaceState(null, '', window.location.pathname);
@@ -67,22 +81,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     if (supabase) {
-      // 1. Initial active session check via Supabase
-      supabase.auth.getSession().then(({ data: { session }, error }) => {
-        if (!error && session?.user) {
-          processUserSession(session.user, 'GET_SESSION');
-        }
-      });
+      let isHandlingAuth = false;
 
-      // 2. Real-time auth state subscription
+      // Real-time auth state subscription (fires INITIAL_SESSION on mount and SIGNED_IN after OAuth)
       const {
         data: { subscription },
       } = supabase.auth.onAuthStateChange(async (event, session) => {
-        if (session?.user) {
-          await processUserSession(session.user, event);
-        } else if (event === 'SIGNED_OUT') {
+        if (event === 'SIGNED_OUT') {
           setCurrentUser(null);
-          setScreen('login');
+          setScreen((prev) => (prev === 'complete-profile' || prev === 'login' || prev === 'signup' ? prev : 'login'));
+          return;
+        }
+
+        if (session?.user && !isHandlingAuth) {
+          isHandlingAuth = true;
+          try {
+            await processUserSession(session.user, event);
+          } finally {
+            isHandlingAuth = false;
+          }
         }
       });
 
