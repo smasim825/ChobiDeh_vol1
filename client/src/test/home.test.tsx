@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import { AuthProvider } from '../context/AuthContext';
 import { HomeScreen } from '../screens/HomeScreen';
 import { ProfileScreen } from '../screens/ProfileScreen';
@@ -62,9 +63,11 @@ describe('ChobiDeh Home & Room Suite', () => {
 
   it('renders CreateRoomScreen with form fields and preset selectors', () => {
     render(
-      <AuthProvider>
-        <CreateRoomScreen />
-      </AuthProvider>
+      <MemoryRouter>
+        <AuthProvider>
+          <CreateRoomScreen />
+        </AuthProvider>
+      </MemoryRouter>
     );
 
     expect(screen.getByRole('heading', { name: /create a room/i })).toBeInTheDocument();
@@ -74,9 +77,11 @@ describe('ChobiDeh Home & Room Suite', () => {
 
   it('renders JoinRoomScreen with room key inputs and paste code action', () => {
     render(
-      <AuthProvider>
-        <JoinRoomScreen />
-      </AuthProvider>
+      <MemoryRouter>
+        <AuthProvider>
+          <JoinRoomScreen />
+        </AuthProvider>
+      </MemoryRouter>
     );
 
     expect(screen.getByRole('heading', { name: /join a room/i })).toBeInTheDocument();
@@ -86,11 +91,22 @@ describe('ChobiDeh Home & Room Suite', () => {
   });
 
   it('navigates to Profile, Room Area, Create Room, and Join Room from the switcher in App', () => {
+    localStorage.setItem(
+      'chobideh_auth_user',
+      JSON.stringify({
+        id: 'usr_mock_123',
+        name: 'Tasnim',
+        email: 'tasnim@example.com',
+        biometricConsent: false,
+        profileCompleted: true,
+      })
+    );
+
     render(<App />);
 
     // Click Profile tab
-    const profileTab = screen.getByRole('button', { name: /profile/i });
-    fireEvent.click(profileTab);
+    const profileTabs = screen.getAllByRole('button', { name: /profile/i });
+    fireEvent.click(profileTabs[0]);
     expect(screen.getByText(/profile & settings/i)).toBeInTheDocument();
 
     // Click Room Area tab
@@ -107,5 +123,7 @@ describe('ChobiDeh Home & Room Suite', () => {
     const joinRoomTab = screen.getByRole('button', { name: /join room/i });
     fireEvent.click(joinRoomTab);
     expect(screen.getByRole('heading', { name: /join a room/i })).toBeInTheDocument();
+
+    localStorage.removeItem('chobideh_auth_user');
   });
 });

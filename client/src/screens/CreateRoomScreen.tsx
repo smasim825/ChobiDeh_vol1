@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../lib/supabase';
 
 export const CreateRoomScreen: React.FC = () => {
   const { setScreen } = useAuth();
+  const navigate = useNavigate();
 
   const [roomName, setRoomName] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('Travel & Roadtrip');
@@ -64,6 +66,7 @@ export const CreateRoomScreen: React.FC = () => {
       setSuccessInfo(data);
       setTimeout(() => {
         setScreen('home');
+        navigate('/');
       }, 1500);
       return;
     }
@@ -71,6 +74,7 @@ export const CreateRoomScreen: React.FC = () => {
     // Fallback simulation mode
     setIsSubmitting(false);
     setScreen('home');
+    navigate('/');
   };
 
   return (
@@ -81,8 +85,11 @@ export const CreateRoomScreen: React.FC = () => {
           <button
             type="button"
             aria-label="Back"
-            onClick={() => setScreen('home')}
-            className="w-9 h-9 rounded-full flex items-center justify-center text-[#005C55] hover:bg-[#E1F1EE] transition-colors active:scale-95 focus:outline-none"
+            onClick={() => {
+              setScreen('home');
+              navigate('/');
+            }}
+            className="w-9 h-9 rounded-full flex items-center justify-center text-[#0F766E] hover:bg-[#E1F1EE] transition-colors active:scale-95 focus:outline-none"
           >
             <span className="material-symbols-outlined text-[22px]">arrow_back</span>
           </button>

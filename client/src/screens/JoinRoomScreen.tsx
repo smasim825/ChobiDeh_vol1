@@ -1,16 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../lib/supabase';
 
 export const JoinRoomScreen: React.FC = () => {
   const { setScreen } = useAuth();
+  const { slug: routeSlug } = useParams<{ slug?: string }>();
+  const navigate = useNavigate();
 
-  const [joinSlug, setJoinSlug] = useState('');
+  const [joinSlug, setJoinSlug] = useState(routeSlug || '');
   const [passcode, setPasscode] = useState('');
   const [showScanner, setShowScanner] = useState(false);
   const [isJoining, setIsJoining] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+
+  useEffect(() => {
+    if (routeSlug) {
+      setJoinSlug(routeSlug);
+    }
+  }, [routeSlug]);
 
   const handlePasteCode = async () => {
     try {
@@ -49,6 +58,7 @@ export const JoinRoomScreen: React.FC = () => {
       setSuccess(true);
       setTimeout(() => {
         setScreen('home');
+        navigate('/');
       }, 1200);
       return;
     }
@@ -56,6 +66,7 @@ export const JoinRoomScreen: React.FC = () => {
     // Fallback simulation mode
     setIsJoining(false);
     setScreen('home');
+    navigate('/');
   };
 
   return (
@@ -66,8 +77,11 @@ export const JoinRoomScreen: React.FC = () => {
           <button
             type="button"
             aria-label="Back"
-            onClick={() => setScreen('home')}
-            className="w-9 h-9 rounded-full flex items-center justify-center text-[#005C55] hover:bg-[#E1F1EE] active:scale-95 transition-all focus:outline-none"
+            onClick={() => {
+              setScreen('home');
+              navigate('/');
+            }}
+            className="w-9 h-9 rounded-full flex items-center justify-center text-[#0F766E] hover:bg-[#E1F1EE] active:scale-95 transition-all focus:outline-none"
           >
             <span className="material-symbols-outlined text-[22px]">arrow_back</span>
           </button>

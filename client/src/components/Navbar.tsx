@@ -26,11 +26,13 @@ const SCREENS: ScreenTab[] = [
 ];
 
 export const Navbar: React.FC<NavbarProps> = ({ currentScreen, onSelectScreen }) => {
+  if (!import.meta.env.DEV) {
+    return null;
+  }
+
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const activeTab = SCREENS.find(
-    (s) => s.id === currentScreen || (s.id === 'home' && currentScreen === 'dashboard')
-  ) || SCREENS[0];
+  const activeTab = SCREENS.find((s) => s.id === currentScreen) || SCREENS[0];
 
   const handleSelect = (id: AuthScreen) => {
     onSelectScreen(id);
@@ -112,9 +114,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentScreen, onSelectScreen })
           className="hidden sm:flex items-center gap-1 overflow-x-auto py-0.5 custom-scrollbar"
         >
           {SCREENS.map((item) => {
-            const isActive =
-              currentScreen === item.id ||
-              (item.id === 'home' && currentScreen === 'dashboard');
+            const isActive = currentScreen === item.id;
 
             return (
               <button
@@ -139,9 +139,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentScreen, onSelectScreen })
       {mobileMenuOpen && (
         <div className="sm:hidden mt-2 pt-2 border-t border-[#E6E1D8] grid grid-cols-2 gap-1.5 animate-fadeIn">
           {SCREENS.map((item) => {
-            const isActive =
-              currentScreen === item.id ||
-              (item.id === 'home' && currentScreen === 'dashboard');
+            const isActive = currentScreen === item.id;
 
             return (
               <button
