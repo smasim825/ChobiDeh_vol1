@@ -3,12 +3,12 @@
 Update this file when starting or handing off a multi-file task. Keep entries short and current.
 
 ## Active work
-- Task: Security Hardening & Review Round 2 Fixes
+- Task: Fix SQLSTATE 42P13 in 20261022000000 migration for Supabase CI
   - Owner: Senior Full-Stack Engineer
-  - Status: Completed (Ready for commit & push)
-  - Branch: `fix/review-round-2`
-  - Scope: Additive migration `20261022000000_review_round_2_fixes.sql` (`photo_assignments.updated_at`, isolated `room_passcodes` table with zero client policies, non-rollback `join_room` rate limiter, role-checked `purge_room_face_data` for owner/admin, `withdraw_member_face_consent` for members, cryptographic join slugs via `gen_random_bytes`, safe storage object regex & pending media check, `profiles.onboarding_completed` trigger protection, revoked EXECUTE from anon). Client: structured `join_room` response handling, role-aware purge, initial session hydration on mount, typed route guards.
-  - Files modified: `supabase/migrations/20261022000000_review_round_2_fixes.sql`, `supabase/tests/database_security.test.sql`, `client/src/context/AuthContext.tsx`, `client/src/screens/HomeScreen.tsx`, `client/src/screens/JoinRoomScreen.tsx`, `client/src/components/RouteGuards.tsx`, `client/src/test/supabase_mocks.test.tsx`, `docs/*`.
+  - Status: In progress
+  - Branch: `fix/ci-migration-return-type`
+  - Scope: Added `DROP FUNCTION IF EXISTS` statements before replacing functions in `20261022000000_review_round_2_fixes.sql` (`resolve_uncertain_match`, `assign_photo_to_cluster`, `create_room`, `join_room`, `purge_room_face_data`, etc.) to prevent Postgres error 42P13 ("cannot change return type of existing function") during `supabase start` migration playback.
+  - Files modified: `supabase/migrations/20261022000000_review_round_2_fixes.sql`, `docs/HANDOFF.md`.
   - Tests run: 22/22 Vitest tests passed, `oxlint` 0 errors / 0 warnings, `tsc -b` 0 errors, `npm run build` passed.
 
 ## Handoff template
