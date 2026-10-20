@@ -1,6 +1,8 @@
-# Database Schema (Conceptual Draft)
+# Database Schema (Active Schema & Three-Level Matching Specification)
 
-This is a logical starting point, not a final migration. Review relationships, constraints, retention, and indexes before implementation.
+This document specifies the database schema for ChobiDeh, including the finalized Three-Level Photo Matching, Grouping, and Rest Photos architecture.
+
+---
 
 ## Entities (Active Schema)
 
@@ -18,9 +20,9 @@ This is a logical starting point, not a final migration. Review relationships, c
 - `join_slug` (text, unique, not null - 12 char cryptographic hex identifier)
 - `created_by` (uuid, references `auth.users.id` on delete set null)
 - `face_clustering_enabled` (boolean, default false - room owner control)
+- `max_photos` (int, default 1000 - room capacity cap)
 - `deleted_at` (timestamptz, nullable - soft deletion)
 - `created_at`, `updated_at` (timestamptz)
-- *(Note: room passcode hashes are isolated in `public.room_passcodes` to prevent exposure)*
 
 ### `public.room_passcodes` (Strictly Isolated - Internal Authentication Only)
 - `room_id` (uuid, pk, references `rooms.id` on delete cascade)
@@ -40,20 +42,24 @@ This is a logical starting point, not a final migration. Review relationships, c
 - `id` (uuid, pk)
 - `room_id` (uuid, references `rooms.id` on delete cascade)
 - `uploaded_by` (uuid, references `auth.users.id` on delete set null)
-- `storage_key` (text, unique, not null - format: `rooms/<room_id>/<uuid>`)
+- `storage_key` (text, unique, not null - single physical storage path in Cloudflare R2)
+- `thumbnail_storage_key` (text, nullable - 300x300 micro-thumbnail path)
 - `content_type` (text, not null)
 - `size_bytes` (bigint, not null)
+- `width` (int, nullable)
+- `height` (int, nullable)
 - `upload_status` (`pending`, `uploaded`, `failed`, `deleted`)
 - `processing_status` (`pending`, `processing`, `completed`, `failed`)
+- `rest_category` (`unknown_faces`, `no_people`, `other_unassigned` - Level 3 categorization, nullable if assigned)
 - `deleted_at` (timestamptz, nullable)
 - `created_at`, `updated_at` (timestamptz)
 
 ### `public.clusters` (Level 1 Confident Person Collections)
 - `id` (uuid, pk)
 - `room_id` (uuid, references `rooms.id` on delete cascade)
-- `cluster_code` (text, not null)
-- `display_name` (text, nullable - editable user label)
-- `thumbnail_storage_key` (text, nullable - private storage path, no permanent URLs)
+- `cluster_code` (text, not null - e.g. "person_1")
+- `display_name` (text, nullable - user editable name e.g. "Rafiqul")
+- `thumbnail_storage_key` (text, nullable - face crop preview storage key)
 - `face_count` (int, default 0)
 - `created_at`, `updated_at` (timestamptz)
 
@@ -62,15 +68,15 @@ This is a logical starting point, not a final migration. Review relationships, c
 - `room_id` (uuid, references `rooms.id` on delete cascade)
 - `media_id` (uuid, references `media.id` on delete cascade)
 - `cluster_id` (uuid, nullable, references `clusters.id` on delete set null)
-- `bounding_box` (jsonb, not null - normalized {x, y, width, height})
+- `bounding_box` (jsonb, not null - normalized `{x, y, width, height}`)
 - `detection_confidence` (real, not null)
+- `is_identified` (boolean, default false)
 - `created_at` (timestamptz)
-- *(Note: embeddings are strictly isolated in `face_embeddings` table)*
 
 ### `public.face_embeddings` (Strictly Isolated - Internal AI Worker Only)
 - `face_instance_id` (uuid, pk, references `face_instances.id` on delete cascade)
 - `room_id` (uuid, references `rooms.id` on delete cascade)
-- `embedding` (`vector(512)` if pgvector available, or `real[]` with check length = 512)
+- `embedding` (`vector(512)` or `real[512]`)
 - `model_version` (text, not null)
 - `created_at` (timestamptz)
 - *Security: RLS enabled, NO client policies, ALL privileges REVOKED from `anon` and `authenticated`.*
@@ -78,47 +84,56 @@ This is a logical starting point, not a final migration. Review relationships, c
 ### `public.uncertain_matches` (Level 2 Suggestions for User Confirmation)
 - `id` (uuid, pk)
 - `room_id` (uuid, references `rooms.id` on delete cascade)
-- `source_cluster_id` (uuid, references `clusters.id` on delete cascade)
-- `target_cluster_id` (uuid, references `clusters.id` on delete cascade)
-- `similarity_score` (real, not null)
-- `status` (`pending_review`, `merged`, `dismissed`)
+- `media_id` (uuid, references `media.id` on delete cascade)
+- `face_instance_id` (uuid, references `face_instances.id` on delete cascade)
+- `suggested_cluster_id` (uuid, references `clusters.id` on delete cascade - initial AI suggestion)
+- `candidate_clusters` (jsonb, not null - array of `{cluster_id, display_name, similarity_score}` for top candidate people)
+- `similarity_score` (real, not null - score for suggested_cluster_id)
+- `status` (`pending_review`, `confirmed`, `rejected`, `corrected`)
+- `resolved_cluster_id` (uuid, nullable, references `clusters.id` on delete set null - if corrected A -> B)
 - `reviewed_by` (uuid, nullable, references `auth.users.id` on delete set null)
 - `reviewed_at` (timestamptz, nullable)
 - `created_at` (timestamptz)
 
-### `public.photo_assignments`
+### `public.photo_assignments` (Many-to-Many Person Collections)
+- `id` (uuid, pk)
+- `room_id` (uuid, references `rooms.id` on delete cascade)
+- `media_id` (uuid, references `media.id` on delete cascade)
+- `cluster_id` (uuid, not null, references `clusters.id` on delete cascade)
+- `face_instance_id` (uuid, nullable, references `face_instances.id` on delete set null)
+- `assignment_level` (`confident` [L1], `confirmed_suggestion` [L2], `manual` [L3])
+- `is_confirmed` (boolean, default true)
+- `assigned_by` (uuid, nullable, references `auth.users.id` on delete set null)
+- `created_at`, `updated_at` (timestamptz)
+- Unique constraint: `(media_id, cluster_id, face_instance_id)` - prevents duplicate assignment of same face instance to same person collection.
+
+### `public.assignment_history` (Audit Log & Undo Support)
 - `id` (uuid, pk)
 - `room_id` (uuid, references `rooms.id` on delete cascade)
 - `media_id` (uuid, references `media.id` on delete cascade)
 - `face_instance_id` (uuid, nullable, references `face_instances.id` on delete set null)
-- `cluster_id` (uuid, nullable, references `clusters.id` on delete set null - null = unsorted)
-- `assignment_level` (`confident` [L1], `confirmed_merge` [L2], `manual` [L3])
-- `assigned_by` (uuid, nullable, references `auth.users.id` on delete set null)
-- `created_at`, `updated_at` (timestamptz)
+- `previous_cluster_id` (uuid, nullable, references `clusters.id` on delete set null)
+- `new_cluster_id` (uuid, nullable, references `clusters.id` on delete set null)
+- `action` (`assigned`, `corrected`, `rejected`, `undone`)
+- `performed_by` (uuid, references `auth.users.id` on delete set null)
+- `details` (jsonb, nullable)
+- `performed_at` (timestamptz DEFAULT NOW())
 
-### `public.processing_jobs` (Internal Background Processing Queue)
-- `id` (uuid, pk)
-- `media_id` (uuid, references `media.id` on delete cascade)
-- `job_type` (`face_detection`, `embedding_extraction`, `clustering`)
-- `status` (`pending`, `processing`, `completed`, `failed`, `cancelled`)
-- `attempts` (int, default 0)
-- `error_message` (text, nullable)
-- `created_at`, `updated_at` (timestamptz)
-- *Security: RLS enabled, NO client policies, ALL privileges REVOKED from `anon` and `authenticated`.*
+---
 
-### `public.join_attempts` (Rate Limiting)
-- `id` (uuid, pk)
-- `user_id` (uuid, references `auth.users.id` on delete cascade)
-- `room_slug` (text, not null)
-- `success` (boolean, not null)
-- `attempted_at` (timestamptz)
-- *Security: RLS enabled, NO client policies, ALL privileges REVOKED from `anon` and `authenticated`.*
+## Core Schema Rules & Guarantees
 
-## Rules
-- Every protected query must be scoped to authorized room membership.
-- Use foreign keys and deletion policies deliberately.
-- Do not store image bytes in these rows by default.
-- Never use a face template as a user login credential.
-- Keep a photo's room and uploader immutable unless an explicit transfer flow is designed.
-- Decide whether room deletion removes media immediately or enters a documented deletion workflow.
-- Add indexes based on measured query patterns, including room/time pagination.
+1. **Single Storage, Multiple Relations:**
+   - `public.media` contains the only reference to the physical image storage key (`storage_key`).
+   - Group photos containing multiple people have **one row** in `public.media` and **multiple rows** in `public.photo_assignments`.
+2. **Explicit Disassociation of Rejections:**
+   - Rejecting an uncertain match marks `public.uncertain_matches.status = 'rejected'`. It NEVER creates a fallback assignment to another candidate.
+3. **Safe A → B Corrections:**
+   - Correcting an assignment from Person A to Person B updates `uncertain_matches.status = 'corrected'`, sets `resolved_cluster_id = B`, inserts a confirmed row in `photo_assignments` for B, and logs the action in `assignment_history` for rollback.
+4. **Rest Photos Organization:**
+   - Photos with no high-confidence face assignments have `rest_category` set to:
+     - `'unknown_faces'`: `face_instances` exist, but no cluster assigned.
+     - `'no_people'`: zero `face_instances` detected.
+     - `'other_unassigned'`: blur/processing failure.
+5. **Model Non-Retraining Guarantee:**
+   - `assignment_history` and `photo_assignments` exist purely at the application database layer. They do not trigger automated retraining or model weight updates.

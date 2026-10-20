@@ -2,14 +2,29 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { calculateTargetDimensions, formatBytes, optimizePhotoForUpload } from '../utils/imageOptimizer';
 import { downloadPhotosAsZip } from '../services/downloadManager';
 import { exportRoomToGoogleDrive } from '../services/googleDriveExport';
+
+const mockRpc = vi.fn();
+const mockUpload = vi.fn();
+
+vi.mock('../lib/supabase', () => ({
+  isSupabaseConfigured: true,
+  supabase: {
+    rpc: (...args: unknown[]) => mockRpc(...args),
+    storage: {
+      from: () => ({
+        upload: (...args: unknown[]) => mockUpload(...args),
+      }),
+    },
+  },
+}));
+
 import { uploadRoomPhotos } from '../services/photoUploader';
-import { supabase } from '../lib/supabase';
 
 describe('Storage & Media Pipeline Unit Tests', () => {
   const originalFetch = global.fetch;
 
   beforeEach(() => {
-    vi.restoreAllMocks();
+    vi.clearAllMocks();
   });
 
   afterEach(() => {
@@ -114,24 +129,20 @@ describe('Storage & Media Pipeline Unit Tests', () => {
 
   describe('photoUploader (direct-to-storage & room cap)', () => {
     it('processes batch uploads with progress reporting and Supabase RPCs', async () => {
-      if (supabase) {
-        vi.spyOn(supabase, 'rpc').mockImplementation(((fn: string) => {
-          if (fn === 'create_upload') {
-            return Promise.resolve({
-              data: { media_id: 'mock-media-1', storage_key: 'rooms/r1/mock-media-1.webp' },
-              error: null,
-            });
-          }
-          if (fn === 'confirm_upload') {
-            return Promise.resolve({ data: { success: true }, error: null });
-          }
-          return Promise.resolve({ data: null, error: null });
-        }) as any);
+      mockRpc.mockImplementation((fn: string) => {
+        if (fn === 'create_upload') {
+          return Promise.resolve({
+            data: { media_id: 'mock-media-1', storage_key: 'rooms/r1/mock-media-1.webp' },
+            error: null,
+          });
+        }
+        if (fn === 'confirm_upload') {
+          return Promise.resolve({ data: { success: true }, error: null });
+        }
+        return Promise.resolve({ data: null, error: null });
+      });
 
-        vi.spyOn(supabase.storage, 'from').mockReturnValue({
-          upload: vi.fn().mockResolvedValue({ data: { path: 'rooms/r1' }, error: null }),
-        } as any);
-      }
+      mockUpload.mockResolvedValue({ data: { path: 'rooms/r1' }, error: null });
 
       const files = [
         new File(['sample-image-1'], 'beach1.jpg', { type: 'image/jpeg' }),
@@ -151,17 +162,15 @@ describe('Storage & Media Pipeline Unit Tests', () => {
     });
 
     it('aborts upload and surfaces user error when room reaches 1,000 photo cap', async () => {
-      if (supabase) {
-        vi.spyOn(supabase, 'rpc').mockImplementation(((fn: string) => {
-          if (fn === 'create_upload') {
-            return Promise.resolve({
-              data: null,
-              error: { message: 'Room has reached the maximum capacity of 1,000 photos.' },
-            });
-          }
-          return Promise.resolve({ data: null, error: null });
-        }) as any);
-      }
+      mockRpc.mockImplementation((fn: string) => {
+        if (fn === 'create_upload') {
+          return Promise.resolve({
+            data: null,
+            error: { message: 'Room has reached the maximum capacity of 1,000 photos.' },
+          });
+        }
+        return Promise.resolve({ data: null, error: null });
+      });
 
       const files = [new File(['sample-image'], 'photo.jpg', { type: 'image/jpeg' })];
       const result = await uploadRoomPhotos('d0000000-0000-0000-0000-000000000001', files);

@@ -1,115 +1,180 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../context/useAuth';
-import { uploadRoomPhotos, type UploadProgress } from '../services/photoUploader';
-import { downloadPhotosAsZip, triggerFileDownload, type DownloadProgress } from '../services/downloadManager';
-import { exportRoomToGoogleDrive, type GoogleDriveExportProgress } from '../services/googleDriveExport';
-import { formatBytes } from '../utils/imageOptimizer';
+import type { PhotoItem, ReviewSuggestion, RestPhotoCategory } from '../types/room';
 
-interface PhotoItem {
-  id: string;
-  url: string;
-  alt: string;
-  person: string;
-  aspect: string;
-  badge?: string;
-  clusterLevel: 'Level 1: Confident' | 'Level 2: Uncertain' | 'Level 3: Unsorted';
-  time: string;
-}
+// ==========================================
+// Seed Data: Curated Photos across 3 Levels
+// ==========================================
 
-const INITIAL_GALLERY_PHOTOS: PhotoItem[] = [
+const INITIAL_PHOTOS: PhotoItem[] = [
+  // Level 1: Confident Matches (Including Multi-Person Group Photos!)
   {
     id: 'p1',
     url: '/placeholder-cover.svg',
-    alt: 'Stunning vertical travel photo of silhouetted figures walking along tide pools of Inani Beach during sunset.',
-    person: 'all',
+    alt: 'Tasnim and Rafiqul walking along tide pools of Inani Beach during sunset.',
     aspect: 'aspect-[3/4]',
-    badge: 'Sunset Silhouette',
-    clusterLevel: 'Level 1: Confident',
     time: '5:42 PM',
+    // MULTI-PERSON PHOTO: Appears in both Tasnim's and Rafiqul's collections without duplicating files!
+    assignedPeople: ['Tasnim', 'Rafiqul'],
+    clusterLevel: 'Level 1: Confident',
+    detectedFaceCount: 2,
+    badge: 'Tasnim + Rafiqul (Group Photo)',
   },
   {
     id: 'p2',
     url: '/placeholder-cover.svg',
-    alt: 'Golden sunset reflections over gentle waves on Inani Beach.',
-    person: 'Tasnim',
+    alt: 'Portrait of Tasnim smiling on the sandy beach.',
     aspect: 'aspect-square',
-    badge: 'Person 1 (Tasnim)',
-    clusterLevel: 'Level 1: Confident',
     time: '5:30 PM',
+    assignedPeople: ['Tasnim'],
+    clusterLevel: 'Level 1: Confident',
+    detectedFaceCount: 1,
+    badge: 'Tasnim',
   },
   {
     id: 'p3',
     url: '/placeholder-cover.svg',
-    alt: 'Portrait of Rafiqul on sandy beach dunes in serene travel atmosphere.',
-    person: 'Rafiqul',
+    alt: 'Portrait of Rafiqul on sandy beach dunes.',
     aspect: 'aspect-[3/4]',
-    badge: 'Person 2 (Rafiqul)',
-    clusterLevel: 'Level 1: Confident',
     time: '4:15 PM',
+    assignedPeople: ['Rafiqul'],
+    clusterLevel: 'Level 1: Confident',
+    detectedFaceCount: 1,
+    badge: 'Rafiqul',
   },
   {
     id: 'p4',
     url: '/placeholder-cover.svg',
     alt: 'Portrait of Samira smiling in front of sea breeze horizon.',
-    person: 'Samira',
     aspect: 'aspect-square',
-    badge: 'Person 3 (Samira)',
-    clusterLevel: 'Level 1: Confident',
     time: '3:45 PM',
+    assignedPeople: ['Samira'],
+    clusterLevel: 'Level 1: Confident',
+    detectedFaceCount: 1,
+    badge: 'Samira',
   },
   {
     id: 'p5',
     url: '/placeholder-cover.svg',
-    alt: 'Portrait of Tanvir laughing during coastal road trip.',
-    person: 'Tanvir',
+    alt: 'Tanvir laughing during coastal road trip.',
     aspect: 'aspect-[4/5]',
-    badge: 'Person 4 (Tanvir)',
-    clusterLevel: 'Level 1: Confident',
     time: '2:10 PM',
+    assignedPeople: ['Tanvir'],
+    clusterLevel: 'Level 1: Confident',
+    detectedFaceCount: 1,
+    badge: 'Tanvir',
   },
+  // Level 3: Rest Photos — Subcategory: No People (Scenery / Food)
   {
     id: 'p6',
     url: '/placeholder-cover.svg',
-    alt: "Wide panoramic landscape of Cox's Bazar coastline.",
-    person: 'unsorted',
+    alt: "Wide panoramic sunset landscape of Cox's Bazar coastline.",
     aspect: 'aspect-video',
-    badge: 'Level 3: Unsorted (Scenic / No Face)',
-    clusterLevel: 'Level 3: Unsorted',
     time: '1:20 PM',
+    assignedPeople: [],
+    clusterLevel: 'Level 3: Rest',
+    restCategory: 'no_people',
+    detectedFaceCount: 0,
+    badge: 'Scenic / No People',
+  },
+  {
+    id: 'p7',
+    url: '/placeholder-cover.svg',
+    alt: 'Fresh seafood platter at beachside restaurant.',
+    aspect: 'aspect-square',
+    time: '12:45 PM',
+    assignedPeople: [],
+    clusterLevel: 'Level 3: Rest',
+    restCategory: 'no_people',
+    detectedFaceCount: 0,
+    badge: 'Food & Dining',
+  },
+  // Level 3: Rest Photos — Subcategory: Unknown Faces (Human face detected, but unassigned)
+  {
+    id: 'p8',
+    url: '/placeholder-cover.svg',
+    alt: 'Unidentified friend in distant beach volleyball game.',
+    aspect: 'aspect-[4/5]',
+    time: '11:15 AM',
+    assignedPeople: [],
+    clusterLevel: 'Level 3: Rest',
+    restCategory: 'unknown_faces',
+    detectedFaceCount: 1,
+    badge: 'Unknown Face Detected',
+  },
+  // Level 3: Rest Photos — Subcategory: Other Unassigned (Blur / Low light)
+  {
+    id: 'p9',
+    url: '/placeholder-cover.svg',
+    alt: 'Motion blurred night walk along Marine Drive.',
+    aspect: 'aspect-video',
+    time: '9:30 PM',
+    assignedPeople: [],
+    clusterLevel: 'Level 3: Rest',
+    restCategory: 'other_unassigned',
+    detectedFaceCount: 0,
+    badge: 'Low Light / Motion Blur',
+  },
+];
+
+const INITIAL_SUGGESTIONS: ReviewSuggestion[] = [
+  {
+    id: 'sug_1',
+    photoId: 'p_uncertain_1',
+    photoUrl: '/placeholder-cover.svg',
+    suggestedPerson: {
+      clusterId: 'cluster_2',
+      name: 'Person 2 (Rafiqul)',
+      similarityScore: 0.74,
+    },
+    candidatePeople: [
+      { clusterId: 'cluster_2', name: 'Rafiqul', similarityScore: 0.74 },
+      { clusterId: 'cluster_3', name: 'Samira', similarityScore: 0.71 },
+      { clusterId: 'cluster_4', name: 'Tanvir', similarityScore: 0.68 },
+    ],
+    status: 'pending',
   },
 ];
 
 export const RoomAreaScreen: React.FC = () => {
   const { setScreen } = useAuth();
 
-  const [photos, setPhotos] = useState<PhotoItem[]>(INITIAL_GALLERY_PHOTOS);
-  const [activeFilter, setActiveFilter] = useState<string>('all');
+  // Navigation: Primary sections
+  // 'people' = Level 1 Confirmed Collections
+  // 'suggestions' = Level 2 Close Match Review
+  // 'rest' = Level 3 Rest Photos
+  const [activeTab, setActiveTab] = useState<'people' | 'suggestions' | 'rest'>('people');
+
+  // Level 1 Subfilter: Selected Person
+  const [selectedPerson, setSelectedPerson] = useState<string>('all');
+
+  // Level 3 Subfilter: Rest Photos Category
+  const [restSubfilter, setRestSubfilter] = useState<RestPhotoCategory>('unknown_faces');
+
+  // Photos State
+  const [photos, setPhotos] = useState<PhotoItem[]>(INITIAL_PHOTOS);
+
+  // Suggestions State (Level 2)
+  const [suggestions, setSuggestions] = useState<ReviewSuggestion[]>(INITIAL_SUGGESTIONS);
+
+  // History for Undo
+  const [undoStack, setUndoStack] = useState<{
+    suggestionId: string;
+    previousState: ReviewSuggestion;
+    actionDescription: string;
+  }[]>([]);
+
+  // Modals & UI helpers
   const [selectedPhoto, setSelectedPhoto] = useState<PhotoItem | null>(null);
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [copiedKey, setCopiedKey] = useState(false);
-  const [showUncertainReview] = useState(true);
+  const [selectedCandidatePerson, setSelectedCandidatePerson] = useState<string>('Rafiqul');
+  const [alertMessage, setAlertMessage] = useState<string | null>(null);
 
-  // Upload state
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const [showUploadModal, setShowUploadModal] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState<UploadProgress | null>(null);
-
-  // Export state
-  const [showExportModal, setShowExportModal] = useState(false);
-  const [isDownloadingZip, setIsDownloadingZip] = useState(false);
-  const [downloadProgress, setDownloadProgress] = useState<DownloadProgress | null>(null);
-  const [isExportingDrive, setIsExportingDrive] = useState(false);
-  const [driveProgress, setDriveProgress] = useState<GoogleDriveExportProgress | null>(null);
-
-  const roomCapacityLimit = 1000;
-  const currentRoomPhotoCount = 136 + photos.length;
-  const roomCapacityPercent = Math.min(100, Math.round((currentRoomPhotoCount / roomCapacityLimit) * 100));
-
-  const filteredPhotos =
-    activeFilter === 'all'
-      ? photos
-      : photos.filter((p) => p.person.toLowerCase() === activeFilter.toLowerCase());
+  const showAlert = (msg: string) => {
+    setAlertMessage(msg);
+    setTimeout(() => setAlertMessage(null), 4000);
+  };
 
   const handleCopyKey = () => {
     navigator.clipboard?.writeText('CB-9821');
@@ -117,103 +182,174 @@ export const RoomAreaScreen: React.FC = () => {
     setTimeout(() => setCopiedKey(false), 2500);
   };
 
-  const handleTriggerUpload = () => {
-    fileInputRef.current?.click();
+  // ==========================================
+  // Level 2 Review Actions: Confirm, Correct, Reject, Undo
+  // ==========================================
+
+  // 1. Confirm AI Suggested Person
+  const handleConfirmSuggestion = (sugId: string) => {
+    const sug = suggestions.find((s) => s.id === sugId);
+    if (!sug) return;
+
+    // Save state for undo
+    setUndoStack((prev) => [
+      ...prev,
+      { suggestionId: sugId, previousState: { ...sug }, actionDescription: `Confirmed as ${sug.suggestedPerson.name}` },
+    ]);
+
+    // Mark suggestion confirmed
+    setSuggestions((prev) =>
+      prev.map((s) =>
+        s.id === sugId ? { ...s, status: 'confirmed', resolvedToPerson: sug.suggestedPerson } : s
+      )
+    );
+
+    // Add photo to confirmed Level 1 photos
+    const newConfirmedPhoto: PhotoItem = {
+      id: sug.photoId,
+      url: sug.photoUrl,
+      alt: `Confirmed photo of ${sug.suggestedPerson.name}`,
+      aspect: 'aspect-square',
+      time: 'Just now',
+      assignedPeople: [sug.suggestedPerson.name.replace(/Person \d+ \((.*)\)/, '$1')],
+      clusterLevel: 'Level 1: Confident',
+      detectedFaceCount: 1,
+      badge: sug.suggestedPerson.name,
+    };
+    setPhotos((prev) => [newConfirmedPhoto, ...prev]);
+
+    showAlert(`Confirmed! Photo assigned to ${sug.suggestedPerson.name}.`);
   };
 
-  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (!files || files.length === 0) return;
+  // 2. Explicitly Correct A -> B (e.g., AI suggested Rafiqul, user selects Samira)
+  const handleCorrectSuggestion = (sugId: string, targetPersonName: string) => {
+    const sug = suggestions.find((s) => s.id === sugId);
+    if (!sug) return;
 
-    const fileList = Array.from(files);
-    setShowUploadModal(true);
-    setIsUploading(true);
+    // Save state for undo
+    setUndoStack((prev) => [
+      ...prev,
+      {
+        suggestionId: sugId,
+        previousState: { ...sug },
+        actionDescription: `Corrected from ${sug.suggestedPerson.name} to ${targetPersonName}`,
+      },
+    ]);
 
-    try {
-      const result = await uploadRoomPhotos('d0000000-0000-0000-0000-000000000001', fileList, (prog) => {
-        setUploadProgress(prog);
-      });
+    // Resolve suggestion for A, assign to B
+    setSuggestions((prev) =>
+      prev.map((s) =>
+        s.id === sugId
+          ? {
+              ...s,
+              status: 'corrected',
+              resolvedToPerson: { clusterId: `cluster_${targetPersonName.toLowerCase()}`, name: targetPersonName },
+            }
+          : s
+      )
+    );
 
-      // Append successfully uploaded photos to gallery feed
-      if (result.successful.length > 0) {
-        const newItems: PhotoItem[] = result.successful.map((item) => ({
-          id: item.mediaId,
-          url: URL.createObjectURL(item.optimized.blob),
-          alt: `Newly uploaded photo (${formatBytes(item.optimized.compressedSizeBytes)})`,
-          person: 'unsorted',
-          aspect: 'aspect-square',
-          badge: 'Level 3: Unsorted (New)',
-          clusterLevel: 'Level 3: Unsorted',
-          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        }));
+    // Create confirmed assignment to Person B
+    const newConfirmedPhoto: PhotoItem = {
+      id: sug.photoId,
+      url: sug.photoUrl,
+      alt: `Photo corrected to ${targetPersonName}`,
+      aspect: 'aspect-square',
+      time: 'Just now',
+      assignedPeople: [targetPersonName],
+      clusterLevel: 'Level 1: Confident',
+      detectedFaceCount: 1,
+      badge: `${targetPersonName} (Corrected from ${sug.suggestedPerson.name})`,
+    };
+    setPhotos((prev) => [newConfirmedPhoto, ...prev]);
 
-        setPhotos((prev) => [...newItems, ...prev]);
-      }
-    } finally {
-      setIsUploading(false);
-      // Reset input value so same files can be re-selected if desired
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
+    showAlert(`Corrected! Removed pending suggestion for ${sug.suggestedPerson.name} and assigned photo to ${targetPersonName}. (Model weights are never altered).`);
+  };
+
+  // 3. Reject Suggestion
+  // Rule: Rejection alone does NOT auto-assign to anyone else! Photo stays in Level 3 Unknown Faces.
+  const handleRejectSuggestion = (sugId: string) => {
+    const sug = suggestions.find((s) => s.id === sugId);
+    if (!sug) return;
+
+    setUndoStack((prev) => [
+      ...prev,
+      { suggestionId: sugId, previousState: { ...sug }, actionDescription: `Rejected suggestion for ${sug.suggestedPerson.name}` },
+    ]);
+
+    setSuggestions((prev) =>
+      prev.map((s) => (s.id === sugId ? { ...s, status: 'rejected' } : s))
+    );
+
+    // Photo remains in Level 3 Rest (Unknown Faces)
+    showAlert(`Suggestion rejected. Photo kept in Level 3 Rest Photos (Unknown Faces). Rejection does NOT auto-assign to another person.`);
+  };
+
+  // 4. Undo Last Action
+  const handleUndo = () => {
+    if (undoStack.length === 0) return;
+    const lastAction = undoStack[undoStack.length - 1];
+
+    // Revert suggestion
+    setSuggestions((prev) =>
+      prev.map((s) => (s.id === lastAction.suggestionId ? { ...lastAction.previousState } : s))
+    );
+
+    // Remove photo if it was added to photos
+    setPhotos((prev) => prev.filter((p) => p.id !== lastAction.previousState.photoId));
+
+    // Pop from stack
+    setUndoStack((prev) => prev.slice(0, prev.length - 1));
+
+    showAlert(`Undone: ${lastAction.actionDescription} was reverted.`);
+  };
+
+  // ==========================================
+  // Level 3 Manual Tagging Action
+  // ==========================================
+  const handleManualTagUnknownFace = (photoId: string, personName: string) => {
+    setPhotos((prev) =>
+      prev.map((p) => {
+        if (p.id === photoId) {
+          return {
+            ...p,
+            assignedPeople: [personName],
+            clusterLevel: 'Level 1: Confident',
+            restCategory: undefined,
+            badge: `${personName} (Manually Tagged)`,
+          };
+        }
+        return p;
+      })
+    );
+    showAlert(`Successfully identified face and assigned photo to ${personName}!`);
+  };
+
+  // ==========================================
+  // Filtered Photo Computations
+  // ==========================================
+  const displayPhotos = photos.filter((p) => {
+    if (activeTab === 'people') {
+      // Level 1: Confident person collections
+      if (p.clusterLevel !== 'Level 1: Confident') return false;
+      if (selectedPerson === 'all') return true;
+      // Multi-person check: Is selectedPerson in assignedPeople array?
+      return p.assignedPeople.map((n) => n.toLowerCase()).includes(selectedPerson.toLowerCase());
     }
-  };
 
-  const handleDownloadAllZip = async () => {
-    setIsDownloadingZip(true);
-    try {
-      const itemsToDownload = photos.map((p, i) => ({
-        id: p.id,
-        url: p.url,
-        filename: `Coxs_Bazar_Photo_${String(i + 1).padStart(3, '0')}.webp`,
-      }));
-
-      const zipBlob = await downloadPhotosAsZip("Cox's Bazar", itemsToDownload, (prog) => {
-        setDownloadProgress(prog);
-      });
-
-      triggerFileDownload(zipBlob, "Coxs_Bazar_Winter_Escape_Photos.zip");
-    } catch (err: unknown) {
-      alert(err instanceof Error ? err.message : 'Failed to download ZIP');
-    } finally {
-      setIsDownloadingZip(false);
+    if (activeTab === 'rest') {
+      // Level 3: Rest Photos
+      if (p.clusterLevel !== 'Level 3: Rest') return false;
+      return p.restCategory === restSubfilter;
     }
-  };
 
-  const handleExportToGoogleDrive = async () => {
-    setIsExportingDrive(true);
-    try {
-      const itemsToExport = photos.map((p, i) => ({
-        id: p.id,
-        url: p.url,
-        name: `Coxs_Bazar_${i + 1}.webp`,
-      }));
+    return false;
+  });
 
-      await exportRoomToGoogleDrive({
-        roomName: "Cox's Bazar Winter Escape",
-        photos: itemsExportFormat(itemsToExport),
-        onProgress: (prog) => {
-          setDriveProgress(prog);
-        },
-      });
-    } finally {
-      setIsExportingDrive(false);
-    }
-  };
-
-  const itemsExportFormat = (items: Array<{ id: string; url: string; name: string }>) => items;
+  const pendingSuggestionsCount = suggestions.filter((s) => s.status === 'pending').length;
 
   return (
     <div className="bg-[#F8F5EF] text-[#101E1C] antialiased selection:bg-[#9CF2E8] selection:text-[#00201D] min-h-screen pb-28">
-      {/* Hidden native file input for direct photo upload */}
-      <input
-        ref={fileInputRef}
-        type="file"
-        multiple
-        accept="image/*"
-        className="hidden"
-        onChange={handleFileChange}
-      />
-
       {/* 1. TOP APP BAR */}
       <header className="fixed top-0 left-0 w-full z-40 flex items-center justify-between px-4 h-14 bg-[#F8F5EF]/85 backdrop-blur-md border-b border-[#E6E1D8] shadow-xs">
         <div className="flex items-center gap-2">
@@ -232,7 +368,7 @@ export const RoomAreaScreen: React.FC = () => {
             <p className="text-[11px] text-[#3E4947] flex items-center gap-1 font-medium">
               <span>Nov 12 - 15</span>
               <span>•</span>
-              <span className="text-[#005C55] font-semibold">3-Level AI Active</span>
+              <span className="text-[#005C55] font-semibold">3-Level Matching Active</span>
             </p>
           </div>
         </div>
@@ -248,21 +384,30 @@ export const RoomAreaScreen: React.FC = () => {
           </button>
           <button
             type="button"
-            aria-label="Export room photos"
-            onClick={() => setShowExportModal(true)}
-            className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-[#E1F1EE] active:scale-95 transition-all text-[#0F766E]"
-            title="Download or Backup Album"
+            aria-label="Room details"
+            onClick={() =>
+              alert("Room Details: Key CB-9821. Three-Level Photo Matching organizes photos with single original storage, multi-person linking, human review for close matches, and categorized Rest Photos.")
+            }
+            className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-[#E1F1EE] active:scale-95 transition-all text-[#3E4947]"
           >
-            <span className="material-symbols-outlined text-[20px]">download</span>
+            <span className="material-symbols-outlined text-[20px]">more_vert</span>
           </button>
         </div>
       </header>
 
+      {/* Alert Toast Notification */}
+      {alertMessage && (
+        <div className="fixed top-16 left-4 right-4 z-50 max-w-lg mx-auto bg-[#005C55] text-white px-4 py-2.5 rounded-xl shadow-card text-[12px] font-medium flex items-center gap-2 animate-fadeIn">
+          <span className="material-symbols-outlined text-[16px]">info</span>
+          <span>{alertMessage}</span>
+        </div>
+      )}
+
       {/* MAIN CONTAINER */}
       <main className="max-w-lg mx-auto pt-16 px-4">
-        {/* 2. EDITORIAL HERO BANNER */}
+        {/* 2. HERO BANNER */}
         <section className="relative rounded-2xl overflow-hidden shadow-card border border-[#E6E1D8] mt-2">
-          <div className="relative h-44 w-full">
+          <div className="relative h-40 w-full">
             <img
               src="/placeholder-cover.svg"
               alt="Cox's Bazar Sunset"
@@ -270,7 +415,7 @@ export const RoomAreaScreen: React.FC = () => {
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
 
-            {/* Top Room Key Badge */}
+            {/* Room Key Badge */}
             <div className="absolute top-3 right-3">
               <button
                 type="button"
@@ -286,451 +431,413 @@ export const RoomAreaScreen: React.FC = () => {
               </button>
             </div>
 
-            {/* Bottom Title */}
+            {/* Room Title & Policy Badge */}
             <div className="absolute bottom-3 left-3 right-3 text-white">
               <div className="flex items-center gap-1.5 mb-0.5">
                 <span className="material-symbols-outlined text-[14px] text-[#6FFBBE]">verified_user</span>
                 <span className="text-[10px] tracking-wide text-[#D6E6E2] uppercase font-bold">
-                  Private to Room Members
+                  Private to Room Members • Cloudflare R2
                 </span>
               </div>
-              <h2 className="text-[20px] font-bold tracking-tight text-white drop-shadow-xs">
+              <h2 className="text-[19px] font-bold tracking-tight text-white drop-shadow-xs">
                 Cox's Bazar Winter Escape
               </h2>
             </div>
           </div>
 
-          {/* Contributor Avatars & Invite Row */}
+          {/* Members Bar & Room Quota (1,000 Photo Cap) */}
           <div className="p-3 bg-white flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="flex -space-x-2.5 overflow-hidden">
-                <img
-                  className="w-8 h-8 rounded-full ring-2 ring-white object-cover"
-                  src="/placeholder-avatar.svg"
-                  alt="Tasnim"
-                />
-                <img
-                  className="w-8 h-8 rounded-full ring-2 ring-white object-cover"
-                  src="/placeholder-avatar.svg"
-                  alt="Rafiq"
-                />
-                <img
-                  className="w-8 h-8 rounded-full ring-2 ring-white object-cover"
-                  src="/placeholder-avatar.svg"
-                  alt="Tanvir"
-                />
+              <div className="flex -space-x-2 overflow-hidden">
+                <div className="w-7 h-7 rounded-full bg-[#005C55] text-white flex items-center justify-center text-[10px] font-bold ring-2 ring-white">T</div>
+                <div className="w-7 h-7 rounded-full bg-[#8E4E14] text-white flex items-center justify-center text-[10px] font-bold ring-2 ring-white">R</div>
+                <div className="w-7 h-7 rounded-full bg-[#0F766E] text-white flex items-center justify-center text-[10px] font-bold ring-2 ring-white">S</div>
               </div>
               <div className="flex flex-col text-left">
-                <span className="text-[12px] text-[#101E1C] font-semibold">Tasnim (Host) + 3 others</span>
-                <span className="text-[10px] text-[#3E4947]">Zero-egress Cloudflare R2</span>
+                <span className="text-[12px] text-[#101E1C] font-semibold">Tasnim, Rafiqul, Samira, Tanvir</span>
+                <span className="text-[10px] text-[#3E4947]">Room Quota: {photos.length} / 1,000 photos</span>
               </div>
             </div>
 
             <button
               type="button"
               onClick={() => setShowInviteModal(true)}
-              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full border border-[#E2DDD4] bg-[#F8F5EF] text-[#101E1C] hover:bg-[#E1F1EE] active:scale-95 transition-all text-[12px] font-semibold"
+              className="inline-flex items-center gap-1 px-3 py-1 rounded-full border border-[#E2DDD4] bg-[#F8F5EF] text-[#101E1C] hover:bg-[#E1F1EE] active:scale-95 transition-all text-[11px] font-semibold"
             >
-              <span className="material-symbols-outlined text-[15px] text-[#005C55]">person_add</span>
+              <span className="material-symbols-outlined text-[14px] text-[#005C55]">person_add</span>
               <span>Invite</span>
             </button>
           </div>
         </section>
 
-        {/* ROOM STORAGE QUOTA INDICATOR */}
-        <section className="mt-3 p-2.5 bg-white rounded-xl border border-[#E6E1D8] shadow-xs">
-          <div className="flex items-center justify-between text-[11px] mb-1.5">
-            <span className="font-semibold text-[#101E1C] flex items-center gap-1">
-              <span className="material-symbols-outlined text-[14px] text-[#0F766E]">cloud_done</span>
-              Room Storage Capacity
-            </span>
-            <span className="text-[#3E4947] font-medium">
-              <strong className="text-[#0F766E]">{currentRoomPhotoCount}</strong> / {roomCapacityLimit} photos ({roomCapacityPercent}%)
-            </span>
-          </div>
-          <div className="w-full bg-[#E6E1D8] h-1.5 rounded-full overflow-hidden">
-            <div
-              className={`h-full transition-all duration-500 ${
-                roomCapacityPercent > 90 ? 'bg-[#BA1A1A]' : 'bg-[#0F766E]'
-              }`}
-              style={{ width: `${roomCapacityPercent}%` }}
-            />
-          </div>
-          <div className="flex items-center justify-between mt-1 text-[10px] text-[#6E7977]">
-            <span>WebP 2K auto-compressed</span>
-            <span>30 days post-trip retention</span>
-          </div>
-        </section>
-
-        {/* 3. QUICK ACTION BUTTONS */}
-        <section className="mt-4 flex items-center gap-2">
+        {/* 3. UPLOAD & DUAL EXPORT ACTION BAR */}
+        <section className="mt-3 space-y-2">
           <button
             type="button"
-            onClick={handleTriggerUpload}
-            className="flex-1 inline-flex items-center justify-center gap-2 px-5 min-h-[48px] h-[50px] rounded-full bg-[#0F766E] text-white font-semibold text-[15px] tracking-wide hover:bg-[#005C55] active:scale-[0.98] transition-all shadow-sm"
+            onClick={() => showAlert("Direct upload to Cloudflare R2 via pre-signed URL")}
+            className="w-full inline-flex items-center justify-center gap-2 px-5 min-h-[48px] h-[50px] rounded-full bg-[#0F766E] text-white font-semibold text-[15px] tracking-wide hover:bg-[#005C55] active:scale-98 transition-all shadow-xs"
           >
-            <span className="material-symbols-outlined text-[20px]">upload_file</span>
+            <span className="material-symbols-outlined text-[18px]">upload_file</span>
             <span>Upload Photos</span>
           </button>
-          <button
-            type="button"
-            onClick={() => setShowExportModal(true)}
-            className="inline-flex items-center gap-1.5 px-4 min-h-[48px] h-[50px] rounded-full border border-[#E2DDD4] bg-white text-[#101E1C] hover:bg-[#F8F5EF] active:scale-[0.98] transition-all text-[14px] font-semibold shadow-xs"
-          >
-            <span className="material-symbols-outlined text-[18px] text-[#0F766E]">download</span>
-            <span>Export</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => alert('Playing Archival Memory Reel: Cox’s Bazar Sunset Highlight')}
-            className="inline-flex items-center gap-1.5 px-3.5 min-h-[48px] h-[50px] rounded-full border border-[#E2DDD4] bg-white text-[#101E1C] hover:bg-[#F8F5EF] active:scale-[0.98] transition-all text-[14px] font-semibold shadow-xs"
-            title="Archival Reel"
-          >
-            <span className="material-symbols-outlined text-[18px] text-[#8E4E14]">movie</span>
-          </button>
+
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              onClick={() => showAlert("Starting in-browser ZIP download of all authorized photos...")}
+              className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl border border-[#E2DDD4] bg-white text-[#101E1C] hover:bg-[#F8F5EF] active:scale-98 transition-all text-[12px] font-semibold shadow-xs"
+            >
+              <span className="material-symbols-outlined text-[17px] text-[#005C55]">download</span>
+              <span>Save to Phone (ZIP)</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => showAlert("Exporting album cloud-to-cloud directly into your Google Drive folder...")}
+              className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl border border-[#E2DDD4] bg-white text-[#101E1C] hover:bg-[#F8F5EF] active:scale-98 transition-all text-[12px] font-semibold shadow-xs"
+            >
+              <span className="material-symbols-outlined text-[17px] text-[#4285F4]">cloud_upload</span>
+              <span>Export to Google Drive</span>
+            </button>
+          </div>
         </section>
 
-        {/* 4. LEVEL 2 — UNCERTAIN MATCH REVIEW CARD */}
-        {showUncertainReview && (
-          <section className="mt-4 p-3.5 bg-[#FFF8ED] rounded-xl border border-[#FFAB69]/40 shadow-xs text-left animate-fadeIn">
-            <div className="flex items-start gap-2.5">
-              <span className="material-symbols-outlined text-[#8E4E14] text-[20px] shrink-0 mt-0.5">
-                help_center
+        {/* 4. THREE-LEVEL PRIMARY NAVIGATION TABS */}
+        <section className="mt-5">
+          <div className="flex p-1 bg-[#E8E3D9] rounded-xl text-[13px] font-semibold">
+            {/* Tab 1: Level 1 Confirmed People */}
+            <button
+              type="button"
+              onClick={() => setActiveTab('people')}
+              className={`flex-1 py-2 rounded-lg transition-all flex items-center justify-center gap-1.5 ${
+                activeTab === 'people'
+                  ? 'bg-white text-[#005C55] shadow-xs'
+                  : 'text-[#3E4947] hover:text-[#101E1C]'
+              }`}
+            >
+              <span className="material-symbols-outlined text-[16px]">groups</span>
+              <span>People (Level 1)</span>
+            </button>
+
+            {/* Tab 2: Level 2 Close Match Suggestions */}
+            <button
+              type="button"
+              onClick={() => setActiveTab('suggestions')}
+              className={`flex-1 py-2 rounded-lg transition-all flex items-center justify-center gap-1.5 relative ${
+                activeTab === 'suggestions'
+                  ? 'bg-white text-[#8E4E14] shadow-xs'
+                  : 'text-[#3E4947] hover:text-[#101E1C]'
+              }`}
+            >
+              <span className="material-symbols-outlined text-[16px]">rule</span>
+              <span>Review Suggestions</span>
+              {pendingSuggestionsCount > 0 && (
+                <span className="w-5 h-5 rounded-full bg-[#FFAB69] text-[#5C3E20] text-[10px] font-bold flex items-center justify-center">
+                  {pendingSuggestionsCount}
+                </span>
+              )}
+            </button>
+
+            {/* Tab 3: Level 3 Rest Photos */}
+            <button
+              type="button"
+              onClick={() => setActiveTab('rest')}
+              className={`flex-1 py-2 rounded-lg transition-all flex items-center justify-center gap-1.5 ${
+                activeTab === 'rest'
+                  ? 'bg-white text-[#BA1A1A] shadow-xs'
+                  : 'text-[#3E4947] hover:text-[#101E1C]'
+              }`}
+            >
+              <span className="material-symbols-outlined text-[16px]">photo_library</span>
+              <span>Rest Photos</span>
+            </button>
+          </div>
+        </section>
+
+        {/* ========================================================= */}
+        {/* VIEW 1: LEVEL 1 CONFIRMED PEOPLE COLLECTIONS              */}
+        {/* ========================================================= */}
+        {activeTab === 'people' && (
+          <section className="mt-4 text-left animate-fadeIn">
+            <h3 className="text-[14px] font-bold text-[#101E1C] mb-2">Person Collections</h3>
+
+            {/* Explanation Note */}
+            <div className="p-2.5 bg-[#E1F1EE] rounded-xl border border-[#005C55]/20 text-[11px] text-[#005C55] mb-3 flex items-start gap-1.5">
+              <span className="material-symbols-outlined text-[15px] shrink-0 mt-0.5">verified</span>
+              <span>
+                <strong>Level 1 Confident Auto-Matching:</strong> Original photo is stored only once. If multiple people appear in a group photo, it automatically appears in each person's collection!
               </span>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between">
-                  <h4 className="text-[13px] font-bold text-[#8E4E14]">
-                    Level 2 — Uncertain Match Review
-                  </h4>
-                  <span className="text-[10px] font-semibold bg-[#FFDCC2] text-[#8E4E14] px-1.5 py-0.5 rounded-full">
-                    3 Suggestions
-                  </span>
-                </div>
-                <p className="text-[11px] text-[#553100] mt-0.5 leading-snug">
-                  AI detected visual similarities without confident facial identity. Review and confirm matches.
-                </p>
-              </div>
+            </div>
+
+            {/* Person Filter Pills */}
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar">
+              <button
+                type="button"
+                onClick={() => setSelectedPerson('all')}
+                className={`flex-shrink-0 px-3 py-1.5 rounded-full text-[12px] font-medium border transition-all ${
+                  selectedPerson === 'all'
+                    ? 'bg-[#005C55] text-white border-[#005C55]'
+                    : 'bg-white border-[#E2DDD4] text-[#101E1C] hover:border-[#005C55]'
+                }`}
+              >
+                All People
+              </button>
+              {['Tasnim', 'Rafiqul', 'Samira', 'Tanvir'].map((name) => (
+                <button
+                  key={name}
+                  type="button"
+                  onClick={() => setSelectedPerson(name)}
+                  className={`flex-shrink-0 px-3 py-1.5 rounded-full text-[12px] font-medium border transition-all ${
+                    selectedPerson === name
+                      ? 'bg-[#005C55] text-white border-[#005C55]'
+                      : 'bg-white border-[#E2DDD4] text-[#101E1C] hover:border-[#005C55]'
+                  }`}
+                >
+                  {name}
+                </button>
+              ))}
             </div>
           </section>
         )}
 
-        {/* 5. FILTER PILLS */}
-        <section className="mt-4 text-left">
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="text-[14px] font-bold text-[#101E1C]">Person Collections</h3>
-            <span className="text-[11px] text-[#0F766E] font-semibold">Anonymous Visual AI</span>
-          </div>
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar text-left">
-            <button
-              type="button"
-              onClick={() => setActiveFilter('all')}
-              className={`flex-shrink-0 flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-[12px] font-medium border transition-all ${
-                activeFilter === 'all'
-                  ? 'bg-[#005C55] text-white border-[#005C55]'
-                  : 'bg-white border-[#E2DDD4] text-[#101E1C] hover:border-[#005C55]'
-              }`}
-            >
-              <span>All Moments</span>
-              <span className="px-1.5 rounded-full bg-[#E1F1EE] text-[#005C55] text-[10px] font-bold">
-                {photos.length}
-              </span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setActiveFilter('Tasnim')}
-              className={`flex-shrink-0 flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-[12px] font-medium border transition-all ${
-                activeFilter === 'Tasnim'
-                  ? 'bg-[#005C55] text-white border-[#005C55]'
-                  : 'bg-white border-[#E2DDD4] text-[#101E1C] hover:border-[#005C55]'
-              }`}
-            >
-              <div className="w-5 h-5 rounded-full overflow-hidden ring-1 ring-[#0F766E]">
-                <img className="w-full h-full object-cover" src="/placeholder-avatar.svg" alt="Tasnim" />
-              </div>
-              <span>Tasnim</span>
-              <span className="px-1.5 rounded-full bg-[#E1F1EE] text-[#3E4947] text-[10px] font-bold">42</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setActiveFilter('Rafiqul')}
-              className={`flex-shrink-0 flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-[12px] font-medium border transition-all ${
-                activeFilter === 'Rafiqul'
-                  ? 'bg-[#005C55] text-white border-[#005C55]'
-                  : 'bg-white border-[#E2DDD4] text-[#101E1C] hover:border-[#005C55]'
-              }`}
-            >
-              <div className="w-5 h-5 rounded-full overflow-hidden ring-1 ring-[#0F766E]">
-                <img className="w-full h-full object-cover" src="/placeholder-avatar.svg" alt="Rafiqul" />
-              </div>
-              <span>Rafiqul</span>
-              <span className="px-1.5 rounded-full bg-[#E1F1EE] text-[#3E4947] text-[10px] font-bold">36</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setActiveFilter('unsorted')}
-              className={`flex-shrink-0 flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-[12px] font-medium border transition-all ${
-                activeFilter === 'unsorted'
-                  ? 'bg-[#BA1A1A] text-white border-[#BA1A1A]'
-                  : 'bg-white border-[#E2DDD4] text-[#BA1A1A] hover:border-[#BA1A1A]'
-              }`}
-            >
-              <span className="material-symbols-outlined text-[15px]">help</span>
-              <span>Level 3: Unsorted</span>
-            </button>
-          </div>
-        </section>
-
-        {/* 6. CURATED PHOTO GALLERY GRID */}
-        <section className="mt-5 text-left">
-          <div className="flex items-center justify-between mb-2.5">
-            <div className="flex items-center gap-2">
-              <span className="text-[16px] font-bold text-[#101E1C]">Gallery</span>
-              <span className="text-[12px] text-[#3E4947]">
-                {activeFilter === 'unsorted'
-                  ? '• Level 3 Unmatched Photos'
-                  : activeFilter === 'all'
-                  ? `• ${photos.length} Photos`
-                  : `• ${activeFilter}`}
-              </span>
-            </div>
-            <span className="text-[11px] text-[#6E7977] font-medium">Timeline View</span>
-          </div>
-
-          {/* Masonry / Grid */}
-          <div className="grid grid-cols-2 gap-2.5">
-            {filteredPhotos.map((photo) => (
-              <div
-                key={photo.id}
-                onClick={() => setSelectedPhoto(photo)}
-                className={`relative group rounded-xl overflow-hidden bg-white border border-[#E6E1D8] shadow-xs cursor-pointer ${photo.aspect}`}
-              >
-                <img
-                  src={photo.url}
-                  alt={photo.alt}
-                  loading="lazy"
-                  decoding="async"
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-
-                {photo.badge && (
-                  <span className="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-white text-[10px] font-semibold max-w-[90%] truncate">
-                    {photo.badge}
-                  </span>
-                )}
-
-                <span className="absolute bottom-2 right-2 text-white text-[10px] font-medium opacity-0 group-hover:opacity-100 transition-opacity">
-                  {photo.time}
-                </span>
-              </div>
-            ))}
-          </div>
-        </section>
-      </main>
-
-      {/* UPLOAD PROGRESS MODAL */}
-      {showUploadModal && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 animate-fadeIn">
-          <div className="bg-white rounded-2xl max-w-sm w-full p-5 shadow-dock border border-[#E6E1D8] text-left">
+        {/* ========================================================= */}
+        {/* VIEW 2: LEVEL 2 CLOSE MATCH SUGGESTIONS                   */}
+        {/* ========================================================= */}
+        {activeTab === 'suggestions' && (
+          <section className="mt-4 text-left animate-fadeIn">
             <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-[#0F766E] text-[22px]">
-                  {uploadProgress?.stage === 'error' ? 'error' : uploadProgress?.stage === 'done' ? 'check_circle' : 'cloud_upload'}
-                </span>
-                <h3 className="text-[16px] font-bold text-[#101E1C]">
-                  {uploadProgress?.stage === 'done'
-                    ? 'Upload Complete'
-                    : uploadProgress?.stage === 'error'
-                    ? 'Upload Failed'
-                    : 'Compressing & Uploading'}
-                </h3>
+              <div>
+                <h3 className="text-[14px] font-bold text-[#8E4E14]">Level 2 — Review Close Match Suggestions</h3>
+                <p className="text-[11px] text-[#5C3E20]">
+                  Uncertain matches are never auto-confirmed. Confirm, reject, or explicitly correct A → B.
+                </p>
               </div>
-              {!isUploading && (
+              {undoStack.length > 0 && (
                 <button
                   type="button"
-                  onClick={() => setShowUploadModal(false)}
-                  className="w-7 h-7 rounded-full bg-[#E1F1EE] flex items-center justify-center text-[#3E4947]"
+                  onClick={handleUndo}
+                  className="px-2.5 py-1 rounded-lg border border-[#8E4E14] text-[#8E4E14] text-[11px] font-bold hover:bg-[#FFF8ED] flex items-center gap-1"
                 >
-                  <span className="material-symbols-outlined text-[16px]">close</span>
+                  <span className="material-symbols-outlined text-[13px]">undo</span>
+                  <span>Undo</span>
                 </button>
               )}
             </div>
 
-            {/* Error Message */}
-            {uploadProgress?.errorMessage && (
-              <div className="p-3 mb-3 bg-[#FFDAD6] border border-[#BA1A1A]/30 rounded-xl text-[12px] text-[#BA1A1A] font-medium">
-                {uploadProgress.errorMessage}
+            {suggestions.filter((s) => s.status === 'pending').length === 0 ? (
+              <div className="p-6 bg-white rounded-2xl border border-[#E2DDD4] text-center text-[#6E7977] text-[13px]">
+                <span className="material-symbols-outlined text-[32px] text-[#005C55] block mb-2">task_alt</span>
+                All suggestions reviewed! All uncertain matches have been resolved.
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {suggestions
+                  .filter((s) => s.status === 'pending')
+                  .map((sug) => (
+                    <div key={sug.id} className="p-3.5 bg-white rounded-2xl border border-[#FFAB69]/50 shadow-xs">
+                      <div className="flex gap-3">
+                        <img
+                          src={sug.photoUrl}
+                          alt="Uncertain face preview"
+                          className="w-20 h-20 rounded-xl object-cover border border-[#E2DDD4] shrink-0"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <span className="px-2 py-0.5 rounded-sm bg-[#FFAB69]/20 text-[#8E4E14] text-[10px] font-bold">
+                            Close Match ({Math.round(sug.suggestedPerson.similarityScore * 100)}%)
+                          </span>
+                          <h4 className="text-[13px] font-bold text-[#101E1C] mt-1">
+                            Suggested: {sug.suggestedPerson.name}
+                          </h4>
+                          <p className="text-[11px] text-[#5C3E20] mt-0.5">
+                            Closest candidates: {sug.candidatePeople.map((c) => `${c.name} (${Math.round(c.similarityScore * 100)}%)`).join(', ')}
+                          </p>
+
+                          {/* Alternative Candidate Selector for Explicit A -> B Correction */}
+                          <div className="mt-2.5 flex items-center gap-2">
+                            <span className="text-[10px] font-bold text-[#6E7977] uppercase">Is this someone else?</span>
+                            <select
+                              value={selectedCandidatePerson}
+                              onChange={(e) => setSelectedCandidatePerson(e.target.value)}
+                              className="text-[11px] font-semibold bg-[#F8F5EF] border border-[#E2DDD4] rounded-lg px-2 py-1 text-[#101E1C]"
+                            >
+                              <option value="Samira">This is Person 3 (Samira)</option>
+                              <option value="Tanvir">This is Person 4 (Tanvir)</option>
+                              <option value="Tasnim">This is Person 1 (Tasnim)</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Review Action Buttons */}
+                      <div className="grid grid-cols-3 gap-2 mt-3 pt-3 border-t border-[#F0EBE0]">
+                        <button
+                          type="button"
+                          onClick={() => handleConfirmSuggestion(sug.id)}
+                          className="py-1.5 px-2 rounded-lg bg-[#005C55] text-white text-[11px] font-bold hover:bg-[#0F766E] transition-all text-center"
+                        >
+                          Confirm {sug.suggestedPerson.name.replace(/Person \d+ \((.*)\)/, '$1')}
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => handleCorrectSuggestion(sug.id, selectedCandidatePerson)}
+                          className="py-1.5 px-2 rounded-lg bg-[#8E4E14] text-white text-[11px] font-bold hover:bg-[#723E10] transition-all text-center"
+                        >
+                          Correct to {selectedCandidatePerson}
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => handleRejectSuggestion(sug.id)}
+                          className="py-1.5 px-2 rounded-lg border border-[#BA1A1A] text-[#BA1A1A] hover:bg-[#FFDAD6] text-[11px] font-bold transition-all text-center"
+                          title="Never auto-assigns to anyone else"
+                        >
+                          Reject
+                        </button>
+                      </div>
+                    </div>
+                  ))}
               </div>
             )}
+          </section>
+        )}
 
-            {/* Progress Bar */}
+        {/* ========================================================= */}
+        {/* VIEW 3: LEVEL 3 REST PHOTOS (CATEGORIZED FALLBACK)        */}
+        {/* ========================================================= */}
+        {activeTab === 'rest' && (
+          <section className="mt-4 text-left animate-fadeIn">
+            {/* Header & Subcategory Tabs */}
             <div className="mb-3">
-              <div className="flex justify-between text-[11px] text-[#3E4947] mb-1">
-                <span>
-                  Photo {uploadProgress?.currentPhotoIndex || 1} of {uploadProgress?.totalPhotos || 1}
-                </span>
-                <span className="font-bold text-[#0F766E]">{uploadProgress?.percent || 0}%</span>
-              </div>
-              <div className="w-full bg-[#E6E1D8] h-2 rounded-full overflow-hidden">
-                <div
-                  className="bg-[#0F766E] h-full transition-all duration-300"
-                  style={{ width: `${uploadProgress?.percent || 0}%` }}
-                />
-              </div>
+              <h3 className="text-[14px] font-bold text-[#BA1A1A]">Level 3 — Rest Photos Repository</h3>
+              <p className="text-[11px] text-[#6E7977]">
+                Photos that cannot be confidently matched or have no recognizable people. Unknown faces are never misclassified as scenery.
+              </p>
             </div>
 
-            {/* Stage Info */}
-            <p className="text-[12px] text-[#3E4947] mb-3">
-              {uploadProgress?.stage === 'compressing' && '🖼️ Converting to 2K WebP via Canvas...'}
-              {uploadProgress?.stage === 'uploading' && '☁️ Streaming directly to zero-egress Cloudflare R2...'}
-              {uploadProgress?.stage === 'confirming' && '⚡ Registering media metadata...'}
-              {uploadProgress?.stage === 'done' && '🎉 All photos successfully uploaded and ready for clustering!'}
-            </p>
+            {/* 3 Subcategory Filters */}
+            <div className="grid grid-cols-3 gap-1.5 p-1 bg-[#E8E3D9] rounded-xl text-[11px] font-semibold mb-3">
+              <button
+                type="button"
+                onClick={() => setRestSubfilter('unknown_faces')}
+                className={`py-1.5 rounded-lg transition-all flex items-center justify-center gap-1 ${
+                  restSubfilter === 'unknown_faces' ? 'bg-white text-[#BA1A1A] shadow-xs' : 'text-[#3E4947]'
+                }`}
+              >
+                <span className="material-symbols-outlined text-[14px]">face</span>
+                <span>Unknown Faces</span>
+              </button>
 
-            {/* Compression Stats */}
-            {uploadProgress && uploadProgress.originalBytesTotal > 0 && (
-              <div className="p-2.5 bg-[#F8F5EF] rounded-xl border border-[#E2DDD4] text-[11px] text-[#3E4947] mb-4">
-                <div className="flex justify-between mb-1">
-                  <span>Original Size:</span>
-                  <span className="font-semibold">{formatBytes(uploadProgress.originalBytesTotal)}</span>
-                </div>
-                <div className="flex justify-between mb-1">
-                  <span>Optimized WebP:</span>
-                  <span className="font-semibold text-[#0F766E]">{formatBytes(uploadProgress.compressedBytesTotal)}</span>
-                </div>
-                <div className="flex justify-between font-bold text-[#005C55] pt-1 border-t border-[#E6E1D8]">
-                  <span>Bandwidth & Storage Saved:</span>
-                  <span>{uploadProgress.savedPercent}%</span>
-                </div>
-              </div>
+              <button
+                type="button"
+                onClick={() => setRestSubfilter('no_people')}
+                className={`py-1.5 rounded-lg transition-all flex items-center justify-center gap-1 ${
+                  restSubfilter === 'no_people' ? 'bg-white text-[#005C55] shadow-xs' : 'text-[#3E4947]'
+                }`}
+              >
+                <span className="material-symbols-outlined text-[14px]">landscape</span>
+                <span>No People (Scenic)</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setRestSubfilter('other_unassigned')}
+                className={`py-1.5 rounded-lg transition-all flex items-center justify-center gap-1 ${
+                  restSubfilter === 'other_unassigned' ? 'bg-white text-[#8E4E14] shadow-xs' : 'text-[#3E4947]'
+                }`}
+              >
+                <span className="material-symbols-outlined text-[14px]">blur_on</span>
+                <span>Other Unassigned</span>
+              </button>
+            </div>
+
+            {restSubfilter === 'unknown_faces' && (
+              <p className="text-[11px] text-[#3E4947] bg-white p-2.5 rounded-xl border border-[#E2DDD4] mb-3">
+                💡 Human faces were detected in these photos, but were not confidently matched to a known person. You can manually identify them and assign them to a person collection.
+              </p>
             )}
 
-            <button
-              type="button"
-              disabled={isUploading}
-              onClick={() => setShowUploadModal(false)}
-              className="w-full py-2.5 rounded-full bg-[#0F766E] text-white text-[13px] font-semibold hover:bg-[#005C55] disabled:opacity-50 transition-all"
-            >
-              {isUploading ? 'Uploading...' : 'Done'}
-            </button>
-          </div>
-        </div>
-      )}
+            {restSubfilter === 'no_people' && (
+              <p className="text-[11px] text-[#3E4947] bg-white p-2.5 rounded-xl border border-[#E2DDD4] mb-3">
+                🏖️ Sunsets, ocean waves, food, and scenery with zero detected human faces.
+              </p>
+            )}
+          </section>
+        )}
 
-      {/* EXPORT DUAL MODAL (ZIP / GOOGLE DRIVE) */}
-      {showExportModal && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 animate-fadeIn">
-          <div className="bg-white rounded-2xl max-w-sm w-full p-5 shadow-dock border border-[#E6E1D8] text-left">
-            <div className="flex items-center justify-between mb-3">
+        {/* ========================================================= */}
+        {/* PHOTO GALLERY GRID (FOR PEOPLE & REST VIEWS)               */}
+        {/* ========================================================= */}
+        {activeTab !== 'suggestions' && (
+          <section className="mt-4 text-left">
+            <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-[#0F766E] text-[22px]">archive</span>
-                <h3 className="text-[17px] font-bold text-[#101E1C]">Export Album</h3>
-              </div>
-              <button
-                type="button"
-                onClick={() => setShowExportModal(false)}
-                className="w-7 h-7 rounded-full bg-[#E1F1EE] flex items-center justify-center text-[#3E4947]"
-              >
-                <span className="material-symbols-outlined text-[16px]">close</span>
-              </button>
-            </div>
-
-            <p className="text-[12px] text-[#3E4947] mb-4">
-              Photos stay in active room storage for 30 days. Export now to keep all original-quality moments forever.
-            </p>
-
-            {/* Option 1: Save to Phone / Download ZIP */}
-            <div className="p-3.5 bg-[#F8F5EF] rounded-xl border border-[#E2DDD4] mb-3">
-              <div className="flex items-center justify-between mb-1.5">
-                <div className="flex items-center gap-2">
-                  <span className="material-symbols-outlined text-[#0F766E] text-[20px]">phone_iphone</span>
-                  <span className="text-[13px] font-bold text-[#101E1C]">Save to Phone / ZIP</span>
-                </div>
-                <span className="text-[10px] font-semibold text-[#005C55] bg-[#E1F1EE] px-2 py-0.5 rounded-full">
-                  Fast & Offline
+                <span className="text-[14px] font-bold text-[#101E1C]">Gallery</span>
+                <span className="text-[12px] text-[#6E7977]">
+                  {activeTab === 'people'
+                    ? selectedPerson === 'all'
+                      ? '• All Confirmed Moments'
+                      : `• Photos with ${selectedPerson}`
+                    : `• Rest Photos: ${restSubfilter.replace('_', ' ').toUpperCase()}`}
                 </span>
               </div>
-              <p className="text-[11px] text-[#6E7977] mb-2.5">
-                Packages all {photos.length} photos directly inside browser memory into a ZIP archive without server egress.
-              </p>
-
-              {downloadProgress && isDownloadingZip && (
-                <div className="mb-2">
-                  <div className="flex justify-between text-[10px] text-[#3E4947] mb-0.5">
-                    <span>{downloadProgress.currentFilename}</span>
-                    <span className="font-bold text-[#0F766E]">{downloadProgress.percent}%</span>
-                  </div>
-                  <div className="w-full bg-[#E6E1D8] h-1.5 rounded-full overflow-hidden">
-                    <div className="bg-[#0F766E] h-full" style={{ width: `${downloadProgress.percent}%` }} />
-                  </div>
-                </div>
-              )}
-
-              <button
-                type="button"
-                disabled={isDownloadingZip}
-                onClick={handleDownloadAllZip}
-                className="w-full py-2 rounded-full bg-[#0F766E] text-white text-[12px] font-semibold hover:bg-[#005C55] disabled:opacity-50 transition-all flex items-center justify-center gap-1.5"
-              >
-                <span className="material-symbols-outlined text-[16px]">download</span>
-                <span>{isDownloadingZip ? 'Preparing ZIP...' : 'Download Full Album (ZIP)'}</span>
-              </button>
+              <span className="text-[11px] text-[#6E7977]">
+                {displayPhotos.length} photo{displayPhotos.length !== 1 ? 's' : ''}
+              </span>
             </div>
 
-            {/* Option 2: Google Drive Backup */}
-            <div className="p-3.5 bg-[#F8F5EF] rounded-xl border border-[#E2DDD4]">
-              <div className="flex items-center justify-between mb-1.5">
-                <div className="flex items-center gap-2">
-                  <span className="material-symbols-outlined text-[#8E4E14] text-[20px]">add_to_drive</span>
-                  <span className="text-[13px] font-bold text-[#101E1C]">Export to Google Drive</span>
-                </div>
-                <span className="text-[10px] font-semibold text-[#8E4E14] bg-[#FFDCC2] px-2 py-0.5 rounded-full">
-                  Cloud Backup
-                </span>
+            {displayPhotos.length === 0 ? (
+              <div className="p-8 bg-white rounded-2xl border border-[#E2DDD4] text-center text-[#6E7977] text-[13px]">
+                No photos found in this category.
               </div>
-              <p className="text-[11px] text-[#6E7977] mb-2.5">
-                Creates a folder `ChobiDeh - Cox's Bazar` in your personal Google Drive with non-sensitive drive.file scope.
-              </p>
+            ) : (
+              <div className="grid grid-cols-2 gap-2.5">
+                {displayPhotos.map((photo) => (
+                  <div
+                    key={photo.id}
+                    onClick={() => setSelectedPhoto(photo)}
+                    className={`relative group rounded-xl overflow-hidden bg-white border border-[#E6E1D8] shadow-xs cursor-pointer ${photo.aspect}`}
+                  >
+                    <img
+                      src={photo.url}
+                      alt={photo.alt}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
 
-              {driveProgress && (
-                <div className="mb-2">
-                  <div className="flex justify-between text-[10px] text-[#3E4947] mb-0.5">
-                    <span>{driveProgress.currentFileName || 'Processing...'}</span>
-                    <span className="font-bold text-[#8E4E14]">
-                      {driveProgress.uploadedFiles} / {driveProgress.totalFiles}
+                    {/* People Badges (Supports Multiple People on One Photo!) */}
+                    {photo.assignedPeople && photo.assignedPeople.length > 0 && (
+                      <div className="absolute top-2 left-2 flex flex-wrap gap-1 max-w-[90%]">
+                        {photo.badge && <span className="sr-only">{photo.badge}</span>}
+                        {photo.assignedPeople.map((name) => (
+                          <span
+                            key={name}
+                            className="px-1.5 py-0.5 rounded-full bg-black/70 backdrop-blur-md text-white text-[9px] font-semibold"
+                          >
+                            {name}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Level 3 Rest Badge */}
+                    {photo.clusterLevel === 'Level 3: Rest' && (
+                      <span className="absolute top-2 left-2 px-1.5 py-0.5 rounded-full bg-[#BA1A1A]/80 backdrop-blur-md text-white text-[9px] font-semibold">
+                        {photo.badge}
+                      </span>
+                    )}
+
+                    <span className="absolute bottom-2 right-2 text-white text-[10px] font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+                      {photo.time}
                     </span>
                   </div>
-                  {driveProgress.folderUrl && driveProgress.stage === 'completed' && (
-                    <a
-                      href={driveProgress.folderUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-[11px] text-[#005C55] font-semibold underline block mb-1"
-                    >
-                      Open in Google Drive ↗
-                    </a>
-                  )}
-                </div>
-              )}
+                ))}
+              </div>
+            )}
+          </section>
+        )}
+      </main>
 
-              <button
-                type="button"
-                disabled={isExportingDrive}
-                onClick={handleExportToGoogleDrive}
-                className="w-full py-2 rounded-full border border-[#BDC9C6] bg-white text-[#101E1C] text-[12px] font-semibold hover:bg-[#E1F1EE] disabled:opacity-50 transition-all flex items-center justify-center gap-1.5"
-              >
-                <span className="material-symbols-outlined text-[16px] text-[#8E4E14]">cloud_upload</span>
-                <span>{isExportingDrive ? 'Exporting to Drive...' : '1-Click Export to Drive'}</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Loupe Modal */}
+      {/* LOUPE / PHOTO DETAIL MODAL */}
       {selectedPhoto && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-fadeIn">
           <div className="bg-white rounded-2xl max-w-lg w-full overflow-hidden shadow-dock border border-[#E6E1D8]">
@@ -740,7 +847,7 @@ export const RoomAreaScreen: React.FC = () => {
                   {selectedPhoto.badge || 'Photo View'}
                 </span>
                 <span className="text-[11px] text-[#3E4947] block">
-                  Cluster Status: {selectedPhoto.clusterLevel}
+                  {selectedPhoto.clusterLevel} {selectedPhoto.restCategory ? `(${selectedPhoto.restCategory})` : ''}
                 </span>
               </div>
               <button
@@ -754,26 +861,45 @@ export const RoomAreaScreen: React.FC = () => {
             <img
               src={selectedPhoto.url}
               alt={selectedPhoto.alt}
-              className="w-full max-h-[60vh] object-contain bg-black"
+              className="w-full max-h-[55vh] object-contain bg-black"
             />
-            <div className="p-3.5 bg-[#F8F5EF] flex items-center justify-between text-left">
-              <div>
-                <p className="text-[12px] font-semibold text-[#101E1C]">Cox's Bazar Beach Memories</p>
-                <p className="text-[11px] text-[#6E7977]">Captured at {selectedPhoto.time}</p>
+            <div className="p-3.5 bg-[#F8F5EF] text-left">
+              <div className="flex items-center justify-between mb-2">
+                <div>
+                  <p className="text-[12px] font-semibold text-[#101E1C]">{selectedPhoto.alt}</p>
+                  <p className="text-[11px] text-[#6E7977]">Captured at {selectedPhoto.time}</p>
+                </div>
+                {/* Manual tag unknown face action */}
+                {selectedPhoto.restCategory === 'unknown_faces' && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      handleManualTagUnknownFace(selectedPhoto.id, 'Tasnim');
+                      setSelectedPhoto(null);
+                    }}
+                    className="px-3 py-1.5 rounded-full bg-[#005C55] text-white text-[11px] font-semibold hover:bg-[#0F766E]"
+                  >
+                    Tag as Tasnim
+                  </button>
+                )}
               </div>
-              <button
-                type="button"
-                onClick={() => alert(`Assigned to collection: ${selectedPhoto.badge}`)}
-                className="px-3 py-1.5 rounded-full bg-[#0F766E] text-white text-[12px] font-semibold hover:bg-[#005C55]"
-              >
-                Edit Tag
-              </button>
+
+              {selectedPhoto.assignedPeople.length > 0 && (
+                <div className="flex items-center gap-1.5 mt-2">
+                  <span className="text-[11px] font-bold text-[#3E4947]">Identified People:</span>
+                  {selectedPhoto.assignedPeople.map((p) => (
+                    <span key={p} className="px-2 py-0.5 rounded-full bg-[#E1F1EE] text-[#005C55] text-[11px] font-bold">
+                      {p}
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>
       )}
 
-      {/* Share / Invite Modal */}
+      {/* SHARE / INVITE MODAL */}
       {showInviteModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-fadeIn">
           <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-dock border border-[#E6E1D8] text-left">
@@ -789,7 +915,7 @@ export const RoomAreaScreen: React.FC = () => {
             </div>
 
             <p className="text-[13px] text-[#3E4947] mb-4">
-              Share the secure room code with friends. Joining does not require face registration or selfies.
+              Share the secure room key with friends. Room photos are private to members.
             </p>
 
             <div className="p-3 bg-[#F8F5EF] rounded-xl border border-[#E2DDD4] flex items-center justify-between mb-4">
@@ -805,18 +931,6 @@ export const RoomAreaScreen: React.FC = () => {
                 {copiedKey ? 'Copied!' : 'Copy Key'}
               </button>
             </div>
-
-            <button
-              type="button"
-              onClick={() => {
-                setShowInviteModal(false);
-                alert('Invite link copied: https://chobideh.app/join/CB-9821');
-              }}
-              className="w-full py-2.5 rounded-full border border-[#BDC9C6] text-[13px] font-semibold text-[#101E1C] hover:bg-[#E1F1EE] transition-all flex items-center justify-center gap-1.5"
-            >
-              <span className="material-symbols-outlined text-[16px]">link</span>
-              <span>Copy Full Link</span>
-            </button>
           </div>
         </div>
       )}

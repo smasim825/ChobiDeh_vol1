@@ -2,7 +2,7 @@
 
 ## Vision
 
-Build ChobiDeh as a privacy-conscious, room-based photo-sharing and AI organization platform. Users upload selected photos to a shared room. The system can organize those photos into collections based on people who appear in them, while allowing users to review and correct uncertain matches.
+Build ChobiDeh as a privacy-conscious, room-based photo-sharing and AI organization platform. Users upload selected photos to a shared room. The system organizes those photos into collections based on people who appear in them, while allowing users to review and correct uncertain matches.
 
 ## Problem
 
@@ -13,7 +13,7 @@ After a group event or trip, photos are scattered across different phones and me
 - A room creator organizing a shared event or trip.
 - Room members contributing selected photos.
 - Members browsing person-based collections.
-- Members reviewing uncertain matches and correcting errors.
+- Members reviewing close match suggestions and correcting errors.
 
 ## MVP outcomes
 
@@ -21,10 +21,14 @@ After a group event or trip, photos are scattered across different phones and me
 2. A user can create a room and share its room ID and joining credential.
 3. Authorized members can join and upload photos they select.
 4. Photos remain private to authorized room members.
-5. The system organizes room photos using a 3-Level AI Face Clustering workflow (Level 1: Confident Clustering, Level 2: Uncertain Matches, Level 3: Unsorted).
+5. The system organizes room photos using a 3-Level Photo Matching & Grouping system:
+   - **Level 1 — High Confidence:** Automatically matches faces to person collections. If multiple people appear in one photo, links that single photo to every matched person's collection.
+   - **Level 2 — Close Match Suggestions:** Presents borderline matches in a Review Suggestions section with closest candidate people. Enables confirming, correcting (A → B), rejecting without auto-assigning, and undoing mistakes. Never retrains the model from user corrections.
+   - **Level 3 — Rest Photos:** Organizes unassigned photos into three distinct filters: **Unknown Faces** (detected but unassigned; manually taggable), **No People** (scenic, sunsets, food), and **Other Unassigned** (processing exceptions/blur). Never confuses unknown faces with scenery.
 6. Users can name, edit, and review anonymous person collections without mandatory face registration or selfie enrollment.
 7. Users can correct assignments, review merge suggestions, and request deletion of their data/clusters.
-8. The system is testable, observable, and deployable without unnecessary infrastructure.
+8. The system provides Dual Exports: **Save to Phone** (in-browser ZIP) and **Export to Google Drive** (cloud-to-cloud backup).
+9. The system is testable, observable, and deployable without unnecessary infrastructure.
 
 ## Non-goals for MVP
 
@@ -42,19 +46,8 @@ After a group event or trip, photos are scattered across different phones and me
 - Privacy and consent first.
 - Room-based authorization.
 - Human review for uncertain matches.
-- Store original media once and reference it from multiple collections.
+- Store original media once and reference it relationally from multiple collections.
+- Model stability: User corrections never retrain or modify the AI model weights.
 - Make failures visible and recoverable.
-- Keep initial operating costs low.
+- Keep operating costs at $0.00 using Cloudflare R2 and client-side compression.
 - Design modularly so travel features can be added later.
-
-## Success measures to establish during beta
-
-- Percentage of invited members who successfully join.
-- Percentage of members who upload at least one photo.
-- Upload failure rate and median processing time.
-- Precision of automatically assigned matches on a consented test set.
-- Percentage of AI suggestions accepted/rejected by users.
-- Number of manual corrections per 100 processed photos.
-- User-reported usefulness and willingness to use the product again.
-
-Do not set accuracy claims or numeric targets until a representative validation set and measurement method exist.

@@ -3,7 +3,7 @@
 -- Run via: supabase test db
 -- ==============================================================================
 BEGIN;
-SELECT plan(24);
+SELECT plan(26);
 
 -- 1. Extensions check
 SELECT has_extension('pgcrypto', 'Extension pgcrypto must be installed for security functions');
