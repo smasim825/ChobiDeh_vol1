@@ -478,6 +478,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         .eq('id', currentUser.id);
 
       if (dbError) {
+        setErrorMessage(dbError.message);
         return { success: false, error: dbError.message };
       }
 

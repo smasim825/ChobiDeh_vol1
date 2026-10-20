@@ -1,6 +1,11 @@
-# API Contract (Draft)
+# API Contract (Superseded / Aspirational)
 
-Status: Proposed route map only. Do not implement blindly; finalize request/response schemas and error conventions before parallel client/server work. Prefix routes with `/api/v1`.
+> [!NOTE]
+> **Architecture Update (DEC-0013):** The custom REST route map listed below is superseded/aspirational.
+> ChobiDeh's active backend architecture is implemented directly via **Supabase Row-Level Security (RLS)** for authenticated table access and **PostgreSQL `SECURITY DEFINER` Remote Procedure Calls (RPCs)** for sensitive operations (e.g., `create_room`, `join_room`, `create_upload`, `rename_cluster`, `resolve_uncertain_match`, `purge_room_face_data`, `set_room_face_consent`).
+> Clients interact with the backend directly through the `@supabase/supabase-js` client SDK.
+
+Status: Proposed route map only (retained for reference or future API gateway extraction). Prefix routes with `/api/v1`.
 
 ## Authentication
 - `POST /auth/register`

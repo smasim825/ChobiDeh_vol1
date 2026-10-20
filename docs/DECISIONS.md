@@ -95,3 +95,36 @@ Use this format:
 - Decision: Enforce keyset pagination using `(created_at, id) < (cursor_created_at, cursor_id)` with B-tree compound indexing.
 - Alternatives considered: Traditional offset pagination (`OFFSET 5000 LIMIT 30`).
 - Consequences: Consistent `O(1)` index seek performance; rock-solid infinite scrolling feeds for both web and mobile.
+
+### DEC-0013 — Backend Architecture: Supabase RLS + SECURITY DEFINER RPCs
+- Status: Accepted
+- Date: 2026-10-21
+- Context: Need a robust, secure, and low-latency API architecture where multi-tenant data isolation and authorization are guaranteed by the database engine, avoiding redundant application layers or leaked client access.
+- Decision: Backend operations are implemented directly via Supabase Row-Level Security (RLS) policies for direct reads, combined with PostgreSQL `SECURITY DEFINER` Remote Procedure Calls (RPCs) with strict `SET search_path = ''` hygiene for all state-changing or privileged operations (room creation, joins, upload initiation, cluster reviews, membership changes, purges). Client calls these via `supabase.rpc(...)`. The traditional REST route listing in `docs/API_CONTRACT.md` is superseded/aspirational.
+- Alternatives considered: Custom REST API gateway proxying database calls.
+- Consequences: Authorization is enforced at the database layer; impossible for client to bypass room isolation; zero API boilerplate.
+
+### DEC-0014 — Per-Room Opt-In Biometric Consent Model
+- Status: Accepted
+- Date: 2026-10-21
+- Context: User privacy and legal compliance require granular, revocable consent for biometric face clustering. A global account-level toggle is insufficient because users may want clustering in a family room but not in a public or professional event room.
+- Decision: Biometric face clustering consent is strictly OPT-IN and defaults to FALSE everywhere:
+  1. Stored per room and per member in `room_members.face_clustering_consent boolean not null default false`.
+  2. Room-level master toggle is controlled by the room owner in `rooms.face_clustering_enabled boolean not null default false`.
+  3. `profiles.face_clustering_enabled` is retained solely as the user's personal default preference when creating or joining new rooms (defaults to `false`).
+  4. Both user consent and room enablement must be TRUE for face embeddings and clustering to run for that member's photos.
+  5. Consent revocation via `set_room_face_consent(room_id, false)` triggers the immediate purge logic removing derived face records and embeddings for that user in that room.
+- Alternatives considered: Global opt-in only, implied consent on upload.
+- Consequences: Highest privacy standard; granular control per room; zero biometric processing without explicit affirmative opt-in.
+
+### DEC-0015 — Room Join via Public Random Slug and Hashed Passcode
+- Status: Accepted
+- Date: 2026-10-21
+- Context: Room join links must be URL-safe, easy to share, and resistant to enumeration and brute-force attacks. Single unhashed codes expose rooms to unauthorized enumeration.
+- Decision: Rooms use a server-generated, URL-safe random `join_slug text unique not null` (>=10 alphanumeric characters) for identification, paired with an optional hashed passcode (`passcode_hash` using PostgreSQL `crypt(passcode, gen_salt('bf'))`). Joining is executed via the `join_room(slug, passcode)` RPC which:
+  1. Requires an authenticated user session (`auth.uid()`).
+  2. Uses rate limiting via a secure internal `join_attempts` table (max 5 failed attempts per user per 10 minutes).
+  3. Returns a single generic error on any failure to prevent room existence leakage.
+  4. Inserts the user into `room_members` atomically with default `face_clustering_consent = false`.
+- Alternatives considered: Short 6-digit PIN codes without slugs, unhashed join codes in client URLs.
+- Consequences: Completely prevents room enumeration; securely handles password verification inside PostgreSQL; protects against brute force attacks.
