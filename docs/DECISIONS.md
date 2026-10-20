@@ -128,3 +128,21 @@ Use this format:
   4. Inserts the user into `room_members` atomically with default `face_clustering_consent = false`.
 - Alternatives considered: Short 6-digit PIN codes without slugs, unhashed join codes in client URLs.
 - Consequences: Completely prevents room enumeration; securely handles password verification inside PostgreSQL; protects against brute force attacks.
+
+### DEC-0016 — Isolated Room Passcode Storage (Zero Hash Exposure in `rooms`)
+- Status: Accepted
+- Date: 2026-10-21
+- Context: Storing `passcode_hash` directly on `public.rooms` allows room members executing `SELECT * FROM rooms` to read bcrypt hashes of passcodes.
+- Decision: Relocate passcode hashes to a dedicated, strictly isolated internal table `public.room_passcodes (room_id pk fk, passcode_hash, created_at)` with Row-Level Security enabled, zero client policies, and all privileges revoked from `anon`, `authenticated`, and `public`. Drop `passcode_hash` entirely from `public.rooms`.
+- Alternatives considered: Postgres column-level security on `rooms.passcode_hash`.
+- Consequences: Hash leakage is structurally impossible even if a client issues `SELECT *` on `rooms`.
+
+### DEC-0017 — Role-Differentiated Biometric Purge vs. Member Consent Revocation
+- Status: Accepted
+- Date: 2026-10-21
+- Context: Room owners should have the authority to wipe all derived room face clusters, while regular members withdrawing consent must not wipe the host's entire room gallery.
+- Decision: Partition purge operations into two distinct RPCs:
+  1. `purge_room_face_data(room_id)`: Enforces `owner` or `admin` role check. Wipes all clusters, embeddings, assignments, and uncertain matches for the room.
+  2. `withdraw_member_face_consent(room_id)`: Executable by any room member. Deletes only face instances and vector embeddings detected on photos uploaded by that specific member, cancels their pending jobs, and toggles `room_members.face_clustering_consent = false`.
+- Alternatives considered: Single purge function with complex branching.
+- Consequences: Protects room albums from accidental or malicious destruction by non-admin members.

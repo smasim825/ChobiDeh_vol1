@@ -39,6 +39,12 @@ export const RequireCompletedProfile: React.FC<{ children: React.ReactNode }> = 
   return <>{children}</>;
 };
 
+interface LocationState {
+  from?: {
+    pathname: string;
+  };
+}
+
 export const RedirectIfAuth: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { currentUser, isLoading } = useAuth();
   const location = useLocation();
@@ -52,7 +58,8 @@ export const RedirectIfAuth: React.FC<{ children: React.ReactNode }> = ({ childr
   }
 
   if (currentUser) {
-    const from = (location.state as any)?.from?.pathname || '/';
+    const state = location.state as LocationState | null;
+    const from = state?.from?.pathname || '/';
     return <Navigate to={from} replace />;
   }
 

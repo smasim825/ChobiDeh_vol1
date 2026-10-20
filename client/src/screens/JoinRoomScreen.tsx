@@ -45,13 +45,13 @@ export const JoinRoomScreen: React.FC = () => {
     setIsJoining(true);
 
     if (supabase) {
-      const { error } = await supabase.rpc('join_room', {
+      const { data, error } = await supabase.rpc('join_room', {
         slug: joinSlug.trim().toLowerCase(),
         passcode: passcode.trim() || null,
       });
 
-      if (error) {
-        setErrorMessage(error.message);
+      if (error || !data || (data as any).success === false) {
+        setErrorMessage((data as any)?.error || error?.message || 'Invalid room invite code or passcode.');
         setIsJoining(false);
         return;
       }

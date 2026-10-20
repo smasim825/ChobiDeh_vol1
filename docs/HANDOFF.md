@@ -3,13 +3,13 @@
 Update this file when starting or handing off a multi-file task. Keep entries short and current.
 
 ## Active work
-- Task: Security Hardening & Review Round 1
+- Task: Security Hardening & Review Round 2 Fixes
   - Owner: Senior Full-Stack Engineer
-  - Status: Completed (Ready for final report & merge)
-  - Branch: `fix/review-round-1`
-  - Scope: Additive migration `20261021000000_security_hardening.sql` (RLS on jobs/attempts, isolated face_embeddings, search_path hygiene, room join slug & RPCs, rate limiting, private storage bucket, cluster RPCs, purge RPCs). Client: opt-in consent default false everywhere, honest wording (no false encryption claims), real create/join RPC wiring, React Router dom routing with auth guards and deep-link preservation, Supabase auth bug fixes (error checks on all calls, DB-backed onboarding completion, deferred auth event loop fix), asset hygiene (zero hotlinks, local SVGs), Vitest mock test suite, CI workflow `.github/workflows/ci.yml`.
-  - Files modified: `supabase/migrations/20261021000000_security_hardening.sql`, `supabase/tests/database_security.test.sql`, `supabase/README.md`, client context/screens/components/tests, `.github/workflows/ci.yml`, documentation docs/*.
-  - Tests run: 21/21 Vitest tests passed, `oxlint` 0 errors / 0 warnings, `tsc -b` 0 errors, `npm run build` passed. Supabase CLI not run locally (Docker not running).
+  - Status: Completed (Ready for commit & push)
+  - Branch: `fix/review-round-2`
+  - Scope: Additive migration `20261022000000_review_round_2_fixes.sql` (`photo_assignments.updated_at`, isolated `room_passcodes` table with zero client policies, non-rollback `join_room` rate limiter, role-checked `purge_room_face_data` for owner/admin, `withdraw_member_face_consent` for members, cryptographic join slugs via `gen_random_bytes`, safe storage object regex & pending media check, `profiles.onboarding_completed` trigger protection, revoked EXECUTE from anon). Client: structured `join_room` response handling, role-aware purge, initial session hydration on mount, typed route guards.
+  - Files modified: `supabase/migrations/20261022000000_review_round_2_fixes.sql`, `supabase/tests/database_security.test.sql`, `client/src/context/AuthContext.tsx`, `client/src/screens/HomeScreen.tsx`, `client/src/screens/JoinRoomScreen.tsx`, `client/src/components/RouteGuards.tsx`, `client/src/test/supabase_mocks.test.tsx`, `docs/*`.
+  - Tests run: 22/22 Vitest tests passed, `oxlint` 0 errors / 0 warnings, `tsc -b` 0 errors, `npm run build` passed.
 
 ## Handoff template
 

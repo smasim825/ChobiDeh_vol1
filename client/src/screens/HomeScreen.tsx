@@ -246,8 +246,8 @@ export const HomeScreen: React.FC = () => {
         passcode: joinPassword.trim() || null,
       });
 
-      if (error || !data) {
-        setJoinError(error?.message || 'Unable to join room. Please check the code and passcode.');
+      if (error || !data || data.success === false) {
+        setJoinError(data?.error || error?.message || 'Unable to join room. Please check the code and passcode.');
         return;
       }
 
