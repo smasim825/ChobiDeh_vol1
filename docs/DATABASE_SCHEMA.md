@@ -15,12 +15,18 @@ This is a logical starting point, not a final migration. Review relationships, c
 ### `public.rooms`
 - `id` (uuid, pk)
 - `name` (text, not null)
-- `join_slug` (text, unique, not null - >=10 char URL-safe identifier)
-- `passcode_hash` (text, nullable - bcrypt hash of room passcode)
+- `join_slug` (text, unique, not null - 12 char cryptographic hex identifier)
 - `created_by` (uuid, references `auth.users.id` on delete set null)
 - `face_clustering_enabled` (boolean, default false - room owner control)
 - `deleted_at` (timestamptz, nullable - soft deletion)
 - `created_at`, `updated_at` (timestamptz)
+- *(Note: room passcode hashes are isolated in `public.room_passcodes` to prevent exposure)*
+
+### `public.room_passcodes` (Strictly Isolated - Internal Authentication Only)
+- `room_id` (uuid, pk, references `rooms.id` on delete cascade)
+- `passcode_hash` (text, not null - bcrypt hash of room passcode)
+- `created_at` (timestamptz)
+- *Security: RLS enabled, NO client policies, ALL privileges REVOKED from `anon` and `authenticated`.*
 
 ### `public.room_members`
 - `room_id` (uuid, references `rooms.id` on delete cascade)

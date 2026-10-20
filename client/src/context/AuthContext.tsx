@@ -6,6 +6,21 @@ import { AuthContext } from './AuthContextBase';
 
 const STORAGE_KEY = 'chobideh_auth_user';
 
+const hasStoredAuthSession = (): boolean => {
+  if (typeof window === 'undefined') return false;
+  try {
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && (key.startsWith('sb-') && key.endsWith('-auth-token'))) {
+        return true;
+      }
+    }
+  } catch {
+    // Ignore storage errors
+  }
+  return false;
+};
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [screen, setScreen] = useState<AuthScreen>('login');
   const [currentUser, setCurrentUser] = useState<User | null>(() => {
@@ -18,7 +33,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return null;
   });
   const [pendingEmail, setPendingEmail] = useState<string>('');
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(() => {
+    if (!supabase) return false;
+    return hasStoredAuthSession();
+  });
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   // Helper to process session user safely without trusting client-side metadata
@@ -36,13 +54,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     if (supabase) {
       // Source of truth for onboarding and profile name is public.profiles
-      const { data: profile } = await supabase
+      const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('display_name, face_clustering_enabled, onboarding_completed')
         .eq('id', user.id)
         .maybeSingle();
 
-      const isCompleted = Boolean(profile?.onboarding_completed);
+      const isCompleted = profile ? Boolean(profile.onboarding_completed) : (profileError ? true : false);
 
       const userObj: User = {
         id: user.id,
@@ -129,10 +147,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             isHandlingAuth = true;
             processUserSession(session.user, event).finally(() => {
               isHandlingAuth = false;
+              setIsLoading(false);
             });
+          } else if (!session) {
+            setIsLoading(false);
           }
         }, 0);
       });
+
+      // Hydrate initial session on mount
+      supabase.auth
+        .getSession()
+        .then(({ data: { session } }) => {
+          if (session?.user && !isHandlingAuth) {
+            isHandlingAuth = true;
+            processUserSession(session.user).finally(() => {
+              isHandlingAuth = false;
+              setIsLoading(false);
+            });
+          } else {
+            setIsLoading(false);
+          }
+        })
+        .catch(() => {
+          setIsLoading(false);
+        });
 
       return () => {
         subscription.unsubscribe();
@@ -511,7 +550,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (supabase) {
       const { data: members, error: memberError } = await supabase
         .from('room_members')
-        .select('room_id')
+        .select('room_id, role')
         .eq('user_id', currentUser.id);
 
       if (memberError) {
@@ -528,22 +567,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       const errors: string[] = [];
       for (const m of members) {
-        const { error: purgeError } = await supabase.rpc('purge_room_face_data', {
-          target_room_id: m.room_id,
-        });
-        if (purgeError) {
-          errors.push(purgeError.message);
+        if (m.role === 'owner' || m.role === 'admin') {
+          const { error: purgeError } = await supabase.rpc('purge_room_face_data', {
+            target_room_id: m.room_id,
+          });
+          if (purgeError) {
+            errors.push(purgeError.message);
+          }
+        } else {
+          const { error: withdrawError } = await supabase.rpc('withdraw_member_face_consent', {
+            target_room_id: m.room_id,
+          });
+          if (withdrawError) {
+            errors.push(withdrawError.message);
+          }
         }
       }
 
       if (errors.length > 0) {
-        return { success: false, error: `Failed to purge some rooms: ${errors.join(', ')}` };
+        return { success: false, error: `Failed to process some rooms: ${errors.join(', ')}` };
       }
 
       await updateBiometricConsent(false);
       return {
         success: true,
-        message: `Successfully purged all face clusters, vector embeddings, and cancelled processing jobs across ${members.length} rooms.`,
+        message: `Successfully purged face data across ${members.length} rooms.`,
       };
     }
 

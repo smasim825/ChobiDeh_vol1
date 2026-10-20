@@ -288,8 +288,8 @@ describe('Phase 6: Supabase Integration & Security Verifications', () => {
 
   it('7b. join room calls join_room RPC and shows error on failure', async () => {
     vi.mocked(supabase!.rpc).mockResolvedValueOnce({
-      data: null,
-      error: { message: 'Invalid room invite code or passcode.' },
+      data: { success: false, error: 'Invalid room invite code or passcode.' },
+      error: null,
     } as any);
 
     render(
@@ -319,7 +319,7 @@ describe('Phase 6: Supabase Integration & Security Verifications', () => {
     vi.mocked(supabase!.from).mockReturnValue({
       select: vi.fn().mockReturnValue({
         eq: vi.fn().mockResolvedValue({
-          data: [{ room_id: 'room_123' }],
+          data: [{ room_id: 'room_123', role: 'owner' }],
           error: null,
         }),
       }),
@@ -364,6 +364,74 @@ describe('Phase 6: Supabase Integration & Security Verifications', () => {
       // Must surface error, must not say success or purged
       expect(screen.getByText(/failed to purge room face data/i)).toBeInTheDocument();
       expect(screen.queryByText(/face data successfully purged/i)).not.toBeInTheDocument();
+    });
+  });
+
+  it('9. member-scoped consent withdrawal calls withdraw_member_face_consent instead of room purge', async () => {
+    vi.mocked(supabase!.from).mockReturnValue({
+      select: vi.fn().mockReturnValue({
+        eq: vi.fn().mockResolvedValue({
+          data: [{ room_id: 'room_member_only', role: 'member' }],
+          error: null,
+        }),
+      }),
+    } as any);
+
+    vi.mocked(supabase!.rpc).mockResolvedValueOnce({
+      data: { success: true, withdrawn_embeddings: 5 },
+      error: null,
+    } as any);
+
+    // Mock update profile for biometric consent toggle
+    const mockUpdate = vi.fn().mockReturnValue({
+      eq: vi.fn().mockResolvedValue({ error: null }),
+    });
+    vi.mocked(supabase!.from).mockReturnValueOnce({
+      select: vi.fn().mockReturnValue({
+        eq: vi.fn().mockResolvedValue({
+          data: [{ room_id: 'room_member_only', role: 'member' }],
+          error: null,
+        }),
+      }),
+    } as any).mockReturnValueOnce({
+      update: mockUpdate,
+    } as any);
+
+    const MemberPurgeTester = () => {
+      const { purgeAllFaceData } = useAuth();
+      return (
+        <button type="button" onClick={() => purgeAllFaceData()}>
+          Withdraw Face Data
+        </button>
+      );
+    };
+
+    localStorage.setItem(
+      'chobideh_auth_user',
+      JSON.stringify({
+        id: 'usr_member_1',
+        name: 'Plain Member',
+        email: 'member@example.com',
+        biometricConsent: true,
+        profileCompleted: true,
+      })
+    );
+
+    render(
+      <MemoryRouter>
+        <AuthProvider>
+          <MemberPurgeTester />
+        </AuthProvider>
+      </MemoryRouter>
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: /withdraw face data/i }));
+
+    await waitFor(() => {
+      expect(supabase!.rpc).toHaveBeenCalledWith('withdraw_member_face_consent', {
+        target_room_id: 'room_member_only',
+      });
+      expect(supabase!.rpc).not.toHaveBeenCalledWith('purge_room_face_data', expect.anything());
     });
   });
 });
