@@ -28,7 +28,7 @@ export const SignupScreen: React.FC = () => {
 
   const handleGoogleSignup = async () => {
     clearError();
-    await loginWithGoogle();
+    await loginWithGoogle(true);
   };
 
   return (

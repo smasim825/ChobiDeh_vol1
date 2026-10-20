@@ -8,7 +8,8 @@ export type AuthScreen =
   | 'room-area'
   | 'profile'
   | 'create-room'
-  | 'join-room';
+  | 'join-room'
+  | 'complete-profile';
 
 export interface User {
   id: string;
@@ -20,6 +21,7 @@ export interface User {
    */
   biometricConsent: boolean;
   faceClusteringEnabled?: boolean;
+  profileCompleted?: boolean;
   enrolledAt?: string;
 }
 
@@ -46,11 +48,13 @@ export interface AuthContextType {
   errorMessage: string | null;
   clearError: () => void;
   login: (data: LoginFormData) => Promise<boolean>;
-  loginWithGoogle: () => Promise<boolean>;
+  loginWithGoogle: (isSignup?: boolean) => Promise<boolean>;
+  completeGoogleProfile: (fullName: string, biometricConsent: boolean) => Promise<boolean>;
   signup: (data: SignupFormData) => Promise<boolean>;
   logout: () => Promise<void> | void;
   sendPasswordReset: (email: string) => Promise<boolean>;
   resendVerificationEmail: () => Promise<boolean>;
   updateBiometricConsent: (consent: boolean) => void;
+  updateProfileName: (newName: string) => Promise<boolean>;
   isSupabaseConnected: boolean;
 }

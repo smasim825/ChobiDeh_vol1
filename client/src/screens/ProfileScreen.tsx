@@ -1,14 +1,36 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { Button } from '../components/Button';
+import { Input } from '../components/Input';
 
 export const ProfileScreen: React.FC = () => {
-  const { currentUser, setScreen, logout, updateBiometricConsent } = useAuth();
+  const { currentUser, setScreen, logout, updateBiometricConsent, updateProfileName } = useAuth();
 
+  const [editName, setEditName] = useState(currentUser?.name || '');
+  const [isSavingName, setIsSavingName] = useState(false);
   const [faceGroupingEnabled, setFaceGroupingEnabled] = useState(currentUser?.biometricConsent ?? true);
   const [wifiDownloadEnabled, setWifiDownloadEnabled] = useState(true);
   const [gpsStrippingEnabled, setGpsStrippingEnabled] = useState(true);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (currentUser?.name) {
+      setEditName(currentUser.name);
+    }
+  }, [currentUser?.name]);
+
+  const handleSaveProfile = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editName.trim()) return;
+    setIsSavingName(true);
+    const success = await updateProfileName(editName.trim());
+    setIsSavingName(false);
+    if (success) {
+      setFeedbackMessage('Profile information updated successfully.');
+      setTimeout(() => setFeedbackMessage(null), 3500);
+    }
+  };
 
   const handleToggleFaceGrouping = () => {
     const nextVal = !faceGroupingEnabled;
@@ -129,7 +151,55 @@ export const ProfileScreen: React.FC = () => {
           </div>
         </section>
 
-        {/* 2. QUICK STATS ROW */}
+        {/* 2. EDIT PROFILE INFO SECTION (RESTRICTED EMAIL) */}
+        <section className="p-5 bg-white rounded-2xl border border-[#D6E6E2]/50 shadow-card text-left space-y-4">
+          <div className="flex items-center justify-between border-b border-[#E6E1D8] pb-3">
+            <div>
+              <h3 className="text-[16px] font-bold text-[#101E1C]">Edit Profile Info</h3>
+              <p className="text-[12px] text-[#3E4947]">Update your public room display name</p>
+            </div>
+            <span className="material-symbols-outlined text-[#0F766E] text-[22px]">manage_accounts</span>
+          </div>
+
+          <form onSubmit={handleSaveProfile} className="space-y-3.5">
+            {/* Primary Email Address (Restricted from changing) */}
+            <Input
+              id="profile-email-restricted"
+              type="email"
+              label="Primary Email Address"
+              value={currentUser?.email || ''}
+              disabled
+              leadingIcon={<span className="material-symbols-outlined text-[18px] text-[#6E7977]">mail</span>}
+              trailingIcon={<span className="material-symbols-outlined text-[18px] text-[#BA1A1A]">lock</span>}
+              helperText="Restricted: Email is permanently linked to your account and cannot be modified."
+            />
+
+            {/* Display / Full Name (Editable) */}
+            <Input
+              id="profile-name-editable"
+              type="text"
+              label="Full Name / Display Name"
+              value={editName}
+              onChange={(e) => setEditName(e.target.value)}
+              required
+              leadingIcon={<span className="material-symbols-outlined text-[18px] text-[#6E7977]">person</span>}
+              helperText="Visible to fellow travelers across your shared rooms."
+            />
+
+            <div className="pt-1 flex items-center justify-end">
+              <Button
+                type="submit"
+                variant="primary"
+                isLoading={isSavingName}
+                icon={<span className="material-symbols-outlined text-[18px]">check</span>}
+              >
+                Save Profile Changes
+              </Button>
+            </div>
+          </form>
+        </section>
+
+        {/* 3. QUICK STATS ROW */}
         <section className="grid grid-cols-3 gap-2">
           <div className="bg-white p-3.5 rounded-xl border border-[#D6E6E2]/40 shadow-card flex flex-col items-center justify-center text-center">
             <span className="text-[24px] font-bold text-[#005C55]">3</span>

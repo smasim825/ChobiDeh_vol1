@@ -5,6 +5,7 @@ import { supabase, isSupabaseConfigured } from '../lib/supabase';
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const STORAGE_KEY = 'chobideh_auth_user';
+const OAUTH_INTENT_KEY = 'chobideh_oauth_intent';
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [screen, setScreen] = useState<AuthScreen>('login');
@@ -13,40 +14,72 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
+  // Helper to process session user safely
+  const processUserSession = async (user: any, _eventName?: string) => {
+    const intent = localStorage.getItem(OAUTH_INTENT_KEY);
+    const isProfileCompleted = Boolean(user.user_metadata?.profile_completed);
+    
+    // An account is newly created by OAuth if created_at is within the last 60 seconds and profile is not completed
+    const accountAgeMs = Math.abs(new Date(user.created_at).getTime() - Date.now());
+    const isBrandNewAccount = !isProfileCompleted && accountAgeMs < 60000;
+
+    // 1. Restriction: If user clicked "Login with Google", but this is a brand new account with no profile:
+    if (intent === 'login') {
+      localStorage.removeItem(OAUTH_INTENT_KEY);
+      if (isBrandNewAccount) {
+        if (supabase) {
+          await supabase.auth.signOut();
+        }
+        setCurrentUser(null);
+        setErrorMessage('No ChobiDeh account found with this Google email. Please sign up first.');
+        setScreen('login');
+        if (window.location.hash) {
+          window.history.replaceState(null, '', window.location.pathname);
+        }
+        return;
+      }
+    }
+
+    const userObj: User = {
+      id: user.id,
+      name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'Member',
+      email: user.email || '',
+      biometricConsent: user.user_metadata?.biometric_consent ?? true,
+      faceClusteringEnabled: user.user_metadata?.face_clustering_enabled ?? true,
+      profileCompleted: isProfileCompleted,
+    };
+
+    setCurrentUser(userObj);
+
+    // 2. If user clicked "Sign up with Google" and hasn't confirmed profile/name, take them to complete-profile form
+    if (intent === 'signup' && !isProfileCompleted) {
+      localStorage.removeItem(OAUTH_INTENT_KEY);
+      setScreen('complete-profile');
+    } else {
+      localStorage.removeItem(OAUTH_INTENT_KEY);
+      setScreen((prev) => (prev === 'login' || prev === 'signup' ? 'home' : prev));
+    }
+
+    if (window.location.hash) {
+      window.history.replaceState(null, '', window.location.pathname);
+    }
+  };
+
   useEffect(() => {
     if (supabase) {
       // 1. Initial active session check via Supabase
       supabase.auth.getSession().then(({ data: { session }, error }) => {
         if (!error && session?.user) {
-          setCurrentUser({
-            id: session.user.id,
-            name: session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'Member',
-            email: session.user.email || '',
-            biometricConsent: session.user.user_metadata?.biometric_consent ?? true,
-            faceClusteringEnabled: session.user.user_metadata?.face_clustering_enabled ?? true,
-          });
-          setScreen('home');
+          processUserSession(session.user, 'GET_SESSION');
         }
       });
 
-      // 2. Real-time auth state subscription (login, logout, token refresh)
+      // 2. Real-time auth state subscription
       const {
         data: { subscription },
-      } = supabase.auth.onAuthStateChange((event, session) => {
+      } = supabase.auth.onAuthStateChange(async (event, session) => {
         if (session?.user) {
-          setCurrentUser({
-            id: session.user.id,
-            name: session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'Member',
-            email: session.user.email || '',
-            biometricConsent: session.user.user_metadata?.biometric_consent ?? true,
-            faceClusteringEnabled: session.user.user_metadata?.face_clustering_enabled ?? true,
-          });
-          if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') {
-            setScreen('home');
-            if (window.location.hash) {
-              window.history.replaceState(null, '', window.location.pathname);
-            }
-          }
+          await processUserSession(session.user, event);
         } else if (event === 'SIGNED_OUT') {
           setCurrentUser(null);
           setScreen('login');
@@ -107,6 +140,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           email: resData.user.email || '',
           biometricConsent: resData.user.user_metadata?.biometric_consent ?? true,
           faceClusteringEnabled: resData.user.user_metadata?.face_clustering_enabled ?? true,
+          profileCompleted: Boolean(resData.user.user_metadata?.profile_completed),
         };
         setCurrentUser(user);
         setScreen('home');
@@ -122,6 +156,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       name: data.email.split('@')[0].replace(/[._]/g, ' '),
       email: data.email,
       biometricConsent: false,
+      profileCompleted: true,
     };
 
     setCurrentUser(mockUser);
@@ -133,9 +168,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return true;
   };
 
-  const loginWithGoogle = async (): Promise<boolean> => {
+  const loginWithGoogle = async (isSignup = false): Promise<boolean> => {
     setIsLoading(true);
     setErrorMessage(null);
+
+    // Save intent: 'login' (must be existing) vs 'signup' (can create profile)
+    localStorage.setItem(OAUTH_INTENT_KEY, isSignup ? 'signup' : 'login');
 
     if (supabase) {
       const { error } = await supabase.auth.signInWithOAuth({
@@ -155,14 +193,79 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // Fallback simulation for Google login
     await new Promise((resolve) => setTimeout(resolve, 400));
-    const mockUser: User = {
+    if (!isSignup) {
+      // In dev fallback: check if account exists
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (!stored) {
+        setErrorMessage('No ChobiDeh account found with this Google email. Please sign up first.');
+        setIsLoading(false);
+        return false;
+      }
+      const existing = JSON.parse(stored) as User;
+      setCurrentUser(existing);
+      setIsLoading(false);
+      setScreen('home');
+      return true;
+    }
+
+    // Sign up fallback: take them to complete-profile form
+    const mockNewGoogleUser: User = {
       id: 'usr_g_' + Math.random().toString(36).substring(2, 9),
-      name: 'Tim Jennings',
-      email: 'tim.jennings@gmail.com',
+      name: 'Google Traveler',
+      email: 'google.traveler@example.com',
       biometricConsent: true,
+      profileCompleted: false,
     };
-    setCurrentUser(mockUser);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(mockUser));
+    setCurrentUser(mockNewGoogleUser);
+    setIsLoading(false);
+    setScreen('complete-profile');
+    return true;
+  };
+
+  const completeGoogleProfile = async (fullName: string, biometricConsent: boolean): Promise<boolean> => {
+    setIsLoading(true);
+    setErrorMessage(null);
+
+    if (supabase && currentUser) {
+      const { error } = await supabase.auth.updateUser({
+        data: {
+          full_name: fullName.trim(),
+          profile_completed: true,
+          biometric_consent: biometricConsent,
+          face_clustering_enabled: biometricConsent,
+        },
+      });
+
+      if (error) {
+        setErrorMessage(error.message);
+        setIsLoading(false);
+        return false;
+      }
+
+      // Upsert profile in public.profiles table
+      try {
+        await supabase.from('profiles').upsert({
+          id: currentUser.id,
+          display_name: fullName.trim(),
+          face_clustering_enabled: biometricConsent,
+        });
+      } catch {
+        // Table might be pending migration
+      }
+    }
+
+    if (currentUser) {
+      const updated: User = {
+        ...currentUser,
+        name: fullName.trim(),
+        biometricConsent,
+        faceClusteringEnabled: biometricConsent,
+        profileCompleted: true,
+      };
+      setCurrentUser(updated);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+    }
+
     setIsLoading(false);
     setScreen('home');
     return true;
@@ -197,6 +300,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         options: {
           data: {
             full_name: data.fullName.trim(),
+            profile_completed: true,
             biometric_consent: data.biometricConsent,
             face_clustering_enabled: data.biometricConsent,
           },
@@ -215,6 +319,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           name: data.fullName.trim(),
           email: data.email.trim(),
           biometricConsent: data.biometricConsent,
+          profileCompleted: true,
         };
         setCurrentUser(user);
         setScreen('home');
@@ -234,6 +339,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       name: data.fullName.trim(),
       email: data.email.trim(),
       biometricConsent: data.biometricConsent,
+      profileCompleted: true,
       enrolledAt: data.biometricConsent ? new Date().toISOString() : undefined,
     };
 
@@ -250,6 +356,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     setCurrentUser(null);
     localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(OAUTH_INTENT_KEY);
     setScreen('login');
   };
 
@@ -332,6 +439,51 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const updateProfileName = async (newName: string): Promise<boolean> => {
+    if (!newName.trim()) {
+      setErrorMessage('Display name cannot be empty.');
+      return false;
+    }
+
+    setIsLoading(true);
+    setErrorMessage(null);
+
+    if (supabase && currentUser) {
+      const { error } = await supabase.auth.updateUser({
+        data: {
+          full_name: newName.trim(),
+        },
+      });
+
+      if (error) {
+        setErrorMessage(error.message);
+        setIsLoading(false);
+        return false;
+      }
+
+      try {
+        await supabase
+          .from('profiles')
+          .update({ display_name: newName.trim(), updated_at: new Date().toISOString() })
+          .eq('id', currentUser.id);
+      } catch {
+        // Table might not be migrated yet
+      }
+    }
+
+    if (currentUser) {
+      const updated: User = {
+        ...currentUser,
+        name: newName.trim(),
+      };
+      setCurrentUser(updated);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+    }
+
+    setIsLoading(false);
+    return true;
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -345,11 +497,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         clearError,
         login,
         loginWithGoogle,
+        completeGoogleProfile,
         signup,
         logout,
         sendPasswordReset,
         resendVerificationEmail,
         updateBiometricConsent,
+        updateProfileName,
         isSupabaseConnected: isSupabaseConfigured,
       }}
     >

@@ -20,7 +20,7 @@ export const LoginScreen: React.FC = () => {
   };
 
   const handleGoogleLogin = async () => {
-    await loginWithGoogle();
+    await loginWithGoogle(false);
   };
 
   return (

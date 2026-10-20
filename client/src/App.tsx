@@ -9,6 +9,7 @@ import { ProfileScreen } from './screens/ProfileScreen';
 import { RoomAreaScreen } from './screens/RoomAreaScreen';
 import { CreateRoomScreen } from './screens/CreateRoomScreen';
 import { JoinRoomScreen } from './screens/JoinRoomScreen';
+import { CompleteProfileScreen } from './screens/CompleteProfileScreen';
 import { Navbar } from './components/Navbar';
 
 const AuthRouter: React.FC = () => {
@@ -23,6 +24,7 @@ const AuthRouter: React.FC = () => {
       <main className="flex-1 flex flex-col justify-center">
         {screen === 'login' && <LoginScreen />}
         {screen === 'signup' && <SignupScreen />}
+        {screen === 'complete-profile' && <CompleteProfileScreen />}
         {screen === 'forgot-password' && <ForgotPasswordScreen />}
         {screen === 'check-email' && <CheckEmailScreen />}
         {(screen === 'home' || screen === 'dashboard') && <HomeScreen />}
