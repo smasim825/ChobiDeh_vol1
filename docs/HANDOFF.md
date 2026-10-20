@@ -3,14 +3,13 @@
 Update this file when starting or handing off a multi-file task. Keep entries short and current.
 
 ## Active work
-- Task: OAuth Intent Segregation, Google Sign Up Profile Form & Flicker Elimination
+- Task: In-App Password Creation for Google Accounts & Smart Login Fallback
   - Owner: Fullstack / Auth agent
-  - Status: Completed & Pushed to remote
+  - Status: Completed (Ready for commit & push)
   - Branch: main
-  - Commit: `4d96d89`
-  - Scope: Segregated Google OAuth intents between Login and Sign Up: login with Google rejects unverified/unregistered emails with an explicit error, eliminating the 1-second home flicker by enforcing strict profile-completion barriers and removing redundant `getSession` race conditions. Sign up with Google prompts new users to complete their display name via `CompleteProfileScreen.tsx`. Added Edit Profile Info section to `ProfileScreen.tsx` allowing name updates while strictly restricting email modifications.
-  - Files modified: client/src/context/AuthContext.tsx, client/src/types/auth.ts, client/src/screens/CompleteProfileScreen.tsx, client/src/screens/ProfileScreen.tsx, client/src/screens/LoginScreen.tsx, client/src/screens/SignupScreen.tsx, client/src/App.tsx, docs/HANDOFF.md
-  - Tests run: 11/11 Vitest tests passed, `tsc -b` passed with 0 errors, `npm run build` completed successfully.
+  - Scope: Added Security & Login Methods card in `ProfileScreen.tsx` allowing Google OAuth users to directly set or change an account password in-app without abusing the "Forgot password" flow. Extracted provider metadata in `AuthContext.tsx` and implemented `setUserPassword()`. Added smart provider detection to `LoginScreen.tsx` offering a 1-click "Login with Google" fallback if an invalid password is entered.
+  - Files modified: client/src/context/AuthContext.tsx, client/src/types/auth.ts, client/src/screens/ProfileScreen.tsx, client/src/screens/LoginScreen.tsx, client/src/test/auth.test.tsx, docs/HANDOFF.md
+  - Tests run: 12/12 Vitest tests passed, `tsc -b` passed with 0 errors, `npm run build` completed successfully.
 
 ## Handoff template
 

@@ -34,6 +34,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return;
     }
 
+    const providers: string[] = user.app_metadata?.providers || (user.identities ? user.identities.map((i: any) => i.provider) : []);
+    const hasPassword = providers.includes('email') || Boolean(user.user_metadata?.has_password);
+
     // 2. If user clicked "Sign up with Google" and hasn't confirmed profile/name, take them to complete-profile form
     if (intent === 'signup' && !isProfileCompleted) {
       localStorage.removeItem(OAUTH_INTENT_KEY);
@@ -44,6 +47,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         biometricConsent: user.user_metadata?.biometric_consent ?? true,
         faceClusteringEnabled: user.user_metadata?.face_clustering_enabled ?? true,
         profileCompleted: false,
+        providers,
+        hasPassword,
       };
       setCurrentUser(userObj);
       setScreen('complete-profile');
@@ -69,6 +74,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       biometricConsent: user.user_metadata?.biometric_consent ?? true,
       faceClusteringEnabled: user.user_metadata?.face_clustering_enabled ?? true,
       profileCompleted: true,
+      providers,
+      hasPassword,
     };
 
     setCurrentUser(userObj);
@@ -501,6 +508,57 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return true;
   };
 
+  const setUserPassword = async (newPassword: string): Promise<{ success: boolean; error?: string }> => {
+    if (!newPassword || newPassword.length < 8) {
+      return { success: false, error: 'Password must be at least 8 characters long.' };
+    }
+
+    setIsLoading(true);
+
+    if (supabase && currentUser) {
+      const { error } = await supabase.auth.updateUser({
+        password: newPassword,
+        data: {
+          has_password: true,
+        },
+      });
+
+      if (error) {
+        setIsLoading(false);
+        return { success: false, error: error.message };
+      }
+
+      const updatedProviders = Array.from(new Set([...(currentUser.providers || ['google']), 'email']));
+      const updated: User = {
+        ...currentUser,
+        hasPassword: true,
+        providers: updatedProviders,
+      };
+      setCurrentUser(updated);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+      setIsLoading(false);
+      return { success: true };
+    }
+
+    // Fallback simulation when Supabase is not connected
+    if (currentUser) {
+      await new Promise((resolve) => setTimeout(resolve, 400));
+      const updatedProviders = Array.from(new Set([...(currentUser.providers || ['google']), 'email']));
+      const updated: User = {
+        ...currentUser,
+        hasPassword: true,
+        providers: updatedProviders,
+      };
+      setCurrentUser(updated);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+      setIsLoading(false);
+      return { success: true };
+    }
+
+    setIsLoading(false);
+    return { success: false, error: 'No active user session found.' };
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -521,6 +579,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         resendVerificationEmail,
         updateBiometricConsent,
         updateProfileName,
+        setUserPassword,
         isSupabaseConnected: isSupabaseConfigured,
       }}
     >

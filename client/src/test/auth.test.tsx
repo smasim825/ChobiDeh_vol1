@@ -104,4 +104,25 @@ describe('ChobiDeh Authentication Suite', () => {
     fireEvent.click(checkEmailTab);
     expect(screen.getByRole('heading', { name: /check your email/i })).toBeInTheDocument();
   });
+
+  it('renders Security & Login Methods card in ProfileScreen allowing password setup', async () => {
+    const { ProfileScreen } = await import('../screens/ProfileScreen');
+    render(
+      <AuthProvider>
+        <ProfileScreen />
+      </AuthProvider>
+    );
+
+    expect(screen.getByRole('heading', { name: /security & login methods/i })).toBeInTheDocument();
+    expect(screen.getByText(/google account/i)).toBeInTheDocument();
+    expect(screen.getByText(/account password/i)).toBeInTheDocument();
+
+    // Click "Set a Password" button to toggle password setup form
+    const setPwdBtn = screen.getByRole('button', { name: /set a password/i });
+    fireEvent.click(setPwdBtn);
+
+    expect(screen.getByLabelText(/create password/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/confirm password/i)).toBeInTheDocument();
+  });
 });
+

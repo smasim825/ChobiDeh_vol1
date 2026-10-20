@@ -23,6 +23,8 @@ export interface User {
   faceClusteringEnabled?: boolean;
   profileCompleted?: boolean;
   enrolledAt?: string;
+  providers?: string[];
+  hasPassword?: boolean;
 }
 
 export interface LoginFormData {
@@ -56,5 +58,6 @@ export interface AuthContextType {
   resendVerificationEmail: () => Promise<boolean>;
   updateBiometricConsent: (consent: boolean) => void;
   updateProfileName: (newName: string) => Promise<boolean>;
+  setUserPassword: (newPassword: string) => Promise<{ success: boolean; error?: string }>;
   isSupabaseConnected: boolean;
 }

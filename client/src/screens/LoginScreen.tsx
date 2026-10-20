@@ -36,24 +36,40 @@ export const LoginScreen: React.FC = () => {
         </p>
       </div>
 
-      {/* Error Alert */}
+      {/* Error Alert with Smart Provider Detection */}
       {errorMessage && (
         <div
           role="alert"
-          className="mb-4 p-3.5 bg-[#FFDAD6] border border-[#BA1A1A]/30 rounded-xl text-[13px] text-[#93000A] flex items-center justify-between shadow-xs animate-fadeIn"
+          className="mb-4 p-3.5 bg-[#FFDAD6] border border-[#BA1A1A]/30 rounded-xl text-[13px] text-[#93000A] shadow-xs animate-fadeIn space-y-2"
         >
-          <div className="flex items-center gap-2">
-            <span className="material-symbols-outlined text-[18px]">error</span>
-            <span className="font-semibold">{errorMessage}</span>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="material-symbols-outlined text-[18px]">error</span>
+              <span className="font-semibold">{errorMessage}</span>
+            </div>
+            <button
+              type="button"
+              aria-label="Dismiss error"
+              onClick={clearError}
+              className="text-[#93000A] hover:opacity-80 focus:outline-none"
+            >
+              <span className="material-symbols-outlined text-[16px]">close</span>
+            </button>
           </div>
-          <button
-            type="button"
-            aria-label="Dismiss error"
-            onClick={clearError}
-            className="text-[#93000A] hover:opacity-80"
-          >
-            <span className="material-symbols-outlined text-[16px]">close</span>
-          </button>
+
+          {/* Smart suggestion if password login failed */}
+          {errorMessage.toLowerCase().includes('invalid') && (
+            <div className="pt-2 border-t border-[#BA1A1A]/20 flex items-center justify-between text-[12px]">
+              <span className="text-[#3E4947]">Used Google to sign up?</span>
+              <button
+                type="button"
+                onClick={handleGoogleLogin}
+                className="font-bold text-[#0F766E] hover:underline flex items-center gap-1 focus:outline-none"
+              >
+                Login with Google &rarr;
+              </button>
+            </div>
+          )}
         </div>
       )}
 

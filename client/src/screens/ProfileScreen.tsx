@@ -4,7 +4,7 @@ import { Button } from '../components/Button';
 import { Input } from '../components/Input';
 
 export const ProfileScreen: React.FC = () => {
-  const { currentUser, setScreen, logout, updateBiometricConsent, updateProfileName } = useAuth();
+  const { currentUser, setScreen, logout, updateBiometricConsent, updateProfileName, setUserPassword } = useAuth();
 
   const [editName, setEditName] = useState(currentUser?.name || '');
   const [isSavingName, setIsSavingName] = useState(false);
@@ -13,6 +13,13 @@ export const ProfileScreen: React.FC = () => {
   const [gpsStrippingEnabled, setGpsStrippingEnabled] = useState(true);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
+
+  // Security & Password Management State
+  const [isPasswordFormOpen, setIsPasswordFormOpen] = useState(false);
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [isSavingPassword, setIsSavingPassword] = useState(false);
 
   useEffect(() => {
     if (currentUser?.name) {
@@ -29,6 +36,33 @@ export const ProfileScreen: React.FC = () => {
     if (success) {
       setFeedbackMessage('Profile information updated successfully.');
       setTimeout(() => setFeedbackMessage(null), 3500);
+    }
+  };
+
+  const handleSavePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPasswordError(null);
+    if (!newPassword || newPassword.length < 8) {
+      setPasswordError('Password must be at least 8 characters long.');
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setPasswordError('Passwords do not match.');
+      return;
+    }
+
+    setIsSavingPassword(true);
+    const result = await setUserPassword(newPassword);
+    setIsSavingPassword(false);
+
+    if (result.success) {
+      setFeedbackMessage('Password successfully saved! You can now log in using either Google or email & password.');
+      setIsPasswordFormOpen(false);
+      setNewPassword('');
+      setConfirmPassword('');
+      setTimeout(() => setFeedbackMessage(null), 4000);
+    } else {
+      setPasswordError(result.error || 'Failed to save password.');
     }
   };
 
@@ -199,7 +233,152 @@ export const ProfileScreen: React.FC = () => {
           </form>
         </section>
 
-        {/* 3. QUICK STATS ROW */}
+        {/* 3. SECURITY & LOGIN METHODS */}
+        <section className="p-5 bg-white rounded-2xl border border-[#D6E6E2]/50 shadow-card text-left space-y-4">
+          <div className="flex items-center justify-between border-b border-[#E6E1D8] pb-3">
+            <div>
+              <h3 className="text-[16px] font-bold text-[#101E1C]">Security &amp; Login Methods</h3>
+              <p className="text-[12px] text-[#3E4947]">Manage how you sign in to your ChobiDeh account</p>
+            </div>
+            <span className="material-symbols-outlined text-[#0F766E] text-[22px]">shield</span>
+          </div>
+
+          <div className="space-y-3">
+            {/* Google OAuth Provider Row */}
+            <div className="flex items-center justify-between p-3.5 rounded-xl bg-[#F8F5EF] border border-[#E6E1D8]">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-xs shrink-0">
+                  <svg className="w-4 h-4" viewBox="0 0 24 24">
+                    <path
+                      d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                      fill="#4285F4"
+                    />
+                    <path
+                      d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                      fill="#34A853"
+                    />
+                    <path
+                      d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
+                      fill="#FBBC05"
+                    />
+                    <path
+                      d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
+                      fill="#EA4335"
+                    />
+                  </svg>
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[13px] font-bold text-[#101E1C]">Google Account</span>
+                    <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full bg-[#E7F7F4] text-[#005C55] text-[10px] font-bold">
+                      Connected
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-[#3E4947] mt-0.5">{currentUser?.email}</p>
+                </div>
+              </div>
+              <span className="material-symbols-outlined text-[#0F766E] text-[20px]">check_circle</span>
+            </div>
+
+            {/* Password Login Row */}
+            <div className="p-3.5 rounded-xl bg-[#F8F5EF] border border-[#E6E1D8] space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-xs shrink-0 text-[#0F766E]">
+                    <span className="material-symbols-outlined text-[18px]">key</span>
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[13px] font-bold text-[#101E1C]">Account Password</span>
+                      {currentUser?.hasPassword ? (
+                        <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full bg-[#E7F7F4] text-[#005C55] text-[10px] font-bold">
+                          Enabled
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full bg-[#FFF0E8] text-[#8E4E14] text-[10px] font-bold">
+                          Not Set
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-[11px] text-[#3E4947] mt-0.5">
+                      {currentUser?.hasPassword
+                        ? 'You can sign in with your email & password or Google.'
+                        : 'Set a password to also sign in using email & password.'}
+                    </p>
+                  </div>
+                </div>
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsPasswordFormOpen(!isPasswordFormOpen)}
+                >
+                  {isPasswordFormOpen ? 'Cancel' : currentUser?.hasPassword ? 'Change Password' : 'Set a Password'}
+                </Button>
+              </div>
+
+              {/* Password Setup Form Accordion */}
+              {isPasswordFormOpen && (
+                <form onSubmit={handleSavePassword} className="pt-2 border-t border-[#E6E1D8] space-y-3">
+                  {passwordError && (
+                    <div className="p-2.5 bg-[#FFDAD6] border border-[#BA1A1A]/30 rounded-lg text-[12px] text-[#93000A] font-semibold flex items-center gap-1.5">
+                      <span className="material-symbols-outlined text-[16px]">error</span>
+                      <span>{passwordError}</span>
+                    </div>
+                  )}
+
+                  <Input
+                    id="new-account-password"
+                    type="password"
+                    label={currentUser?.hasPassword ? 'New Password' : 'Create Password'}
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    required
+                    placeholder="Min. 8 characters"
+                    leadingIcon={<span className="material-symbols-outlined text-[18px] text-[#6E7977]">lock</span>}
+                  />
+
+                  <Input
+                    id="confirm-account-password"
+                    type="password"
+                    label="Confirm Password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    required
+                    placeholder="Repeat new password"
+                    leadingIcon={<span className="material-symbols-outlined text-[18px] text-[#6E7977]">lock_clock</span>}
+                  />
+
+                  <div className="flex justify-end gap-2 pt-1">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setIsPasswordFormOpen(false);
+                        setPasswordError(null);
+                      }}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      type="submit"
+                      variant="primary"
+                      size="sm"
+                      isLoading={isSavingPassword}
+                      icon={<span className="material-symbols-outlined text-[16px]">save</span>}
+                    >
+                      {currentUser?.hasPassword ? 'Update Password' : 'Save Password'}
+                    </Button>
+                  </div>
+                </form>
+              )}
+            </div>
+          </div>
+        </section>
+
+        {/* 4. QUICK STATS ROW */}
         <section className="grid grid-cols-3 gap-2">
           <div className="bg-white p-3.5 rounded-xl border border-[#D6E6E2]/40 shadow-card flex flex-col items-center justify-center text-center">
             <span className="text-[24px] font-bold text-[#005C55]">3</span>
