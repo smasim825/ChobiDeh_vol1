@@ -3,13 +3,12 @@
 Update this file when starting or handing off a multi-file task. Keep entries short and current.
 
 ## Active work
-- Task: Fix SQLSTATE 42P13 in 20261022000000 migration for Supabase CI
+- Task: Review Round 1 & Round 2 Hardening + CI Migration Fixes
   - Owner: Senior Full-Stack Engineer
-  - Status: In progress
-  - Branch: `fix/ci-migration-return-type`
-  - Scope: Added `DROP FUNCTION IF EXISTS` statements before replacing functions in `20261022000000_review_round_2_fixes.sql` (`resolve_uncertain_match`, `assign_photo_to_cluster`, `create_room`, `join_room`, `purge_room_face_data`, etc.) to prevent Postgres error 42P13 ("cannot change return type of existing function") during `supabase start` migration playback.
-  - Files modified: `supabase/migrations/20261022000000_review_round_2_fixes.sql`, `docs/HANDOFF.md`.
-  - Tests run: 22/22 Vitest tests passed, `oxlint` 0 errors / 0 warnings, `tsc -b` 0 errors, `npm run build` passed.
+  - Status: Completed (Merged into `main`)
+  - Branch: `main`
+  - Scope: Additive security hardening migrations (`20261021000000`, `20261022000000`), isolated `room_passcodes` table with zero client access, non-rollback rate limiting for `join_room`, role-checked purge / member consent withdrawal, safe storage policies, profiles trigger protections, 22 Vitest client tests, 24 pgTAP database security tests, and CI GitHub Actions workflow running on `supabase/setup-cli@v3`.
+  - Tests run: All 22 Vitest tests pass, `oxlint` 0 errors, `tsc -b` 0 errors, `npm run build` succeeds, CI GitHub Actions on `main` passed completely (Client checks + pgTAP 24/24).
 
 ## Handoff template
 
