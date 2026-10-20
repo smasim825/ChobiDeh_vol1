@@ -25,13 +25,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             biometricConsent: session.user.user_metadata?.biometric_consent ?? true,
             faceClusteringEnabled: session.user.user_metadata?.face_clustering_enabled ?? true,
           });
+          setScreen('home');
         }
       });
 
       // 2. Real-time auth state subscription (login, logout, token refresh)
       const {
         data: { subscription },
-      } = supabase.auth.onAuthStateChange((_event, session) => {
+      } = supabase.auth.onAuthStateChange((event, session) => {
         if (session?.user) {
           setCurrentUser({
             id: session.user.id,
@@ -40,8 +41,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             biometricConsent: session.user.user_metadata?.biometric_consent ?? true,
             faceClusteringEnabled: session.user.user_metadata?.face_clustering_enabled ?? true,
           });
-        } else {
+          if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') {
+            setScreen('home');
+            if (window.location.hash) {
+              window.history.replaceState(null, '', window.location.pathname);
+            }
+          }
+        } else if (event === 'SIGNED_OUT') {
           setCurrentUser(null);
+          setScreen('login');
         }
       });
 
