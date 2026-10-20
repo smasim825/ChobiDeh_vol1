@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useAuth } from '../context/AuthContext';
+import React, { useState } from 'react';
+import { useAuth } from '../context/useAuth';
 import { Button } from '../components/Button';
 import { Input } from '../components/Input';
 
@@ -7,6 +7,12 @@ export const ProfileScreen: React.FC = () => {
   const { currentUser, setScreen, logout, updateBiometricConsent, purgeAllFaceData, updateProfileName, setUserPassword } = useAuth();
 
   const [editName, setEditName] = useState(currentUser?.name || '');
+  const [prevCurrentUserName, setPrevCurrentUserName] = useState(currentUser?.name);
+  if (currentUser?.name !== prevCurrentUserName) {
+    setPrevCurrentUserName(currentUser?.name);
+    setEditName(currentUser?.name || '');
+  }
+
   const [isSavingName, setIsSavingName] = useState(false);
   const [faceGroupingEnabled, setFaceGroupingEnabled] = useState(currentUser?.biometricConsent ?? false);
   const [wifiDownloadEnabled, setWifiDownloadEnabled] = useState(true);
@@ -20,12 +26,6 @@ export const ProfileScreen: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [passwordError, setPasswordError] = useState<string | null>(null);
   const [isSavingPassword, setIsSavingPassword] = useState(false);
-
-  useEffect(() => {
-    if (currentUser?.name) {
-      setEditName(currentUser.name);
-    }
-  }, [currentUser?.name]);
 
   const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();

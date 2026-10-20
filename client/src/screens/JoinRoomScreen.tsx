@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/useAuth';
 import { supabase } from '../lib/supabase';
 
 export const JoinRoomScreen: React.FC = () => {
@@ -9,17 +9,19 @@ export const JoinRoomScreen: React.FC = () => {
   const navigate = useNavigate();
 
   const [joinSlug, setJoinSlug] = useState(routeSlug || '');
+  const [prevRouteSlug, setPrevRouteSlug] = useState(routeSlug);
+  if (routeSlug !== prevRouteSlug) {
+    setPrevRouteSlug(routeSlug);
+    if (routeSlug) {
+      setJoinSlug(routeSlug);
+    }
+  }
+
   const [passcode, setPasscode] = useState('');
   const [showScanner, setShowScanner] = useState(false);
   const [isJoining, setIsJoining] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
-
-  useEffect(() => {
-    if (routeSlug) {
-      setJoinSlug(routeSlug);
-    }
-  }, [routeSlug]);
 
   const handlePasteCode = async () => {
     try {

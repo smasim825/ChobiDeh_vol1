@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import { AuthProvider } from '../context/AuthContext';
 import App from '../App';
 import { LoginScreen } from '../screens/LoginScreen';
@@ -10,9 +11,11 @@ import { CheckEmailScreen } from '../screens/CheckEmailScreen';
 describe('ChobiDeh Authentication Suite', () => {
   it('renders LoginScreen with email, password inputs, and toggles password visibility', () => {
     render(
-      <AuthProvider>
-        <LoginScreen />
-      </AuthProvider>
+      <MemoryRouter>
+        <AuthProvider>
+          <LoginScreen />
+        </AuthProvider>
+      </MemoryRouter>
     );
 
     expect(screen.getByRole('heading', { name: /welcome back/i })).toBeInTheDocument();
@@ -32,9 +35,11 @@ describe('ChobiDeh Authentication Suite', () => {
 
   it('renders SignupScreen with name, email, password, and explicit biometric consent toggle', () => {
     render(
-      <AuthProvider>
-        <SignupScreen />
-      </AuthProvider>
+      <MemoryRouter>
+        <AuthProvider>
+          <SignupScreen />
+        </AuthProvider>
+      </MemoryRouter>
     );
 
     expect(screen.getByRole('heading', { name: /create your account/i })).toBeInTheDocument();
@@ -54,9 +59,11 @@ describe('ChobiDeh Authentication Suite', () => {
 
   it('renders ForgotPasswordScreen and allows sending a reset link', async () => {
     render(
-      <AuthProvider>
-        <ForgotPasswordScreen />
-      </AuthProvider>
+      <MemoryRouter>
+        <AuthProvider>
+          <ForgotPasswordScreen />
+        </AuthProvider>
+      </MemoryRouter>
     );
 
     expect(screen.getByRole('heading', { name: /forgot password\?/i })).toBeInTheDocument();
@@ -73,13 +80,15 @@ describe('ChobiDeh Authentication Suite', () => {
 
   it('renders CheckEmailScreen with destination email and open email app link', () => {
     render(
-      <AuthProvider>
-        <CheckEmailScreen />
-      </AuthProvider>
+      <MemoryRouter>
+        <AuthProvider>
+          <CheckEmailScreen />
+        </AuthProvider>
+      </MemoryRouter>
     );
 
     expect(screen.getByRole('heading', { name: /check your email/i })).toBeInTheDocument();
-    expect(screen.getByText(/tim.jennings@example.com/i)).toBeInTheDocument();
+    expect(screen.getByText(/your email address/i)).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /open email app/i })).toHaveAttribute('href', 'mailto:');
   });
 

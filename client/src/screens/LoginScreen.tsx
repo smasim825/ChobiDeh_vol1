@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/useAuth';
 import { BrandLogo } from '../components/BrandLogo';
 import { PrivacyCard } from '../components/PrivacyCard';
 import { LegalFooter } from '../components/LegalFooter';
@@ -8,9 +9,10 @@ import { Input } from '../components/Input';
 
 export const LoginScreen: React.FC = () => {
   const { login, loginWithGoogle, isLoading, errorMessage, clearError, setScreen } = useAuth();
+  const navigate = useNavigate();
 
-  const [email, setEmail] = useState('tim.jennings@example.com');
-  const [password, setPassword] = useState('password123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
 
@@ -97,6 +99,7 @@ export const LoginScreen: React.FC = () => {
           onChange={(e) => setPassword(e.target.value)}
           placeholder="••••••••"
           required
+          minLength={8}
           className={!showPassword ? 'tracking-widest' : ''}
           trailingIcon={
             <button
@@ -128,6 +131,7 @@ export const LoginScreen: React.FC = () => {
             onClick={() => {
               clearError();
               setScreen('forgot-password');
+              navigate('/forgot-password');
             }}
             className="text-[14px] font-medium text-[#0F766E] hover:underline transition-colors focus:outline-none"
           >
@@ -156,6 +160,7 @@ export const LoginScreen: React.FC = () => {
               onClick={() => {
                 clearError();
                 setScreen('signup');
+                navigate('/signup');
               }}
               className="font-bold text-[#0F766E] hover:underline ml-1 focus:outline-none"
             >

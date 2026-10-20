@@ -26,11 +26,11 @@ const SCREENS: ScreenTab[] = [
 ];
 
 export const Navbar: React.FC<NavbarProps> = ({ currentScreen, onSelectScreen }) => {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
   if (!import.meta.env.DEV) {
     return null;
   }
-
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const activeTab = SCREENS.find((s) => s.id === currentScreen) || SCREENS[0];
 

@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
-import { AuthProvider, useAuth } from './context/AuthContext';
+import { AuthProvider } from './context/AuthContext';
+import { useAuth } from './context/useAuth';
 import { LoginScreen } from './screens/LoginScreen';
 import { SignupScreen } from './screens/SignupScreen';
 import { ForgotPasswordScreen } from './screens/ForgotPasswordScreen';
@@ -16,7 +17,7 @@ import { Navbar } from './components/Navbar';
 import { RequireAuth, RequireCompletedProfile, RedirectIfAuth } from './components/RouteGuards';
 import type { AuthScreen } from './types/auth';
 
-export function getScreenFromPath(pathname: string): AuthScreen {
+function getScreenFromPath(pathname: string): AuthScreen {
   if (pathname === '/login') return 'login';
   if (pathname === '/signup') return 'signup';
   if (pathname === '/forgot-password') return 'forgot-password';
@@ -30,7 +31,7 @@ export function getScreenFromPath(pathname: string): AuthScreen {
   return 'home';
 }
 
-export function getPathFromScreen(screen: AuthScreen): string {
+function getPathFromScreen(screen: AuthScreen): string {
   switch (screen) {
     case 'login': return '/login';
     case 'signup': return '/signup';

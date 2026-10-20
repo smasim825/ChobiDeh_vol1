@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/useAuth';
 import { BrandLogo } from '../components/BrandLogo';
 import { Button } from '../components/Button';
 import { Input } from '../components/Input';
