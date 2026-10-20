@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/useAuth';
 import { ScreenHeader } from '../components/ScreenHeader';
 import { BrandLogo } from '../components/BrandLogo';
 import { PrivacyCard } from '../components/PrivacyCard';
@@ -7,31 +8,27 @@ import { LegalFooter } from '../components/LegalFooter';
 
 export const CheckEmailScreen: React.FC = () => {
   const { setScreen, pendingEmail, setPendingEmail, resendVerificationEmail, isLoading } = useAuth();
+  const navigate = useNavigate();
 
   const [countdown, setCountdown] = useState<number>(54);
-  const [canResend, setCanResend] = useState<boolean>(false);
+  const canResend = countdown === 0;
   const [isEditingEmail, setIsEditingEmail] = useState<boolean>(false);
   const [tempEmail, setTempEmail] = useState<string>(pendingEmail);
   const [resendNotice, setResendNotice] = useState<string | null>(null);
 
   useEffect(() => {
-    let timer: ReturnType<typeof setTimeout>;
-    if (countdown > 0) {
-      timer = setTimeout(() => {
-        setCountdown((prev) => prev - 1);
-      }, 1000);
-    } else {
-      setCanResend(true);
-    }
+    if (countdown <= 0) return;
+    const timer = setTimeout(() => {
+      setCountdown((prev) => prev - 1);
+    }, 1000);
     return () => clearTimeout(timer);
   }, [countdown]);
 
   const handleResend = async () => {
-    if (!canResend && countdown > 0) return;
+    if (!canResend) return;
     await resendVerificationEmail();
     setResendNotice('New verification link sent to your inbox!');
     setCountdown(60);
-    setCanResend(false);
     setTimeout(() => setResendNotice(null), 4000);
   };
 
@@ -42,7 +39,6 @@ export const CheckEmailScreen: React.FC = () => {
       setIsEditingEmail(false);
       setResendNotice('Email updated. Reset instructions sent!');
       setCountdown(60);
-      setCanResend(false);
     }
   };
 
@@ -50,7 +46,10 @@ export const CheckEmailScreen: React.FC = () => {
     <div className="w-full max-w-md mx-auto flex flex-col flex-1 px-4 sm:px-6 pb-6 pt-2">
       {/* Navigation Header */}
       <ScreenHeader
-        onBack={() => setScreen('login')}
+        onBack={() => {
+          setScreen('login');
+          navigate('/login');
+        }}
         badgeText="SECURE VERIFICATION"
         badgeIcon="lock"
       />
@@ -98,7 +97,7 @@ export const CheckEmailScreen: React.FC = () => {
                 alternate_email
               </span>
               <span className="text-[14px] text-[#101E1C] truncate font-semibold">
-                {pendingEmail}
+                {pendingEmail || 'your email address'}
               </span>
             </div>
             <button
@@ -195,7 +194,10 @@ export const CheckEmailScreen: React.FC = () => {
         {/* Back to Login Navigation */}
         <button
           type="button"
-          onClick={() => setScreen('login')}
+          onClick={() => {
+            setScreen('login');
+            navigate('/login');
+          }}
           className="inline-flex items-center gap-1.5 text-[14px] text-[#0F766E] hover:text-[#00504A] font-semibold transition-colors group focus:outline-none"
         >
           <span className="material-symbols-outlined text-[18px] group-hover:-translate-x-0.5 transition-transform">

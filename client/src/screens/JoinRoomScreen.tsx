@@ -1,39 +1,74 @@
 import React, { useState } from 'react';
-import { useAuth } from '../context/AuthContext';
+import { useParams, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/useAuth';
+import { supabase } from '../lib/supabase';
 
 export const JoinRoomScreen: React.FC = () => {
   const { setScreen } = useAuth();
+  const { slug: routeSlug } = useParams<{ slug?: string }>();
+  const navigate = useNavigate();
 
-  const [codeChars, setCodeChars] = useState<string[]>(['C', 'H', 'B', '9', '8', '2']);
+  const [joinSlug, setJoinSlug] = useState(routeSlug || '');
+  const [prevRouteSlug, setPrevRouteSlug] = useState(routeSlug);
+  if (routeSlug !== prevRouteSlug) {
+    setPrevRouteSlug(routeSlug);
+    if (routeSlug) {
+      setJoinSlug(routeSlug);
+    }
+  }
+
   const [passcode, setPasscode] = useState('');
   const [showScanner, setShowScanner] = useState(false);
   const [isJoining, setIsJoining] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
 
-  const handleCharChange = (index: number, val: string) => {
-    const updated = [...codeChars];
-    updated[index] = val.slice(-1).toUpperCase();
-    setCodeChars(updated);
-
-    // Auto-focus next input
-    if (val && index < 5) {
-      const nextInput = document.getElementById(`char-${index + 1}`);
-      nextInput?.focus();
+  const handlePasteCode = async () => {
+    try {
+      const text = await navigator.clipboard.readText();
+      if (text) {
+        const cleaned = text.trim().replace(/\/$/, '').split('/').pop() || text.trim();
+        setJoinSlug(cleaned.toLowerCase());
+      }
+    } catch {
+      setErrorMessage('Clipboard permission denied. Please paste or type manually.');
     }
   };
 
-  const handlePasteCode = async () => {
-    const sample = 'CB9821';
-    const split = sample.split('');
-    setCodeChars(split);
-  };
-
-  const handleJoin = (e: React.FormEvent) => {
+  const handleJoin = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!joinSlug.trim()) {
+      setErrorMessage('Please enter a room invite code or link slug.');
+      return;
+    }
+    setErrorMessage(null);
     setIsJoining(true);
-    setTimeout(() => {
+
+    if (supabase) {
+      const { error } = await supabase.rpc('join_room', {
+        slug: joinSlug.trim().toLowerCase(),
+        passcode: passcode.trim() || null,
+      });
+
+      if (error) {
+        setErrorMessage(error.message);
+        setIsJoining(false);
+        return;
+      }
+
       setIsJoining(false);
-      setScreen('room-area');
-    }, 700);
+      setSuccess(true);
+      setTimeout(() => {
+        setScreen('home');
+        navigate('/');
+      }, 1200);
+      return;
+    }
+
+    // Fallback simulation mode
+    setIsJoining(false);
+    setScreen('home');
+    navigate('/');
   };
 
   return (
@@ -44,8 +79,11 @@ export const JoinRoomScreen: React.FC = () => {
           <button
             type="button"
             aria-label="Back"
-            onClick={() => setScreen('home')}
-            className="w-9 h-9 rounded-full flex items-center justify-center text-[#005C55] hover:bg-[#E1F1EE] active:scale-95 transition-all focus:outline-none"
+            onClick={() => {
+              setScreen('home');
+              navigate('/');
+            }}
+            className="w-9 h-9 rounded-full flex items-center justify-center text-[#0F766E] hover:bg-[#E1F1EE] active:scale-95 transition-all focus:outline-none"
           >
             <span className="material-symbols-outlined text-[22px]">arrow_back</span>
           </button>
@@ -53,7 +91,7 @@ export const JoinRoomScreen: React.FC = () => {
         </div>
         <button
           type="button"
-          onClick={() => alert('Ask your room creator for the 6-character room access key or camera QR code.')}
+          onClick={() => alert('Ask your room host for the invite code or join link.')}
           className="w-9 h-9 rounded-full flex items-center justify-center text-[#005C55] hover:bg-[#E1F1EE] focus:outline-none"
         >
           <span className="material-symbols-outlined text-[20px]">auto_awesome</span>
@@ -62,6 +100,20 @@ export const JoinRoomScreen: React.FC = () => {
 
       {/* Main Content */}
       <main className="w-full max-w-md mx-auto pt-16 px-4 space-y-4 text-left">
+        {/* Alerts */}
+        {errorMessage && (
+          <div className="p-3.5 bg-[#FFDAD6] border border-[#BA1A1A]/30 rounded-xl text-[13px] text-[#93000A] font-semibold flex items-center gap-2">
+            <span className="material-symbols-outlined text-[18px]">error</span>
+            <span>{errorMessage}</span>
+          </div>
+        )}
+        {success && (
+          <div className="p-3.5 bg-[#E7F7F4] border border-[#0F766E]/30 rounded-xl text-[13px] text-[#005C55] font-semibold flex items-center gap-2">
+            <span className="material-symbols-outlined text-[18px]">check_circle</span>
+            <span>Joined room successfully! Redirecting...</span>
+          </div>
+        )}
+
         {/* Hero Card */}
         <section className="relative overflow-hidden rounded-2xl bg-white p-5 border border-[#BDC9C6]/40 shadow-card">
           <div className="flex items-center justify-between mb-2">
@@ -71,23 +123,23 @@ export const JoinRoomScreen: React.FC = () => {
             </span>
             <span className="flex items-center gap-1 text-[11px] text-[#6E7977]">
               <span className="material-symbols-outlined text-[14px]">lock</span>
-              Encrypted
+              Private Room
             </span>
           </div>
           <h2 className="text-[20px] font-bold text-[#101E1C] tracking-tight mb-1">
             Enter Room Code or Scan QR
           </h2>
           <p className="text-[13px] text-[#3E4947] leading-relaxed">
-            Ask the room host for the 6-character room code or invite link to join shared memories.
+            Enter the room invite slug or link provided by the room host.
           </p>
         </section>
 
-        {/* 6-Char Room Key Segmented Inputs */}
+        {/* Room Key Input */}
         <form onSubmit={handleJoin} className="space-y-4">
           <div className="space-y-2">
             <div className="flex items-center justify-between px-0.5">
-              <label className="text-[13px] font-semibold text-[#101E1C]" htmlFor="char-0">
-                Room Access Key
+              <label className="text-[13px] font-semibold text-[#101E1C]" htmlFor="join-slug">
+                Room Invite Code or Slug
               </label>
               <button
                 type="button"
@@ -95,28 +147,23 @@ export const JoinRoomScreen: React.FC = () => {
                 className="inline-flex items-center gap-1 text-[#005C55] hover:underline text-[12px] font-semibold"
               >
                 <span className="material-symbols-outlined text-[15px]">content_paste</span>
-                Paste CB-9821
+                Paste from Clipboard
               </button>
             </div>
 
-            {/* 6 Input Boxes */}
-            <div className="grid grid-cols-6 gap-2 w-full">
-              {codeChars.map((char, i) => (
-                <input
-                  key={i}
-                  id={`char-${i}`}
-                  type="text"
-                  maxLength={1}
-                  value={char}
-                  onChange={(e) => handleCharChange(i, e.target.value)}
-                  className="w-full h-13 text-center text-[22px] font-extrabold text-[#005C55] bg-white border-2 border-[#0F766E]/40 focus:border-[#0F766E] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0F766E]/20 shadow-xs"
-                />
-              ))}
-            </div>
-
-            <div className="flex items-center gap-1.5 px-1 text-[11px] text-[#005E3F] font-medium">
-              <span className="material-symbols-outlined text-[15px]">check_circle</span>
-              <span>Node verified: <strong>ChobiDeh Verified Room</strong></span>
+            <div className="relative">
+              <span className="material-symbols-outlined absolute left-3.5 top-3 text-[#6E7977] text-[20px] pointer-events-none">
+                link
+              </span>
+              <input
+                id="join-slug"
+                type="text"
+                value={joinSlug}
+                onChange={(e) => setJoinSlug(e.target.value)}
+                placeholder="e.g. 7f8a9b2c3d4e or room link"
+                required
+                className="w-full pl-10 pr-4 py-3 rounded-xl bg-white border border-[#BDC9C6]/60 text-[14px] text-[#101E1C] focus:outline-none focus:border-[#0F766E] focus:ring-2 focus:ring-[#0F766E]/20 shadow-xs font-mono"
+              />
             </div>
           </div>
 

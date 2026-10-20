@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/useAuth';
 import { BrandLogo } from '../components/BrandLogo';
 import { PrivacyCard } from '../components/PrivacyCard';
 import { LegalFooter } from '../components/LegalFooter';
@@ -8,11 +9,12 @@ import { Input } from '../components/Input';
 
 export const SignupScreen: React.FC = () => {
   const { setScreen, signup, loginWithGoogle, isLoading, errorMessage, clearError } = useAuth();
+  const navigate = useNavigate();
 
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [biometricConsent, setBiometricConsent] = useState(true);
+  const [biometricConsent, setBiometricConsent] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -103,6 +105,7 @@ export const SignupScreen: React.FC = () => {
             onChange={(e) => setPassword(e.target.value)}
             placeholder="At least 8 characters"
             required
+            minLength={8}
             leadingIcon="lock"
             trailingIcon={
               <button
@@ -200,6 +203,7 @@ export const SignupScreen: React.FC = () => {
               onClick={() => {
                 clearError();
                 setScreen('login');
+                navigate('/login');
               }}
               className="text-[#005C55] font-bold hover:underline ml-1 focus:outline-none"
             >

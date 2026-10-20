@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/useAuth';
 import { ScreenHeader } from '../components/ScreenHeader';
 import { BrandLogo } from '../components/BrandLogo';
 import { PrivacyCard } from '../components/PrivacyCard';

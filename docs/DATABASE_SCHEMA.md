@@ -2,93 +2,111 @@
 
 This is a logical starting point, not a final migration. Review relationships, constraints, retention, and indexes before implementation.
 
-## Proposed entities
+## Entities (Active Schema)
 
-### `users`
-- `id`
-- `email` or provider identity reference
-- `display_name`
-- `avatar_object_key` (optional)
-- `created_at`, `updated_at`, `deleted_at`
+### `public.profiles`
+- `id` (uuid, pk, references `auth.users.id` on delete cascade)
+- `display_name` (varchar(50), not null, sanitized default 'Member')
+- `avatar_storage_key` (text, nullable)
+- `face_clustering_enabled` (boolean, default false - user's global default preference)
+- `onboarding_completed` (boolean, default false - set only via `complete_onboarding` RPC)
+- `created_at`, `updated_at` (timestamptz)
 
-### `user_preferences`
-- `id`
-- `user_id`
-- `face_clustering_enabled` (boolean)
-- `updated_at`
+### `public.rooms`
+- `id` (uuid, pk)
+- `name` (text, not null)
+- `join_slug` (text, unique, not null - >=10 char URL-safe identifier)
+- `passcode_hash` (text, nullable - bcrypt hash of room passcode)
+- `created_by` (uuid, references `auth.users.id` on delete set null)
+- `face_clustering_enabled` (boolean, default false - room owner control)
+- `deleted_at` (timestamptz, nullable - soft deletion)
+- `created_at`, `updated_at` (timestamptz)
 
-### `rooms`
-- `id`
-- `name`
-- `created_by`
-- `join_credential_hash`
-- `created_at`, `updated_at`, `deleted_at`
+### `public.room_members`
+- `room_id` (uuid, references `rooms.id` on delete cascade)
+- `user_id` (uuid, references `auth.users.id` on delete cascade)
+- `role` (`owner`, `admin`, `member`)
+- `face_clustering_consent` (boolean, default false - member's per-room opt-in consent)
+- `joined_at` (timestamptz)
+- Primary key: `(room_id, user_id)`
 
-### `room_members`
-- `room_id`
-- `user_id`
-- `role` (`owner`, `member`, future roles as approved)
-- `joined_at`
-- unique constraint on `(room_id, user_id)`
+### `public.media`
+- `id` (uuid, pk)
+- `room_id` (uuid, references `rooms.id` on delete cascade)
+- `uploaded_by` (uuid, references `auth.users.id` on delete set null)
+- `storage_key` (text, unique, not null - format: `rooms/<room_id>/<uuid>`)
+- `content_type` (text, not null)
+- `size_bytes` (bigint, not null)
+- `upload_status` (`pending`, `uploaded`, `failed`, `deleted`)
+- `processing_status` (`pending`, `processing`, `completed`, `failed`)
+- `deleted_at` (timestamptz, nullable)
+- `created_at`, `updated_at` (timestamptz)
 
-### `media`
-- `id`
-- `room_id`
-- `uploaded_by`
-- `object_key`
-- `content_type`
-- `size_bytes`
-- `checksum` (optional)
-- `upload_status`
-- `processing_status`
-- `created_at`, `deleted_at`
+### `public.clusters` (Level 1 Confident Person Collections)
+- `id` (uuid, pk)
+- `room_id` (uuid, references `rooms.id` on delete cascade)
+- `cluster_code` (text, not null)
+- `display_name` (text, nullable - editable user label)
+- `thumbnail_storage_key` (text, nullable - private storage path, no permanent URLs)
+- `face_count` (int, default 0)
+- `created_at`, `updated_at` (timestamptz)
 
-### `room_person_clusters` (Level 1 Confident Clustering)
-- `id`
-- `room_id`
-- `cluster_code` (e.g. "person-1", "person-2")
-- `display_name` (optional user-assigned name e.g. "Rafiqul", "Samira")
-- `created_at`, `deleted_at`
-- Scoped strictly to the room.
+### `public.face_instances`
+- `id` (uuid, pk)
+- `room_id` (uuid, references `rooms.id` on delete cascade)
+- `media_id` (uuid, references `media.id` on delete cascade)
+- `cluster_id` (uuid, nullable, references `clusters.id` on delete set null)
+- `bounding_box` (jsonb, not null - normalized {x, y, width, height})
+- `detection_confidence` (real, not null)
+- `created_at` (timestamptz)
+- *(Note: embeddings are strictly isolated in `face_embeddings` table)*
 
-### `face_instances`
-- `id`
-- `media_id`
-- `cluster_id` nullable (null indicates Level 3 Unsorted)
-- bounding box coordinates
-- `embedding_vector` (protected/encrypted vector or reference)
-- `confidence_score`
-- `model_version`
-- `created_at`
+### `public.face_embeddings` (Strictly Isolated - Internal AI Worker Only)
+- `face_instance_id` (uuid, pk, references `face_instances.id` on delete cascade)
+- `room_id` (uuid, references `rooms.id` on delete cascade)
+- `embedding` (`vector(512)` if pgvector available, or `real[]` with check length = 512)
+- `model_version` (text, not null)
+- `created_at` (timestamptz)
+- *Security: RLS enabled, NO client policies, ALL privileges REVOKED from `anon` and `authenticated`.*
 
-### `uncertain_matches` (Level 2 Suggestions)
-- `id`
-- `room_id`
-- `source_cluster_id`
-- `target_cluster_id` (or `face_instance_id`)
-- `similarity_score`
+### `public.uncertain_matches` (Level 2 Suggestions for User Confirmation)
+- `id` (uuid, pk)
+- `room_id` (uuid, references `rooms.id` on delete cascade)
+- `source_cluster_id` (uuid, references `clusters.id` on delete cascade)
+- `target_cluster_id` (uuid, references `clusters.id` on delete cascade)
+- `similarity_score` (real, not null)
 - `status` (`pending_review`, `merged`, `dismissed`)
-- `reviewed_by` nullable
-- `reviewed_at` nullable
-- `created_at`
+- `reviewed_by` (uuid, nullable, references `auth.users.id` on delete set null)
+- `reviewed_at` (timestamptz, nullable)
+- `created_at` (timestamptz)
 
-### `photo_assignments`
-- `id`
-- `media_id`
-- `cluster_id` nullable (nullable = Level 3 Unsorted)
-- `assignment_level` (`level_1_confident`, `level_2_confirmed_merge`, `level_3_manual`)
-- `assigned_by` nullable (null for automatic Level 1 clustering)
-- `created_at`, `updated_at`
-- unique constraint on `(media_id, cluster_id)`
+### `public.photo_assignments`
+- `id` (uuid, pk)
+- `room_id` (uuid, references `rooms.id` on delete cascade)
+- `media_id` (uuid, references `media.id` on delete cascade)
+- `face_instance_id` (uuid, nullable, references `face_instances.id` on delete set null)
+- `cluster_id` (uuid, nullable, references `clusters.id` on delete set null - null = unsorted)
+- `assignment_level` (`confident` [L1], `confirmed_merge` [L2], `manual` [L3])
+- `assigned_by` (uuid, nullable, references `auth.users.id` on delete set null)
+- `created_at`, `updated_at` (timestamptz)
 
-### `processing_jobs`
-- `id`
-- `media_id`
-- `job_type`
-- `status`
-- `attempt_count`
-- `last_error_code` (not sensitive payload)
-- `created_at`, `updated_at`
+### `public.processing_jobs` (Internal Background Processing Queue)
+- `id` (uuid, pk)
+- `media_id` (uuid, references `media.id` on delete cascade)
+- `job_type` (`face_detection`, `embedding_extraction`, `clustering`)
+- `status` (`pending`, `processing`, `completed`, `failed`, `cancelled`)
+- `attempts` (int, default 0)
+- `error_message` (text, nullable)
+- `created_at`, `updated_at` (timestamptz)
+- *Security: RLS enabled, NO client policies, ALL privileges REVOKED from `anon` and `authenticated`.*
+
+### `public.join_attempts` (Rate Limiting)
+- `id` (uuid, pk)
+- `user_id` (uuid, references `auth.users.id` on delete cascade)
+- `room_slug` (text, not null)
+- `success` (boolean, not null)
+- `attempted_at` (timestamptz)
+- *Security: RLS enabled, NO client policies, ALL privileges REVOKED from `anon` and `authenticated`.*
 
 ## Rules
 - Every protected query must be scoped to authorized room membership.

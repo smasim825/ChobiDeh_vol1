@@ -1,14 +1,20 @@
-import React, { useState, useEffect } from 'react';
-import { useAuth } from '../context/AuthContext';
+import React, { useState } from 'react';
+import { useAuth } from '../context/useAuth';
 import { Button } from '../components/Button';
 import { Input } from '../components/Input';
 
 export const ProfileScreen: React.FC = () => {
-  const { currentUser, setScreen, logout, updateBiometricConsent, updateProfileName, setUserPassword } = useAuth();
+  const { currentUser, setScreen, logout, updateBiometricConsent, purgeAllFaceData, updateProfileName, setUserPassword } = useAuth();
 
   const [editName, setEditName] = useState(currentUser?.name || '');
+  const [prevCurrentUserName, setPrevCurrentUserName] = useState(currentUser?.name);
+  if (currentUser?.name !== prevCurrentUserName) {
+    setPrevCurrentUserName(currentUser?.name);
+    setEditName(currentUser?.name || '');
+  }
+
   const [isSavingName, setIsSavingName] = useState(false);
-  const [faceGroupingEnabled, setFaceGroupingEnabled] = useState(currentUser?.biometricConsent ?? true);
+  const [faceGroupingEnabled, setFaceGroupingEnabled] = useState(currentUser?.biometricConsent ?? false);
   const [wifiDownloadEnabled, setWifiDownloadEnabled] = useState(true);
   const [gpsStrippingEnabled, setGpsStrippingEnabled] = useState(true);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -20,12 +26,6 @@ export const ProfileScreen: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [passwordError, setPasswordError] = useState<string | null>(null);
   const [isSavingPassword, setIsSavingPassword] = useState(false);
-
-  useEffect(() => {
-    if (currentUser?.name) {
-      setEditName(currentUser.name);
-    }
-  }, [currentUser?.name]);
 
   const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -66,24 +66,33 @@ export const ProfileScreen: React.FC = () => {
     }
   };
 
-  const handleToggleFaceGrouping = () => {
+  const handleToggleFaceGrouping = async () => {
     const nextVal = !faceGroupingEnabled;
     setFaceGroupingEnabled(nextVal);
-    updateBiometricConsent(nextVal);
-    setFeedbackMessage(
-      nextVal
-        ? '3-Level AI face clustering enabled. Visually similar faces will be grouped anonymously.'
-        : '3-Level AI face clustering paused. No face clusters or vectors generated.'
-    );
-    setTimeout(() => setFeedbackMessage(null), 3500);
+    const res = await updateBiometricConsent(nextVal);
+    if (res.success) {
+      setFeedbackMessage(
+        nextVal
+          ? 'Face clustering preference saved (enabled). Photos in opted-in rooms will be grouped anonymously.'
+          : 'Face clustering preference saved (disabled). Face grouping is paused.'
+      );
+    } else {
+      setFaceGroupingEnabled(!nextVal);
+      setFeedbackMessage(`Failed to update consent preference: ${res.error || 'Server error'}`);
+    }
+    setTimeout(() => setFeedbackMessage(null), 4000);
   };
 
-  const handlePurgeBiometrics = () => {
-    setFaceGroupingEnabled(false);
-    updateBiometricConsent(false);
+  const handlePurgeBiometrics = async () => {
     setShowDeleteModal(false);
-    setFeedbackMessage('All room face clusters and vector embeddings purged.');
-    setTimeout(() => setFeedbackMessage(null), 3500);
+    const res = await purgeAllFaceData();
+    if (res.success) {
+      setFaceGroupingEnabled(false);
+      setFeedbackMessage(res.message || 'Face data successfully purged from rooms.');
+    } else {
+      setFeedbackMessage(`Failed to purge room face data: ${res.error || 'Server error'}`);
+    }
+    setTimeout(() => setFeedbackMessage(null), 5000);
   };
 
   return (
@@ -137,7 +146,7 @@ export const ProfileScreen: React.FC = () => {
                 <img
                   className="w-full h-full object-cover"
                   alt={currentUser?.name || 'Tasnim Rahman'}
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuDjDxKnJI_lzaHbWuodGA9ZD1etukufXXJJGPbe1chtc25iJcBSIBqXgMkeIS40lnS_ri-ZV7ZcYTmklBi_lzMVF0gdJR4ic_zsjbAtsrddUv59UQouipxSWh7Yn6fDOidsd-UrffxZZyJz2ztOHZwmBQI-prmQqnVFux88W9o1hlhUeq4hGFa6Dw8UO-8bMObMV5SJjIWBld2QOIjMvMYLILbhQ6WxZtYszTQ2JSKY8FIa49rx9cTp"
+                  src="/placeholder-avatar.svg"
                 />
               </div>
               <button
@@ -407,13 +416,13 @@ export const ProfileScreen: React.FC = () => {
                 </span>
               </div>
               <div>
-                <h3 className="text-[14px] font-bold text-[#101E1C]">On-Device Photo Vault</h3>
-                <p className="text-[12px] text-[#3E4947]">Private neural clustering active</p>
+                <h3 className="text-[14px] font-bold text-[#101E1C]">Private Photo Vault</h3>
+                <p className="text-[12px] text-[#3E4947]">Private to room members. Face grouping runs on our servers only if you opt in.</p>
               </div>
             </div>
             <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#007952]/15 text-[#005E3F] text-[11px] font-semibold">
               <span className="w-1.5 h-1.5 rounded-full bg-[#005E3F] animate-pulse" />
-              Biometrics Local &amp; Safe
+              Private &amp; Opt-In
             </span>
           </div>
 

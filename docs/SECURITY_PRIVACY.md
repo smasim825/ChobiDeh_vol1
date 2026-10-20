@@ -38,6 +38,10 @@ This is a working checklist, not a legal opinion. Before public launch, assess a
 - Ensure object storage access cannot bypass API authorization.
 - Re-check membership when issuing download links and processing jobs.
 
+## Third-party Assets & External Network Requests
+- **Google Fonts & Material Symbols:** The client currently loads webfonts (Plus Jakarta Sans, Manrope) and icon glyphs (Material Symbols Outlined) via `fonts.googleapis.com` and `fonts.gstatic.com`. Client IP addresses and user agent headers are transmitted to Google during browser stylesheet and font file fetching. For zero-external-network privacy compliance or air-gapped deployments, these font files should be self-hosted statically in `client/public/fonts/`.
+- **Zero Third-Party Image Hotlinking:** All UI sample photos, avatars, and icons are bundled locally as static SVGs in `client/public/` to prevent tracking or external referer leakage.
+
 ## Secure development
 - Keep secrets in environment/secret management, never source control.
 - Commit an `.env.example` with placeholders only.

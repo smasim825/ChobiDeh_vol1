@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/useAuth';
 import { BrandLogo } from '../components/BrandLogo';
 import { Button } from '../components/Button';
 import { Input } from '../components/Input';
@@ -10,7 +10,7 @@ export const CompleteProfileScreen: React.FC = () => {
   const { currentUser, completeGoogleProfile, isLoading, errorMessage, clearError } = useAuth();
 
   const [fullName, setFullName] = useState(currentUser?.name || '');
-  const [biometricConsent, setBiometricConsent] = useState(currentUser?.biometricConsent ?? true);
+  const [biometricConsent, setBiometricConsent] = useState(currentUser?.biometricConsent ?? false);
   const [validationError, setValidationError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {

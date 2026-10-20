@@ -3,13 +3,13 @@
 Update this file when starting or handing off a multi-file task. Keep entries short and current.
 
 ## Active work
-- Task: In-App Password Creation for Google Accounts & Smart Login Fallback
-  - Owner: Fullstack / Auth agent
-  - Status: Completed (Ready for commit & push)
-  - Branch: main
-  - Scope: Added Security & Login Methods card in `ProfileScreen.tsx` allowing Google OAuth users to directly set or change an account password in-app without abusing the "Forgot password" flow. Extracted provider metadata in `AuthContext.tsx` and implemented `setUserPassword()`. Added smart provider detection to `LoginScreen.tsx` offering a 1-click "Login with Google" fallback if an invalid password is entered.
-  - Files modified: client/src/context/AuthContext.tsx, client/src/types/auth.ts, client/src/screens/ProfileScreen.tsx, client/src/screens/LoginScreen.tsx, client/src/test/auth.test.tsx, docs/HANDOFF.md
-  - Tests run: 12/12 Vitest tests passed, `tsc -b` passed with 0 errors, `npm run build` completed successfully.
+- Task: Security Hardening & Review Round 1
+  - Owner: Senior Full-Stack Engineer
+  - Status: Completed (Ready for final report & merge)
+  - Branch: `fix/review-round-1`
+  - Scope: Additive migration `20261021000000_security_hardening.sql` (RLS on jobs/attempts, isolated face_embeddings, search_path hygiene, room join slug & RPCs, rate limiting, private storage bucket, cluster RPCs, purge RPCs). Client: opt-in consent default false everywhere, honest wording (no false encryption claims), real create/join RPC wiring, React Router dom routing with auth guards and deep-link preservation, Supabase auth bug fixes (error checks on all calls, DB-backed onboarding completion, deferred auth event loop fix), asset hygiene (zero hotlinks, local SVGs), Vitest mock test suite, CI workflow `.github/workflows/ci.yml`.
+  - Files modified: `supabase/migrations/20261021000000_security_hardening.sql`, `supabase/tests/database_security.test.sql`, `supabase/README.md`, client context/screens/components/tests, `.github/workflows/ci.yml`, documentation docs/*.
+  - Tests run: 21/21 Vitest tests passed, `oxlint` 0 errors / 0 warnings, `tsc -b` 0 errors, `npm run build` passed. Supabase CLI not run locally (Docker not running).
 
 ## Handoff template
 
