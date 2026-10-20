@@ -688,8 +688,8 @@ GRANT EXECUTE ON FUNCTION public.resolve_uncertain_match(uuid, text) TO authenti
 REVOKE EXECUTE ON FUNCTION public.assign_photo_to_cluster(uuid, uuid, uuid, uuid) FROM PUBLIC, anon;
 GRANT EXECUTE ON FUNCTION public.assign_photo_to_cluster(uuid, uuid, uuid, uuid) TO authenticated;
 
-REVOKE EXECUTE ON FUNCTION public.unassign_photo_from_cluster(uuid, uuid, uuid) FROM PUBLIC, anon;
-GRANT EXECUTE ON FUNCTION public.unassign_photo_from_cluster(uuid, uuid, uuid) TO authenticated;
+REVOKE EXECUTE ON FUNCTION public.unassign_photo_from_cluster(uuid, uuid) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.unassign_photo_from_cluster(uuid, uuid) TO authenticated;
 
 REVOKE EXECUTE ON FUNCTION public.purge_room_face_data(uuid) FROM PUBLIC, anon;
 GRANT EXECUTE ON FUNCTION public.purge_room_face_data(uuid) TO authenticated;
