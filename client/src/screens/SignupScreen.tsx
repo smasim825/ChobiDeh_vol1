@@ -12,7 +12,7 @@ export const SignupScreen: React.FC = () => {
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [biometricConsent, setBiometricConsent] = useState(true);
+  const [biometricConsent, setBiometricConsent] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {

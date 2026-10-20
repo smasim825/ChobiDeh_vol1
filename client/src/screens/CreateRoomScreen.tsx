@@ -1,15 +1,18 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { supabase } from '../lib/supabase';
 
 export const CreateRoomScreen: React.FC = () => {
   const { setScreen } = useAuth();
 
-  const [roomName, setRoomName] = useState('Sajek Valley Expedition');
+  const [roomName, setRoomName] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('Travel & Roadtrip');
-  const [eventDate, setEventDate] = useState('Oct 14 — Oct 18, 2024');
-  const [selectedCover, setSelectedCover] = useState('cloud_peak');
+  const [eventDate, setEventDate] = useState('');
+  const [selectedCover, setSelectedCover] = useState('teal_gradient');
   const [passcode, setPasscode] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [successInfo, setSuccessInfo] = useState<{ id: string; join_slug: string } | null>(null);
 
   const categories = [
     { id: 'travel', label: 'Travel & Roadtrip', icon: 'explore' },
@@ -20,29 +23,54 @@ export const CreateRoomScreen: React.FC = () => {
 
   const coverPresets = [
     {
-      id: 'cloud_peak',
-      title: 'Cloud Peak',
-      url: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCaVmD4MnddAPe6CaZ6cUT6ZJykFOGBe9H3SSq_IOVedUfG0TSHW_kFCF1Ra4nEg8RIE1hoBkVMO8RcNuGSP_m2T6CI5oTk5RPw0kzTDPJHe2BiXgCjCFPzabfLHHknMf3TH381ZR-nY65ZQdOClYrGuqGM1VQ_1-6X-bef4cbp7hptMJ6NakoYsrFjLy-Q_XwQOueqVx0gyykhFJuD4m336vRJRRrHTP2JspECYqtTYACtCH0QxcBM',
+      id: 'teal_gradient',
+      title: 'Emerald Peak',
+      gradient: 'from-[#005C55] to-[#9CF2E8]',
     },
     {
-      id: 'sunset_cove',
-      title: 'Sunset Cove',
-      url: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAvwNHi7wAt2XVqZ-dKnyfSkiEvqAm5ahP_QFG8rERpmNnt_SPgxua6GdY1g5sjH_A2qb2cIjr5XIGFwpmMY40nOdol97rlK3TAxqjhw7c0_r-Xugr11MbfheoqzhsCb1hEr5MDe5oq5LASoGCqSaa-0S1T4IH0Kvrm8V2wzwgj0RuBR-tkfEX8R6dMI-AVFJwLAAzjPOLfzbtgWqR7lG20J7-RlFmv4-ghbH_Z5jTkI61EwSdeDOlM',
+      id: 'sunset_gradient',
+      title: 'Warm Amber',
+      gradient: 'from-[#8E4E14] to-[#FFAB69]',
     },
     {
-      id: 'tea_horizon',
-      title: 'Tea Horizon',
-      url: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAWYrfftPQsdshkkzfF_31E5qQ1tB9MUONyujMzgYasT3aImHUzFnNEMpa8ir_rloshsfk8-3pRCE2pVoBrWsrWgx9zT30rR-D72VIEbGjZSICEbjNj8Yq3flbktTvz1P8b1Iy2eCYYmpQvcSigPmMZiV3TBovDwmwN_5NVJs9WU1oLkuRwGqq2xt-cAiJZKFQRvpIzq-o3Y5BtaJ1hQYq1lE0ZCHhAlldSkd5sz1K5U77G6YcyczRv',
+      id: 'slate_gradient',
+      title: 'Archival Slate',
+      gradient: 'from-[#253331] to-[#6E7977]',
     },
   ];
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!roomName.trim()) {
+      setErrorMessage('Room name is required.');
+      return;
+    }
+    setErrorMessage(null);
     setIsSubmitting(true);
-    setTimeout(() => {
+
+    if (supabase) {
+      const { data, error } = await supabase.rpc('create_room', {
+        room_name: roomName.trim(),
+        passcode: passcode.trim() || null,
+      });
+
+      if (error) {
+        setErrorMessage(error.message);
+        setIsSubmitting(false);
+        return;
+      }
+
       setIsSubmitting(false);
-      setScreen('room-area');
-    }, 600);
+      setSuccessInfo(data);
+      setTimeout(() => {
+        setScreen('home');
+      }, 1500);
+      return;
+    }
+
+    // Fallback simulation mode
+    setIsSubmitting(false);
+    setScreen('home');
   };
 
   return (
@@ -65,7 +93,7 @@ export const CreateRoomScreen: React.FC = () => {
         </div>
         <button
           type="button"
-          onClick={() => alert('Rooms are private, invitation-only photo spaces with end-to-end access isolation.')}
+          onClick={() => alert('Rooms are private, invitation-only photo spaces with membership-based access isolation.')}
           className="w-9 h-9 rounded-full flex items-center justify-center text-[#005C55] hover:bg-[#E1F1EE] focus:outline-none"
         >
           <span className="material-symbols-outlined text-[20px]">help_outline</span>
@@ -74,6 +102,25 @@ export const CreateRoomScreen: React.FC = () => {
 
       {/* Main Content */}
       <main className="w-full max-w-md mx-auto pt-16 px-4 space-y-4 text-left">
+        {/* Error / Success Alerts */}
+        {errorMessage && (
+          <div className="p-3.5 bg-[#FFDAD6] border border-[#BA1A1A]/30 rounded-xl text-[13px] text-[#93000A] font-semibold flex items-center gap-2">
+            <span className="material-symbols-outlined text-[18px]">error</span>
+            <span>{errorMessage}</span>
+          </div>
+        )}
+        {successInfo && (
+          <div className="p-3.5 bg-[#E7F7F4] border border-[#0F766E]/30 rounded-xl text-[13px] text-[#005C55] font-semibold space-y-1">
+            <div className="flex items-center gap-2">
+              <span className="material-symbols-outlined text-[18px]">check_circle</span>
+              <span>Room created successfully!</span>
+            </div>
+            <p className="text-[12px] font-normal text-[#3E4947]">
+              Join link slug: <strong className="font-mono text-[#005C55]">{successInfo.join_slug}</strong>
+            </p>
+          </div>
+        )}
+
         {/* Intro Card */}
         <div className="relative overflow-hidden rounded-2xl bg-[#E7F7F4] border border-[#BDC9C6]/40 p-4 mt-2">
           <div className="space-y-1">
@@ -85,7 +132,7 @@ export const CreateRoomScreen: React.FC = () => {
             </div>
             <h2 className="text-[18px] text-[#101E1C] font-bold">Shared Space for Memories</h2>
             <p className="text-[13px] text-[#3E4947] leading-relaxed">
-              Gather everyone's high-res shots into a curated gallery with local facial categorization.
+              Gather everyone's high-res shots into a private room. Face grouping runs on our servers and only if you opt in.
             </p>
           </div>
         </div>
@@ -169,14 +216,13 @@ export const CreateRoomScreen: React.FC = () => {
                 <div
                   key={preset.id}
                   onClick={() => setSelectedCover(preset.id)}
-                  className={`group relative aspect-video rounded-xl overflow-hidden cursor-pointer shadow-xs transition-all ${
+                  className={`group relative aspect-video rounded-xl overflow-hidden cursor-pointer shadow-xs transition-all bg-gradient-to-br ${preset.gradient} ${
                     selectedCover === preset.id
                       ? 'ring-2 ring-[#005C55] ring-offset-2'
                       : 'border border-[#BDC9C6]/60 opacity-80 hover:opacity-100'
                   }`}
                 >
-                  <img src={preset.url} alt={preset.title} className="w-full h-full object-cover" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                  <div className="absolute inset-0 bg-black/15" />
                   {selectedCover === preset.id && (
                     <span className="absolute top-1.5 right-1.5 bg-[#005C55] text-white rounded-full p-0.5">
                       <span className="material-symbols-outlined text-[13px]">check</span>

@@ -10,7 +10,7 @@ export const CompleteProfileScreen: React.FC = () => {
   const { currentUser, completeGoogleProfile, isLoading, errorMessage, clearError } = useAuth();
 
   const [fullName, setFullName] = useState(currentUser?.name || '');
-  const [biometricConsent, setBiometricConsent] = useState(currentUser?.biometricConsent ?? true);
+  const [biometricConsent, setBiometricConsent] = useState(currentUser?.biometricConsent ?? false);
   const [validationError, setValidationError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {

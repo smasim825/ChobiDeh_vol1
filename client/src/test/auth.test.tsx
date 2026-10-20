@@ -45,11 +45,11 @@ describe('ChobiDeh Authentication Suite', () => {
       name: /enable 3-level ai face clustering/i,
     }) as HTMLInputElement;
     expect(consentCheckbox).toBeInTheDocument();
-    expect(consentCheckbox.checked).toBe(true);
-
-    // Toggle consent off
-    fireEvent.click(consentCheckbox);
     expect(consentCheckbox.checked).toBe(false);
+
+    // Toggle consent on
+    fireEvent.click(consentCheckbox);
+    expect(consentCheckbox.checked).toBe(true);
   });
 
   it('renders ForgotPasswordScreen and allows sending a reset link', async () => {

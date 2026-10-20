@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import type { Room } from '../types/room';
+import { supabase } from '../lib/supabase';
 
 const INITIAL_ROOMS: Room[] = [
   {
@@ -11,27 +12,14 @@ const INITIAL_ROOMS: Room[] = [
     photoCount: 142,
     updatedAt: 'Updated 2h ago',
     coverImage:
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuBf-dFHqUJzS6AsGnsObKvM1ZSYPEdqaqwLfEuSU-KzRO7pCyUQdPC46ziMPT-Goedt16W0YlOfRn2_oGkrNBzp2iBxNtmiroEhqFkiWTCpZCk25vrJ5UiwMpdfS7-Udoz3ItUatALRG2r49VR26O_qimwtia7lBupaZf3r4OIZtleDm4yZ5nqS4f1vj63pd2EcODsRTI37gyioFoeiLReYSG09_cfUlcjUH8XyjtgirYLX2VTI4UuK',
+      'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80',
     altText:
       "Vibrant panoramic view of Cox's Bazar beach at golden sunset with warm reflections on ocean tides.",
     members: [
       {
         id: 'm1',
         name: 'Amina',
-        avatar:
-          'https://lh3.googleusercontent.com/aida-public/AB6AXuCfxRNFQFSdCj8iajZ62oVX4SzJqF2lhS2YNhkfQbV8UYwhsNa2-t6lCzChqYPq9MeqNFCBgZQjUh9GYMRxWzDoi4xE2bkdLiimgBum4O66sc20BGnqGfJEEhKwalnxiOK2LOW5vegS5ipMDSoqGaKpB3Oa9AN3Tkyk3zV1xN12JqJfhaG3Qi8tfE-Vaz2yMcML30r2HJoV2DFVtM9cSVJXU6h0mTIknIi19BBT3d7Zl-g161ja1OOw',
-      },
-      {
-        id: 'm2',
-        name: 'Rafiq',
-        avatar:
-          'https://lh3.googleusercontent.com/aida-public/AB6AXuApXnDbtVFoEwAchXY_hbVn8VDdvzDVun56ckDau44eZSmzj392ziJg5IJ9JPyglfnzirgdIFF_QC0EUl6OLEfDMUrPXGFLmJrUZdqFbzDladGN11KOGc7be5nuWPglidOcH3hocefXHts6rYn3EbrWXK3brvBEa-tvZmiZryKBunm_QSsmOMkFqiyuKho7uiRPXjrKf7P1MxAMmsAXGKz0kYlFpFeodwnEnc6PdAZii4wzSkzlgegf',
-      },
-      {
-        id: 'm3',
-        name: 'Tanvir',
-        avatar:
-          'https://lh3.googleusercontent.com/aida-public/AB6AXuBnYUB5z27Eyd8l0DH3XRN5UquaQn-xAmk3vj7JZ7guMNIS77HdALDvLjrxjOY8GonHWFIKTz3GgSp99UZD1snjSOrwQrVVmGemeAoFmDruBXI3jLsj7it00YrNfIwvMCOjQSGXeCLtA2Etd8XrrYEoQHwv8hK9EuEHwh4PWAPpEU_D7KnOixbVvX1-Jelx4zn_knuiJ1uCpBThkZbiSajIumDjMVM3KGdZ7gohe4GMnWFA7_rBi7SV',
+        avatar: '',
       },
     ],
     extraMemberCount: 1,
@@ -44,58 +32,25 @@ const INITIAL_ROOMS: Room[] = [
     photoCount: 384,
     updatedAt: 'Updated yesterday',
     coverImage:
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuDdJdzXVsQtdt0p7Z3fxxQljYRzkC9roaddOH9O8yIuw3fJJ0ywNlh4saos6JE7Esv_CnuIboB6fKPp2IsIK9V0V7qQxqLwI9KsJZtOvpuo-QNTtli7iRSBNgNimvAiEQar4XP_4V3A8Yp_jm6RuRDeyxVgLw3yzV6EG-c2Lzc5eNq3c9IyP38ZUssSEr8W9OTNjxUm6hryfMXzRGNDwfDZf04JKpORjyc8CKOBukBUYAs8fjWwp8X-',
+      'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=80',
     altText:
       'Candid group photograph of university friends laughing together outdoors on a lush green campus lawn.',
     members: [
       {
         id: 'm4',
         name: 'Farzana',
-        avatar:
-          'https://lh3.googleusercontent.com/aida-public/AB6AXuDLbCkor7zMroWonKzYox9MoSGxAl0oIbaGqYNt71b0Uknf8eveKuu5aB8V8MPH1hDkWEeD46SFuzG6oj-UvcH13bFztZGw174yknVLSEJLdXROnzfcJcOepDttb-f-k6YSdeDwfGWROrrdUpiYsKz8DXvk1EEFmrRROEdLjikEjbzQbI5xDRiZlfpFuBp_pK7EGF29HGcO3tl9Z4bicrAfA9j7WZIdUa2DkufIWaOlY4_spKwdMS2G',
-      },
-      {
-        id: 'm5',
-        name: 'Shakil',
-        avatar:
-          'https://lh3.googleusercontent.com/aida-public/AB6AXuANhsWKZ-sHTy0UQYhOXtbTPJKBtufrzj_QszII2UYQOfEAnjA5cgISeBtvO_0udvwBbhrylvqtnoIGfrp7Mx23F99C9Z-74ENa8ajf5NMvANwFaXWKpowyd6U-sOu_uBVG2hgnpppqprc9k6RrX1210ivFI9aJ9CFIvQ0lPIHPnHEa2zSr9Ninjpa0ahpQN-jdVWiyOx_bCPB_nqblPIQy5ZP6ml7epdKz2snt81BejS9MdImYllfN',
+        avatar: '',
       },
     ],
     extraMemberCount: 4,
-  },
-  {
-    id: 'room_sylhet_03',
-    title: 'Sylhet Weekend',
-    category: 'Nature Retreat',
-    badge: { label: 'Weekend Getaway', type: 'weekend' },
-    photoCount: 89,
-    updatedAt: 'Updated 3 days ago',
-    coverImage:
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuAWYrfftPQsdshkkzfF_31E5qQ1tB9MUONyujMzgYasT3aImHUzFnNEMpa8ir_rloshsfk8-3pRCE2pVoBrWsrWgx9zT30rR-D72VIEbGjZSICEbjNj8Yq3flbktTvz1P8b1Iy2eCYYmpQvcSigPmMZiV3TBovDwmwN_5NVJs9WU1oLkuRwGqq2xt-cAiJZKFQRvpIzq-o3Y5BtaJ1hQYq1lE0ZCHhAlldSkd5sz1K5U77G6YcyczRv',
-    altText:
-      'Breathtaking landscape photo of undulating lush emerald green tea gardens in Sylhet shrouded in morning mist.',
-    members: [
-      {
-        id: 'm6',
-        name: 'Nabila',
-        avatar:
-          'https://lh3.googleusercontent.com/aida-public/AB6AXuBvQx4LXY6bkfjaX4VuROHQPRe5jbDlb6Vgkdy8FTQ-4khl9RFG2C2X_y9G2tnt0lBv4x3tQNe0Ll9N9INqVAXtCQSxYyYiGYlifqR-PoWImKblmCgH67VP8hCa6Tf5h3kTopMDGhHv2LNf-fGxLdocgB9_KyTEKdsh9DB3Vkg9nd0CL6uvYZrwyPcEasZTdrAS14ysOZElXUKn--8GapJLkSMtSTKhtKHRfp_nEQ65QYYVul5lBbBI',
-      },
-      {
-        id: 'm7',
-        name: 'Zubair',
-        avatar:
-          'https://lh3.googleusercontent.com/aida-public/AB6AXuB4z3DUx5EF8_u3QI-ZGkHZwd5Ji3hSRPLBFrN58BmIJyNyd73UDZO3r5GnXvrXtgXwmwarVdHyuKPxk_pMJ52Un6W0rfrMYy54vY09GZ5EHz_mKS2WPejVUJHNi-w2YcNUWpgXOvFn9MKPcDQILYLM1qH32mKVF4jRok7ZI3w119XZ-0G5qmOZDhOC2QkzObwm3acTpxnX6yikhmAp8pJp43SdCil1vgC5O6-xV94AHKgu8jl0SKLW',
-      },
-    ],
-    extraMemberCount: 1,
   },
 ];
 
 export const HomeScreen: React.FC = () => {
   const { currentUser, logout, updateBiometricConsent, setScreen } = useAuth();
 
-  const [rooms, setRooms] = useState<Room[]>(INITIAL_ROOMS);
+  const [rooms, setRooms] = useState<Room[]>([]);
+  const [isDemoData, setIsDemoData] = useState(false);
   const [activeNav, setActiveNav] = useState<'rooms' | 'gallery' | 'people' | 'review'>('rooms');
   const [showAiBanner, setShowAiBanner] = useState(true);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
@@ -110,50 +65,236 @@ export const HomeScreen: React.FC = () => {
   const [joinCode, setJoinCode] = useState('');
   const [joinPassword, setJoinPassword] = useState('');
   const [actionFeedback, setActionFeedback] = useState<string | null>(null);
+  const [createError, setCreateError] = useState<string | null>(null);
+  const [joinError, setJoinError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleCreateRoom = (e: React.FormEvent) => {
+  useEffect(() => {
+    let isMounted = true;
+    const fetchRooms = async () => {
+      if (!currentUser || !supabase) {
+        if (import.meta.env.DEV && isMounted) {
+          setRooms(INITIAL_ROOMS);
+          setIsDemoData(true);
+        }
+        return;
+      }
+
+      try {
+        const { data: memberRooms, error: memberErr } = await supabase
+          .from('room_members')
+          .select('room_id, role, rooms(id, name, created_at, join_slug, face_clustering_enabled)');
+
+        if (memberErr || !memberRooms || memberRooms.length === 0) {
+          if (import.meta.env.DEV && isMounted) {
+            setRooms(INITIAL_ROOMS);
+            setIsDemoData(true);
+          } else if (isMounted) {
+            setRooms([]);
+            setIsDemoData(false);
+          }
+        } else if (isMounted) {
+          const loaded: Room[] = memberRooms
+            .filter((rm: any) => rm.rooms)
+            .map((rm: any) => ({
+              id: rm.rooms.id,
+              title: rm.rooms.name,
+              category: 'Shared Album',
+              badge: { label: rm.role === 'owner' ? 'Host' : 'Member', type: 'shared' },
+              photoCount: 0,
+              updatedAt: new Date(rm.rooms.created_at).toLocaleDateString(),
+              coverImage:
+                'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80',
+              altText: rm.rooms.name,
+              members: [
+                {
+                  id: currentUser.id,
+                  name: currentUser.name,
+                  avatar: '',
+                },
+              ],
+              extraMemberCount: 0,
+            }));
+          setRooms(loaded);
+          setIsDemoData(false);
+        }
+      } catch {
+        if (import.meta.env.DEV && isMounted) {
+          setRooms(INITIAL_ROOMS);
+          setIsDemoData(true);
+        }
+      }
+    };
+
+    fetchRooms();
+    return () => {
+      isMounted = false;
+    };
+  }, [currentUser]);
+
+  const handleCreateRoom = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newRoomTitle.trim()) return;
 
-    const newRoom: Room = {
-      id: 'room_' + Math.random().toString(36).substring(2, 8),
-      title: newRoomTitle.trim(),
-      category: newRoomCategory.trim() || 'Shared Album',
-      badge: { label: 'New', type: 'new' },
-      photoCount: 0,
-      updatedAt: 'Just now',
-      coverImage:
-        'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80',
-      altText: newRoomTitle.trim(),
-      members: [
-        {
-          id: currentUser?.id || 'creator',
-          name: currentUser?.name || 'Creator',
-          avatar:
-            'https://lh3.googleusercontent.com/aida-public/AB6AXuBOywiE7V8t1qbeeXpXX6gvjcINY4_kmN-zdjgJvvP1hXImASFvuTOFsRkiHZWFlA3PVsZanagfSZuBuf0KUkaw0hxUedCOLenmHwF-qw2uNb4Z-VeBclVtL0XyAXnmbcSCMUtnwp7VchVrs2ByLde60XhJe1cdhCgAsMywV-uDbPqIwEApa-hT4ExnW1mvbv54XLy2DE6IOmtKkWtXlAAldMBpNKtzedQQ48UCGGM6PzgmAn5oVnuL',
-        },
-      ],
-      extraMemberCount: 0,
-    };
+    setCreateError(null);
+    setIsSubmitting(true);
+    try {
+      if (!supabase) {
+        if (import.meta.env.DEV) {
+          const newRoom: Room = {
+            id: 'room_' + Math.random().toString(36).substring(2, 8),
+            title: newRoomTitle.trim(),
+            category: newRoomCategory.trim() || 'Shared Album',
+            badge: { label: 'New', type: 'new' },
+            photoCount: 0,
+            updatedAt: 'Just now',
+            coverImage:
+              'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80',
+            altText: newRoomTitle.trim(),
+            members: [
+              {
+                id: currentUser?.id || 'creator',
+                name: currentUser?.name || 'Creator',
+                avatar: '',
+              },
+            ],
+            extraMemberCount: 0,
+          };
+          setRooms((prev) => [newRoom, ...prev]);
+          setShowCreateModal(false);
+          setNewRoomTitle('');
+          setNewRoomCategory('');
+          setNewRoomPassword('');
+          setActionFeedback(`Room "${newRoom.title}" created successfully!`);
+          setTimeout(() => setActionFeedback(null), 3500);
+        } else {
+          setCreateError('Supabase is not configured.');
+        }
+        return;
+      }
 
-    setRooms([newRoom, ...rooms]);
-    setNewRoomTitle('');
-    setNewRoomCategory('');
-    setNewRoomPassword('');
-    setShowCreateModal(false);
-    setActionFeedback(`Room "${newRoom.title}" created successfully!`);
-    setTimeout(() => setActionFeedback(null), 3500);
+      const { data, error } = await supabase.rpc('create_room', {
+        room_name: newRoomTitle.trim(),
+        passcode: newRoomPassword.trim() || null,
+      });
+
+      if (error || !data) {
+        setCreateError(error?.message || 'Failed to create room. Please try again.');
+        return;
+      }
+
+      setShowCreateModal(false);
+      const title = newRoomTitle.trim();
+      setNewRoomTitle('');
+      setNewRoomCategory('');
+      setNewRoomPassword('');
+      setActionFeedback(`Room "${title}" created successfully!`);
+      setTimeout(() => setActionFeedback(null), 3500);
+
+      const { data: memberRooms } = await supabase
+        .from('room_members')
+        .select('room_id, role, rooms(id, name, created_at, join_slug, face_clustering_enabled)');
+      if (memberRooms && memberRooms.length > 0) {
+        const loaded: Room[] = memberRooms
+          .filter((rm: any) => rm.rooms)
+          .map((rm: any) => ({
+            id: rm.rooms.id,
+            title: rm.rooms.name,
+            category: 'Shared Album',
+            badge: { label: rm.role === 'owner' ? 'Host' : 'Member', type: 'shared' },
+            photoCount: 0,
+            updatedAt: new Date(rm.rooms.created_at).toLocaleDateString(),
+            coverImage:
+              'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80',
+            altText: rm.rooms.name,
+            members: [
+              {
+                id: currentUser?.id || 'creator',
+                name: currentUser?.name || 'Creator',
+                avatar: '',
+              },
+            ],
+            extraMemberCount: 0,
+          }));
+        setRooms(loaded);
+        setIsDemoData(false);
+      }
+    } catch (err: any) {
+      setCreateError(err?.message || 'An unexpected error occurred while creating room.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const handleJoinRoom = (e: React.FormEvent) => {
+  const handleJoinRoom = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!joinCode.trim()) return;
 
-    setShowJoinModal(false);
-    setJoinCode('');
-    setJoinPassword('');
-    setActionFeedback(`Joined room successfully! Loading shared memories...`);
-    setTimeout(() => setActionFeedback(null), 3500);
+    setJoinError(null);
+    setIsSubmitting(true);
+    try {
+      if (!supabase) {
+        if (import.meta.env.DEV) {
+          setShowJoinModal(false);
+          setJoinCode('');
+          setJoinPassword('');
+          setActionFeedback(`Joined room successfully! Loading shared memories...`);
+          setTimeout(() => setActionFeedback(null), 3500);
+        } else {
+          setJoinError('Supabase is not configured.');
+        }
+        return;
+      }
+
+      const { data, error } = await supabase.rpc('join_room', {
+        slug: joinCode.trim().toLowerCase(),
+        passcode: joinPassword.trim() || null,
+      });
+
+      if (error || !data) {
+        setJoinError(error?.message || 'Unable to join room. Please check the code and passcode.');
+        return;
+      }
+
+      setShowJoinModal(false);
+      setJoinCode('');
+      setJoinPassword('');
+      setActionFeedback(`Joined room successfully! Loading shared memories...`);
+      setTimeout(() => setActionFeedback(null), 3500);
+
+      const { data: memberRooms } = await supabase
+        .from('room_members')
+        .select('room_id, role, rooms(id, name, created_at, join_slug, face_clustering_enabled)');
+      if (memberRooms && memberRooms.length > 0) {
+        const loaded: Room[] = memberRooms
+          .filter((rm: any) => rm.rooms)
+          .map((rm: any) => ({
+            id: rm.rooms.id,
+            title: rm.rooms.name,
+            category: 'Shared Album',
+            badge: { label: rm.role === 'owner' ? 'Host' : 'Member', type: 'shared' },
+            photoCount: 0,
+            updatedAt: new Date(rm.rooms.created_at).toLocaleDateString(),
+            coverImage:
+              'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80',
+            altText: rm.rooms.name,
+            members: [
+              {
+                id: currentUser?.id || 'creator',
+                name: currentUser?.name || 'Creator',
+                avatar: '',
+              },
+            ],
+            extraMemberCount: 0,
+          }));
+        setRooms(loaded);
+        setIsDemoData(false);
+      }
+    } catch (err: any) {
+      setJoinError(err?.message || 'Unable to join room. Please check the code and passcode.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -366,6 +507,11 @@ export const HomeScreen: React.FC = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <h2 className="text-[18px] font-bold text-[#253331]">Your Memories</h2>
+              {isDemoData && (
+                <span className="text-[11px] font-bold bg-[#FFAB69]/20 text-[#8E4E14] px-2 py-0.5 rounded-full border border-[#FFAB69]/40">
+                  Demo data
+                </span>
+              )}
               <span className="text-[11px] font-bold bg-[#E1F1EE] text-[#3E4947] px-2 py-0.5 rounded-full">
                 {rooms.length} active
               </span>
@@ -519,6 +665,11 @@ export const HomeScreen: React.FC = () => {
             </p>
 
             <form onSubmit={handleCreateRoom} className="space-y-3.5">
+              {createError && (
+                <div className="p-2.5 rounded-xl bg-[#FFDAD6] text-[#93000A] text-[12px] font-medium">
+                  {createError}
+                </div>
+              )}
               <div>
                 <label className="block text-[12px] font-semibold text-[#101E1C] mb-1">
                   Room Name
@@ -572,9 +723,10 @@ export const HomeScreen: React.FC = () => {
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 py-2.5 rounded-full bg-[#0F766E] text-white text-[13px] font-semibold hover:bg-[#005C55] shadow-xs"
+                  disabled={isSubmitting}
+                  className="flex-1 py-2.5 rounded-full bg-[#0F766E] text-white text-[13px] font-semibold hover:bg-[#005C55] shadow-xs disabled:opacity-50"
                 >
-                  Create
+                  {isSubmitting ? 'Creating...' : 'Create'}
                 </button>
               </div>
             </form>
@@ -595,6 +747,11 @@ export const HomeScreen: React.FC = () => {
             </p>
 
             <form onSubmit={handleJoinRoom} className="space-y-3.5">
+              {joinError && (
+                <div className="p-2.5 rounded-xl bg-[#FFDAD6] text-[#93000A] text-[12px] font-medium">
+                  {joinError}
+                </div>
+              )}
               <div>
                 <label className="block text-[12px] font-semibold text-[#101E1C] mb-1">
                   Room ID / Invite Code
@@ -632,9 +789,10 @@ export const HomeScreen: React.FC = () => {
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 py-2.5 rounded-full bg-[#0F766E] text-white text-[13px] font-semibold hover:bg-[#005C55] shadow-xs"
+                  disabled={isSubmitting}
+                  className="flex-1 py-2.5 rounded-full bg-[#0F766E] text-white text-[13px] font-semibold hover:bg-[#005C55] shadow-xs disabled:opacity-50"
                 >
-                  Join Room
+                  {isSubmitting ? 'Joining...' : 'Join Room'}
                 </button>
               </div>
             </form>
@@ -740,7 +898,7 @@ export const HomeScreen: React.FC = () => {
             type="button"
             onClick={() => {
               setActiveNav('people');
-              alert('People Collections: On-device recognized individuals in this room.');
+              alert('People Collections: Face grouping runs on our servers only if you opt in.');
             }}
             className={`flex flex-col items-center justify-center py-1 transition-colors duration-150 active:scale-95 ${
               activeNav === 'people' ? 'text-[#005C55] font-bold' : 'text-[#3E4947]'

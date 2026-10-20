@@ -82,8 +82,7 @@ export const RoomAreaScreen: React.FC = () => {
   const [selectedPhoto, setSelectedPhoto] = useState<PhotoItem | null>(null);
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [copiedKey, setCopiedKey] = useState(false);
-  const [uploadToast, setUploadToast] = useState<string | null>(null);
-  const [showUncertainReview, setShowUncertainReview] = useState(true);
+  const [showUncertainReview] = useState(true);
 
   const filteredPhotos =
     activeFilter === 'all'
@@ -94,26 +93,6 @@ export const RoomAreaScreen: React.FC = () => {
     navigator.clipboard?.writeText('CB-9821');
     setCopiedKey(true);
     setTimeout(() => setCopiedKey(false), 2500);
-  };
-
-  const handleSimulateUpload = () => {
-    setUploadToast('Uploading 3 photos to encrypted room vault...');
-    setTimeout(() => {
-      setUploadToast('3 photos uploaded! Confident faces grouped into anonymous clusters.');
-      setTimeout(() => setUploadToast(null), 3500);
-    }, 1200);
-  };
-
-  const handleMergeSuggestion = () => {
-    setShowUncertainReview(false);
-    setUploadToast('Level 2 Match Confirmed: Merged candidate photos into Person 2 (Rafiqul).');
-    setTimeout(() => setUploadToast(null), 3500);
-  };
-
-  const handleDismissSuggestion = () => {
-    setShowUncertainReview(false);
-    setUploadToast('Level 2 Match Dismissed: Kept collections separate. No automatic merge.');
-    setTimeout(() => setUploadToast(null), 3500);
   };
 
   return (
@@ -161,14 +140,6 @@ export const RoomAreaScreen: React.FC = () => {
         </div>
       </header>
 
-      {/* Upload Feedback Toast */}
-      {uploadToast && (
-        <div className="fixed top-16 left-1/2 -translate-x-1/2 z-50 bg-[#005C55] text-white px-4 py-2.5 rounded-full shadow-dock text-[13px] font-semibold flex items-center gap-2 animate-fadeIn max-w-[90%]">
-          <span className="material-symbols-outlined text-[18px] text-[#6FFBBE]">check_circle</span>
-          <span className="truncate">{uploadToast}</span>
-        </div>
-      )}
-
       {/* MAIN CONTAINER */}
       <main className="max-w-lg mx-auto pt-16 px-4">
         {/* 2. EDITORIAL HERO BANNER */}
@@ -202,7 +173,7 @@ export const RoomAreaScreen: React.FC = () => {
               <div className="flex items-center gap-1.5 mb-0.5">
                 <span className="material-symbols-outlined text-[14px] text-[#6FFBBE]">verified_user</span>
                 <span className="text-[10px] tracking-wide text-[#D6E6E2] uppercase font-bold">
-                  End-to-End Vault
+                  Private to Room Members
                 </span>
               </div>
               <h2 className="text-[20px] font-bold tracking-tight text-white drop-shadow-xs">
@@ -233,7 +204,7 @@ export const RoomAreaScreen: React.FC = () => {
               </div>
               <div className="flex flex-col text-left">
                 <span className="text-[12px] text-[#101E1C] font-semibold">Tasnim (Host) + 3 others</span>
-                <span className="text-[10px] text-[#3E4947]">Encrypted sync active</span>
+                <span className="text-[10px] text-[#3E4947]">Private room sync</span>
               </div>
             </div>
 
@@ -252,11 +223,11 @@ export const RoomAreaScreen: React.FC = () => {
         <section className="mt-4 flex items-center gap-2">
           <button
             type="button"
-            onClick={handleSimulateUpload}
-            className="flex-1 inline-flex items-center justify-center gap-2 px-5 min-h-[48px] h-[50px] rounded-full bg-[#0F766E] text-white font-semibold text-[16px] tracking-wide shadow-xs hover:bg-[#0D645E] active:scale-[0.98] transition-all"
+            disabled
+            className="flex-1 inline-flex items-center justify-center gap-2 px-5 min-h-[48px] h-[50px] rounded-full bg-[#0F766E]/60 text-white/90 font-semibold text-[15px] tracking-wide cursor-not-allowed opacity-80"
           >
             <span className="material-symbols-outlined text-[18px]">upload_file</span>
-            <span>Upload Photos</span>
+            <span>Upload Photos (Coming soon)</span>
           </button>
           <button
             type="button"
@@ -298,17 +269,17 @@ export const RoomAreaScreen: React.FC = () => {
                 <div className="flex items-center gap-2 mt-3">
                   <button
                     type="button"
-                    onClick={handleMergeSuggestion}
-                    className="flex-1 py-1.5 px-3 rounded-lg bg-[#0F766E] text-white text-[12px] font-bold hover:bg-[#005C55] transition-all active:scale-95"
+                    disabled
+                    className="flex-1 py-1.5 px-3 rounded-lg bg-[#0F766E]/50 text-white/80 text-[12px] font-bold cursor-not-allowed"
                   >
-                    Confirm Merge
+                    Confirm Merge (Coming soon)
                   </button>
                   <button
                     type="button"
-                    onClick={handleDismissSuggestion}
-                    className="flex-1 py-1.5 px-3 rounded-lg border border-[#BDC9C6] bg-white text-[#3E4947] text-[12px] font-semibold hover:bg-[#F8F5EF] transition-all active:scale-95"
+                    disabled
+                    className="flex-1 py-1.5 px-3 rounded-lg border border-[#BDC9C6] bg-white/70 text-[#3E4947]/70 text-[12px] font-semibold cursor-not-allowed"
                   >
-                    Keep Separate
+                    Keep Separate (Coming soon)
                   </button>
                 </div>
               </div>

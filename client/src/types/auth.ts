@@ -56,7 +56,8 @@ export interface AuthContextType {
   logout: () => Promise<void> | void;
   sendPasswordReset: (email: string) => Promise<boolean>;
   resendVerificationEmail: () => Promise<boolean>;
-  updateBiometricConsent: (consent: boolean) => void;
+  updateBiometricConsent: (consent: boolean) => Promise<{ success: boolean; error?: string }>;
+  purgeAllFaceData: () => Promise<{ success: boolean; error?: string; message?: string }>;
   updateProfileName: (newName: string) => Promise<boolean>;
   setUserPassword: (newPassword: string) => Promise<{ success: boolean; error?: string }>;
   isSupabaseConnected: boolean;

@@ -44,8 +44,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         id: user.id,
         name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'Member',
         email: user.email || '',
-        biometricConsent: user.user_metadata?.biometric_consent ?? true,
-        faceClusteringEnabled: user.user_metadata?.face_clustering_enabled ?? true,
+        biometricConsent: user.user_metadata?.biometric_consent ?? false,
+        faceClusteringEnabled: user.user_metadata?.face_clustering_enabled ?? false,
         profileCompleted: false,
         providers,
         hasPassword,
@@ -71,8 +71,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       id: user.id,
       name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'Member',
       email: user.email || '',
-      biometricConsent: user.user_metadata?.biometric_consent ?? true,
-      faceClusteringEnabled: user.user_metadata?.face_clustering_enabled ?? true,
+      biometricConsent: user.user_metadata?.biometric_consent ?? false,
+      faceClusteringEnabled: user.user_metadata?.face_clustering_enabled ?? false,
       profileCompleted: true,
       providers,
       hasPassword,
@@ -162,8 +162,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           id: resData.user.id,
           name: resData.user.user_metadata?.full_name || resData.user.email?.split('@')[0] || 'Member',
           email: resData.user.email || '',
-          biometricConsent: resData.user.user_metadata?.biometric_consent ?? true,
-          faceClusteringEnabled: resData.user.user_metadata?.face_clustering_enabled ?? true,
+          biometricConsent: resData.user.user_metadata?.biometric_consent ?? false,
+          faceClusteringEnabled: resData.user.user_metadata?.face_clustering_enabled ?? false,
           profileCompleted: Boolean(resData.user.user_metadata?.profile_completed),
         };
         setCurrentUser(user);
@@ -237,7 +237,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       id: 'usr_g_' + Math.random().toString(36).substring(2, 9),
       name: 'Google Traveler',
       email: 'google.traveler@example.com',
-      biometricConsent: true,
+      biometricConsent: false,
       profileCompleted: false,
     };
     setCurrentUser(mockNewGoogleUser);
@@ -440,27 +440,94 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return true;
   };
 
-  const updateBiometricConsent = (consent: boolean) => {
-    if (currentUser) {
-      const updated: User = {
-        ...currentUser,
-        biometricConsent: consent,
-        faceClusteringEnabled: consent,
-        enrolledAt: consent ? currentUser.enrolledAt || new Date().toISOString() : undefined,
-      };
-      setCurrentUser(updated);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-
-      // If Supabase is connected, update user metadata
-      if (supabase) {
-        supabase.auth.updateUser({
-          data: {
-            biometric_consent: consent,
-            face_clustering_enabled: consent,
-          },
-        });
-      }
+  const updateBiometricConsent = async (consent: boolean): Promise<{ success: boolean; error?: string }> => {
+    if (!currentUser) {
+      return { success: false, error: 'User session not found.' };
     }
+
+    if (supabase) {
+      const { error: dbError } = await supabase
+        .from('profiles')
+        .update({
+          face_clustering_enabled: consent,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', currentUser.id);
+
+      if (dbError) {
+        return { success: false, error: dbError.message };
+      }
+
+      await supabase.auth.updateUser({
+        data: {
+          face_clustering_enabled: consent,
+          biometric_consent: consent,
+        },
+      });
+    }
+
+    const updated: User = {
+      ...currentUser,
+      biometricConsent: consent,
+      faceClusteringEnabled: consent,
+      enrolledAt: consent ? currentUser.enrolledAt || new Date().toISOString() : undefined,
+    };
+    setCurrentUser(updated);
+    if (!supabase) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+    }
+    return { success: true };
+  };
+
+  const purgeAllFaceData = async (): Promise<{ success: boolean; error?: string; message?: string }> => {
+    if (!currentUser) {
+      return { success: false, error: 'User session not found.' };
+    }
+
+    if (supabase) {
+      const { data: members, error: memberError } = await supabase
+        .from('room_members')
+        .select('room_id')
+        .eq('user_id', currentUser.id);
+
+      if (memberError) {
+        return { success: false, error: memberError.message };
+      }
+
+      if (!members || members.length === 0) {
+        await updateBiometricConsent(false);
+        return {
+          success: true,
+          message: 'No active rooms found. Face clustering preferences have been reset and disabled globally.',
+        };
+      }
+
+      const errors: string[] = [];
+      for (const m of members) {
+        const { error: purgeError } = await supabase.rpc('purge_room_face_data', {
+          target_room_id: m.room_id,
+        });
+        if (purgeError) {
+          errors.push(purgeError.message);
+        }
+      }
+
+      if (errors.length > 0) {
+        return { success: false, error: `Failed to purge some rooms: ${errors.join(', ')}` };
+      }
+
+      await updateBiometricConsent(false);
+      return {
+        success: true,
+        message: `Successfully purged all face clusters, vector embeddings, and cancelled processing jobs across ${members.length} rooms.`,
+      };
+    }
+
+    await updateBiometricConsent(false);
+    return {
+      success: true,
+      message: 'Demo mode: Local clustering preferences and simulated vector records cleared.',
+    };
   };
 
   const updateProfileName = async (newName: string): Promise<boolean> => {
@@ -578,6 +645,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         sendPasswordReset,
         resendVerificationEmail,
         updateBiometricConsent,
+        purgeAllFaceData,
         updateProfileName,
         setUserPassword,
         isSupabaseConnected: isSupabaseConfigured,

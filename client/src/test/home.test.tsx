@@ -25,14 +25,13 @@ describe('ChobiDeh Home & Room Suite', () => {
     // Memory Rooms
     expect(screen.getAllByText("Cox's Bazar Trip")[0]).toBeInTheDocument();
     expect(screen.getAllByText("University Memories")[0]).toBeInTheDocument();
-    expect(screen.getAllByText("Sylhet Weekend")[0]).toBeInTheDocument();
 
     // Action buttons
     expect(screen.getByRole('button', { name: /create a room/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /join a room/i })).toBeInTheDocument();
   });
 
-  it('renders ProfileScreen with user details, metrics, and on-device vault settings', () => {
+  it('renders ProfileScreen with user details, metrics, and private vault settings', () => {
     render(
       <AuthProvider>
         <ProfileScreen />
@@ -41,8 +40,8 @@ describe('ChobiDeh Home & Room Suite', () => {
 
     expect(screen.getByRole('heading', { name: /chobideh/i })).toBeInTheDocument();
     expect(screen.getByText(/profile & settings/i)).toBeInTheDocument();
-    expect(screen.getByText(/on-device photo vault/i)).toBeInTheDocument();
-    expect(screen.getByText(/biometrics local & safe/i)).toBeInTheDocument();
+    expect(screen.getByText(/private photo vault/i)).toBeInTheDocument();
+    expect(screen.getByText(/private & opt-in/i)).toBeInTheDocument();
     expect(screen.getByText(/active rooms/i)).toBeInTheDocument();
     expect(screen.getByText(/3-level ai face clustering/i)).toBeInTheDocument();
   });
@@ -55,7 +54,7 @@ describe('ChobiDeh Home & Room Suite', () => {
     );
 
     expect(screen.getByRole('heading', { name: /cox's bazar winter escape/i })).toBeInTheDocument();
-    expect(screen.getByText(/end-to-end vault/i)).toBeInTheDocument();
+    expect(screen.getByText(/private to room members/i)).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /person collections/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /upload photos/i })).toBeInTheDocument();
     expect(screen.getByText(/gallery/i)).toBeInTheDocument();
@@ -73,7 +72,7 @@ describe('ChobiDeh Home & Room Suite', () => {
     expect(screen.getByRole('button', { name: /create shared room/i })).toBeInTheDocument();
   });
 
-  it('renders JoinRoomScreen with 6-character room key inputs and paste code action', () => {
+  it('renders JoinRoomScreen with room key inputs and paste code action', () => {
     render(
       <AuthProvider>
         <JoinRoomScreen />
@@ -81,8 +80,8 @@ describe('ChobiDeh Home & Room Suite', () => {
     );
 
     expect(screen.getByRole('heading', { name: /join a room/i })).toBeInTheDocument();
-    expect(screen.getByText(/room access key/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /paste cb-9821/i })).toBeInTheDocument();
+    expect(screen.getByText(/room invite code or slug/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /paste/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /join room/i })).toBeInTheDocument();
   });
 
