@@ -293,7 +293,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ initialRooms }) => {
                 <img
                   className="w-full h-full object-cover"
                   alt={currentUser?.name || 'User profile'}
-                  src="/placeholder-avatar.svg"
+                  src={currentUser?.avatarUrl || '/placeholder-avatar.svg'}
                 />
               </div>
               <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-[#007952] ring-2 ring-white" />

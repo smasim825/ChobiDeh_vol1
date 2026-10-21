@@ -27,6 +27,7 @@ const renderWithAuth = (ui: React.ReactElement) => {
     updateBiometricConsent: async () => ({ success: true }),
     purgeAllFaceData: async () => ({ success: true }),
     updateProfileName: async () => true,
+    updateProfileAvatar: async () => ({ success: true }),
     setUserPassword: async () => ({ success: true }),
     isSupabaseConnected: false,
   };

@@ -3,6 +3,7 @@ import type { User as SupabaseUser } from '@supabase/supabase-js';
 import type { AuthScreen, User, LoginFormData, SignupFormData } from '../types/auth';
 import { supabase } from '../lib/supabase';
 import { AuthContext } from './AuthContextBase';
+import { optimizeAvatarPhoto } from '../utils/imageOptimizer';
 
 const STORAGE_KEY = 'chobideh_auth_user';
 
@@ -56,7 +57,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Source of truth for onboarding and profile name is public.profiles
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
-        .select('display_name, face_clustering_enabled, onboarding_completed')
+        .select('display_name, face_clustering_enabled, onboarding_completed, avatar_url')
         .eq('id', user.id)
         .maybeSingle();
 
@@ -70,6 +71,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           user.email?.split('@')[0] ||
           'Member',
         email: user.email || '',
+        avatarUrl: profile?.avatar_url || user.user_metadata?.avatar_url || '',
         biometricConsent: profile?.face_clustering_enabled ?? false,
         faceClusteringEnabled: profile?.face_clustering_enabled ?? false,
         profileCompleted: isCompleted,
@@ -644,6 +646,57 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return true;
   };
 
+  const updateProfileAvatar = async (
+    file: File
+  ): Promise<{ success: boolean; avatarUrl?: string; error?: string }> => {
+    if (!file) return { success: false, error: 'No photo selected.' };
+
+    if (!file.type.startsWith('image/')) {
+      return { success: false, error: 'Please choose a valid image file (JPEG, PNG, or WebP).' };
+    }
+
+    setIsLoading(true);
+    try {
+      const optimizedDataUrl = await optimizeAvatarPhoto(file);
+
+      if (supabase && currentUser) {
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .update({
+            avatar_url: optimizedDataUrl,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', currentUser.id);
+
+        if (profileError) {
+          setIsLoading(false);
+          return { success: false, error: profileError.message };
+        }
+
+        await supabase.auth.updateUser({
+          data: { avatar_url: optimizedDataUrl },
+        });
+      }
+
+      if (currentUser) {
+        const updated: User = {
+          ...currentUser,
+          avatarUrl: optimizedDataUrl,
+        };
+        setCurrentUser(updated);
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+        } catch {}
+      }
+
+      setIsLoading(false);
+      return { success: true, avatarUrl: optimizedDataUrl };
+    } catch (err: any) {
+      setIsLoading(false);
+      return { success: false, error: err.message || 'Failed to update profile photo.' };
+    }
+  };
+
   const setUserPassword = async (newPassword: string): Promise<{ success: boolean; error?: string }> => {
     if (!newPassword || newPassword.length < 8) {
       return { success: false, error: 'Password must be at least 8 characters long.' };
@@ -715,6 +768,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         updateBiometricConsent,
         purgeAllFaceData,
         updateProfileName,
+        updateProfileAvatar,
         setUserPassword,
         setScreen,
         setPendingEmail,

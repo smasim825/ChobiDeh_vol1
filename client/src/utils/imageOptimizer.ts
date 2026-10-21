@@ -183,3 +183,20 @@ export function formatBytes(bytes: number, decimals = 1): string {
   const i = Math.floor(Math.log(bytes) / Math.log(k));
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
 }
+
+/**
+ * Optimizes an avatar photo to a compact max 256x256 WebP data URL.
+ */
+export async function optimizeAvatarPhoto(file: File): Promise<string> {
+  const result = await optimizePhotoForUpload(file, 256, 0.85);
+  return new Promise<string>((resolve, reject) => {
+    if (typeof FileReader === 'undefined') {
+      return resolve('data:image/webp;base64,mock');
+    }
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = () => reject(new Error('Failed to read compressed avatar.'));
+    reader.readAsDataURL(result.blob);
+  });
+}
+
