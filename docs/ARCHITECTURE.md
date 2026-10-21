@@ -1,60 +1,59 @@
-# Architecture
+# Architecture & Engineering Principles
 
-Status: Proposed architecture; validate choices before implementation.  
-Detailed Blueprint: [`docs/SCALABLE_ARCHITECTURE_PLAN.md`](SCALABLE_ARCHITECTURE_PLAN.md) (comprehensive system design primer mapping, schema DDL, RLS policies, request flows, and scaling milestones).
+## Architecture Overview
 
-## Recommended starting point
+ChobiDeh uses a modular architecture with managed backend services (Supabase PostgreSQL with Row-Level Security, GoTrue Auth, and Cloudflare R2 private S3-compatible storage) and an asynchronous background AI worker.
 
-Use a modular monolith with managed backend services (Supabase PostgreSQL with Row-Level Security, GoTrue Auth, private S3-compatible storage) and an independent asynchronous Python AI worker. Do not start with microservices unless a concrete scaling or deployment bottleneck appears.
+```
+[ Client (React/Vite & Mobile) ]
+       │                      ▲
+       │ 1. Metadata          │ 2. Direct S3 Binary Stream
+       ▼                      ▼
+[ Supabase PostgreSQL & Auth ]   [ Cloudflare R2 Storage ]
+       │                      ▲
+       │ 3. Asynch Queue      │ 4. Read Originals
+       ▼                      │
+[ Python AI Worker (Clustering) ]
+```
 
-## Proposed components
+---
 
-- **Client:** React/Vite web client (current MVP UI) with architecture designed for native Flutter mobile client reuse without backend modification.
-- **Backend Core:** Supabase / PostgreSQL 16+ with Row-Level Security (RLS) for automated room isolation.
-- **API Gateway & Auth:** Managed JWT authentication (GoTrue) + PostgREST / Node.js modular endpoints.
-- **Object Storage:** Private S3-compatible storage (raw original bucket + derived thumbnails bucket) accessed via short-lived presigned URLs.
-- **Queue:** Relational `processing_jobs` table using PostgreSQL `FOR UPDATE SKIP LOCKED` for transactional, durable background task coordination.
-- **AI Worker:** Standalone Python service/container for image normalization, WebP thumbnail generation, face detection, ephemeral vector extraction, and 3-level face clustering.
-- **Delivery:** GitHub repository, pull requests, automated CI, staging, and production environments.
+## Core Components
 
-## Module boundaries
+- **Client:** React/Vite responsive web application. Architecture designed for native Flutter mobile client reuse without backend changes.
+- **Backend & Database:** Supabase PostgreSQL 16+ with Row-Level Security (RLS) enforcing strict room isolation.
+- **Authentication:** Managed JWT authentication (GoTrue) + PostgREST.
+- **Media Storage:** Cloudflare R2 (S3-compatible object storage) accessed via short-lived pre-signed URLs. Zero egress bandwidth charges.
+- **AI Worker:** Standalone Python container for image normalization, face detection, ephemeral vector extraction, and 3-level face clustering.
 
-- `identity`: accounts, sessions, profile, consent state.
-- `rooms`: room creation, membership, roles, joining credentials.
-- `media`: upload authorization, metadata, storage lifecycle, downloads.
-- `ai-processing`: jobs, model adapters, embeddings, match candidates, retries.
-- `collections`: person collections, assignments, review decisions.
-- `notifications`: future module.
-- `trips`: future module.
-- `expenses`: future module.
+---
 
-## Data ownership rules
+## The Three-Level Matching & Grouping Rules
 
-- Database stores structured metadata, relationships, processing state, and storage keys.
-- Object storage holds image bytes and optional derived thumbnails.
-- Do not store raw image blobs in ordinary relational rows by default.
-- A collection is a relationship between a room/person and a media record, not a duplicate file.
-- A face/person identity is scoped to a room unless a separate, explicit product and privacy design approves cross-room identity.
-- Store model/version and decision source to support explainability and debugging.
+1. **Level 1 — High Confidence:**
+   - Visual similarity $\ge T_{\text{high}}$ automatically groups faces into room-scoped person collections.
+   - If multiple known people appear in one photo, the **same photo reference is added to every matched person's collection**.
+   - **Single Storage Rule:** The original photo is uploaded and stored **only once** in Cloudflare R2.
+2. **Level 2 — Close Match Suggestions:**
+   - Marginal similarity ($T_{\text{low}} \le \text{Similarity} < T_{\text{high}}$) generates a suggestion for human review with top candidates.
+   - **Never auto-confirm.**
+   - Users can confirm, correct (e.g., "This is B" when suggested for A), or reject.
+   - Correcting A → B removes the suggestion for A and creates a confirmed assignment to B.
+   - Rejecting does not automatically assign to any other person.
+   - Full undo support backed by `assignment_history`.
+3. **Level 3 — Rest Photos:**
+   - Photos that cannot be confidently assigned are organized into three dedicated filters:
+     1. **Unknown Faces:** Human faces detected, but unmatched. Manual tagging supported.
+     2. **No People:** Scenery, sunsets, buildings, mountains, food, nature.
+     3. **Other Unassigned:** Processing exceptions, severe blur, low light.
+   - Unknown faces are **never misclassified as non-person scenery**.
 
-## Scalability path
+---
 
-1. Begin with one API deployment, PostgreSQL, private object storage, and one worker.
-2. Add indexes, pagination, caching only where measurements justify them.
-3. Increase worker concurrency independently of API instances.
-4. Add a dedicated durable queue when job volume or reliability requirements justify it.
-5. Separate high-load modules into services only when ownership, scaling, or reliability benefits exceed added complexity.
-6. Use CDN delivery only with private authorization/signing appropriate to the privacy model.
+## Data Ownership & Model Stability Rules
 
-## Observability
-
-Track request errors, latency, queue depth, processing duration, failed jobs, upload failures, and authorization denials. Never log passwords, access tokens, raw embeddings, or photo bytes.
-
-## Open decisions
-
-- Mobile-first Flutter or web-first React.
-- Authentication provider or self-managed auth.
-- Object-storage provider and expected cost.
-- Face model/license, on-device vs server processing, and consent UX.
-- Queue technology.
-- Data retention and backup deletion timelines.
+- **Database stores metadata:** Relationships, tags, and storage keys live in PostgreSQL. Image blobs live in R2.
+- **Single Source of Truth:** A collection is a relational record (`photo_assignments`), not a duplicated file.
+- **Model Non-Retraining Rule:** User corrections, confirmations, and rejections **never retrain or alter the underlying recognition model weights**. All corrections update room-scoped relational records only.
+- **Room Authorization Enforcement:** Every query, view, download, suggestion review, correction, and deletion strictly checks room membership.
+- **Biometric Isolation:** Embeddings and clusters are strictly scoped to the room. No global biometric identities exist across rooms.

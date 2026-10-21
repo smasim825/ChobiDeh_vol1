@@ -117,9 +117,11 @@ describe('ChobiDeh Authentication Suite', () => {
   it('renders Security & Login Methods card in ProfileScreen allowing password setup', async () => {
     const { ProfileScreen } = await import('../screens/ProfileScreen');
     render(
-      <AuthProvider>
-        <ProfileScreen />
-      </AuthProvider>
+      <MemoryRouter>
+        <AuthProvider>
+          <ProfileScreen />
+        </AuthProvider>
+      </MemoryRouter>
     );
 
     expect(screen.getByRole('heading', { name: /security & login methods/i })).toBeInTheDocument();
@@ -133,5 +135,24 @@ describe('ChobiDeh Authentication Suite', () => {
     expect(screen.getByLabelText(/create password/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/confirm password/i)).toBeInTheDocument();
   });
+
+  it('renders Profile picture with interactive upload button and allows selecting an image', async () => {
+    const { ProfileScreen } = await import('../screens/ProfileScreen');
+    render(
+      <MemoryRouter>
+        <AuthProvider>
+          <ProfileScreen />
+        </AuthProvider>
+      </MemoryRouter>
+    );
+
+    const uploadBtn = screen.getByRole('button', { name: /change profile photo/i });
+    expect(uploadBtn).toBeInTheDocument();
+
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    expect(fileInput).toBeInTheDocument();
+    expect(fileInput.accept).toContain('image/');
+  });
 });
+
 

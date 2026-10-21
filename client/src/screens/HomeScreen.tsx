@@ -1,53 +1,18 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/useAuth';
 import type { Room } from '../types/room';
 import { supabase } from '../lib/supabase';
 
-const INITIAL_ROOMS: Room[] = [
-  {
-    id: 'room_coxsbazar_01',
-    title: "Cox's Bazar Trip",
-    category: 'Coastal Trip',
-    badge: { label: 'New', type: 'new' },
-    photoCount: 142,
-    updatedAt: 'Updated 2h ago',
-    coverImage: '/placeholder-cover.svg',
-    altText:
-      "Vibrant panoramic view of Cox's Bazar beach at golden sunset with warm reflections on ocean tides.",
-    members: [
-      {
-        id: 'm1',
-        name: 'Amina',
-        avatar: '',
-      },
-    ],
-    extraMemberCount: 1,
-  },
-  {
-    id: 'room_univ_02',
-    title: 'University Memories',
-    category: 'Campus & Reunion',
-    badge: { label: 'Shared Room', type: 'shared' },
-    photoCount: 384,
-    updatedAt: 'Updated yesterday',
-    coverImage: '/placeholder-cover.svg',
-    altText:
-      'Candid group photograph of university friends laughing together outdoors on a lush green campus lawn.',
-    members: [
-      {
-        id: 'm4',
-        name: 'Farzana',
-        avatar: '',
-      },
-    ],
-    extraMemberCount: 4,
-  },
-];
+export interface HomeScreenProps {
+  initialRooms?: Room[];
+}
 
-export const HomeScreen: React.FC = () => {
+export const HomeScreen: React.FC<HomeScreenProps> = ({ initialRooms }) => {
   const { currentUser, logout, updateBiometricConsent, setScreen } = useAuth();
+  const navigate = useNavigate();
 
-  const [rooms, setRooms] = useState<Room[]>([]);
+  const [rooms, setRooms] = useState<Room[]>(initialRooms || []);
   const [isDemoData, setIsDemoData] = useState(false);
   const [activeNav, setActiveNav] = useState<'rooms' | 'gallery' | 'people' | 'review'>('rooms');
   const [showAiBanner, setShowAiBanner] = useState(true);
@@ -71,9 +36,9 @@ export const HomeScreen: React.FC = () => {
     let isMounted = true;
     const fetchRooms = async () => {
       if (!currentUser || !supabase) {
-        if (import.meta.env.DEV && isMounted) {
-          setRooms(INITIAL_ROOMS);
-          setIsDemoData(true);
+        if (!initialRooms && isMounted) {
+          setRooms([]);
+          setIsDemoData(false);
         }
         return;
       }
@@ -84,10 +49,7 @@ export const HomeScreen: React.FC = () => {
           .select('room_id, role, rooms(id, name, created_at, join_slug, face_clustering_enabled)');
 
         if (memberErr || !memberRooms || memberRooms.length === 0) {
-          if (import.meta.env.DEV && isMounted) {
-            setRooms(INITIAL_ROOMS);
-            setIsDemoData(true);
-          } else if (isMounted) {
+          if (!initialRooms && isMounted) {
             setRooms([]);
             setIsDemoData(false);
           }
@@ -116,9 +78,9 @@ export const HomeScreen: React.FC = () => {
           setIsDemoData(false);
         }
       } catch {
-        if (import.meta.env.DEV && isMounted) {
-          setRooms(INITIAL_ROOMS);
-          setIsDemoData(true);
+        if (!initialRooms && isMounted) {
+          setRooms([]);
+          setIsDemoData(false);
         }
       }
     };
@@ -127,7 +89,7 @@ export const HomeScreen: React.FC = () => {
     return () => {
       isMounted = false;
     };
-  }, [currentUser]);
+  }, [currentUser, initialRooms]);
 
   const handleCreateRoom = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -331,7 +293,7 @@ export const HomeScreen: React.FC = () => {
                 <img
                   className="w-full h-full object-cover"
                   alt={currentUser?.name || 'User profile'}
-                  src="/placeholder-avatar.svg"
+                  src={currentUser?.avatarUrl || '/placeholder-avatar.svg'}
                 />
               </div>
               <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-[#007952] ring-2 ring-white" />
@@ -381,6 +343,7 @@ export const HomeScreen: React.FC = () => {
                     onClick={() => {
                       setShowProfileMenu(false);
                       setScreen('profile');
+                      navigate('/profile');
                     }}
                     className="w-full py-1.5 text-center text-[12px] font-bold text-[#005C55] hover:bg-[#E7F7F4] rounded-lg transition-colors flex items-center justify-center gap-1.5"
                   >
@@ -428,13 +391,13 @@ export const HomeScreen: React.FC = () => {
               </div>
               <div className="min-w-0">
                 <div className="flex items-center gap-1.5">
-                  <span className="inline-block w-2 h-2 rounded-full bg-[#FFAB69] animate-pulse" />
+                  <span className="inline-block w-2 h-2 rounded-full bg-[#005C55]" />
                   <p className="text-[11px] font-bold text-[#005C55] tracking-wide uppercase">
                     3-LEVEL AI CLUSTERING ACTIVE
                   </p>
                 </div>
                 <p className="text-[13px] text-[#253331] font-medium truncate">
-                  4 anonymous person clusters • 2 uncertain matches to review
+                  Privacy-first face matching organizes photos with zero biometric data leaks
                 </p>
               </div>
             </div>
@@ -442,8 +405,8 @@ export const HomeScreen: React.FC = () => {
               <button
                 type="button"
                 onClick={() => {
-                  const coxRoom = rooms.find((r) => r.id === 'room_coxsbazar_01');
-                  if (coxRoom) setSelectedRoom(coxRoom);
+                  setScreen('room-area');
+                  navigate('/rooms/demo');
                 }}
                 className="text-[13px] font-bold text-[#005C55] hover:underline active:scale-95 transition-transform"
               >
@@ -477,7 +440,10 @@ export const HomeScreen: React.FC = () => {
             {/* Primary CTA: Create a Room */}
             <button
               type="button"
-              onClick={() => setScreen('create-room')}
+              onClick={() => {
+                setScreen('create-room');
+                navigate('/rooms/new');
+              }}
               className="min-h-[48px] h-[50px] flex items-center justify-center gap-2 bg-[#0F766E] text-white px-4 rounded-full font-semibold text-[15px] sm:text-[16px] shadow-sm hover:bg-[#0D645E] active:scale-[0.98] transition-all"
             >
               <span className="material-symbols-outlined text-[20px]">add</span>
@@ -487,7 +453,10 @@ export const HomeScreen: React.FC = () => {
             {/* Secondary CTA: Join a Room */}
             <button
               type="button"
-              onClick={() => setScreen('join-room')}
+              onClick={() => {
+                setScreen('join-room');
+                navigate('/join');
+              }}
               className="min-h-[48px] h-[50px] flex items-center justify-center gap-2 bg-white text-[#005C55] border border-[#0F766E]/30 px-4 rounded-full font-semibold text-[15px] sm:text-[16px] shadow-xs hover:bg-[#E7F7F4] active:scale-[0.98] transition-all"
             >
               <span className="material-symbols-outlined text-[20px]">group_add</span>
@@ -520,8 +489,37 @@ export const HomeScreen: React.FC = () => {
           </div>
 
           {/* Shared Rooms List */}
-          <div className="flex flex-col gap-4">
-            {rooms.map((room) => (
+          {rooms.length === 0 ? (
+            <div className="bg-white rounded-2xl p-8 border border-[#E6E1D8] text-center flex flex-col items-center gap-3 shadow-xs">
+              <div className="w-14 h-14 rounded-full bg-[#E1F1EE] text-[#005C55] flex items-center justify-center">
+                <span className="material-symbols-outlined text-[28px]">photo_library</span>
+              </div>
+              <h3 className="text-[17px] font-bold text-[#101E1C]">No Active Rooms Yet</h3>
+              <p className="text-[13px] text-[#3E4947] max-w-xs">
+                Create a trip room or join one with a room code to start uploading and sharing memories with friends.
+              </p>
+              <div className="flex gap-2.5 mt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowCreateModal(true)}
+                  className="px-4 py-2 rounded-xl bg-[#0F766E] text-white text-[13px] font-semibold hover:bg-[#005C55] transition-all shadow-xs flex items-center gap-1.5"
+                >
+                  <span className="material-symbols-outlined text-[16px]">add</span>
+                  <span>Create Room</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowJoinModal(true)}
+                  className="px-4 py-2 rounded-xl border border-[#D6E6E2] bg-white text-[#101E1C] text-[13px] font-semibold hover:bg-[#F8F5EF] transition-all flex items-center gap-1.5"
+                >
+                  <span className="material-symbols-outlined text-[16px]">meeting_room</span>
+                  <span>Join Room</span>
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-4">
+              {rooms.map((room) => (
               <div
                 key={room.id}
                 className="relative bg-white rounded-xl overflow-hidden shadow-xs border border-[#BDC9C6]/30 hover:shadow-md transition-shadow group"
@@ -605,7 +603,10 @@ export const HomeScreen: React.FC = () => {
                   {/* Quick Action */}
                   <button
                     type="button"
-                    onClick={() => setScreen('room-area')}
+                    onClick={() => {
+                      setScreen('room-area');
+                      navigate(`/rooms/${room.id}`);
+                    }}
                     className="flex items-center gap-1 text-[#005C55] hover:text-[#0F766E] text-[13px] font-bold pl-2 focus:outline-none"
                   >
                     <span>Open</span>
@@ -614,34 +615,63 @@ export const HomeScreen: React.FC = () => {
                 </div>
               </div>
             ))}
-          </div>
+            </div>
+          )}
         </section>
 
         {/* Section 2: Recently Added Photos Carousel */}
-        <section className="flex flex-col gap-2.5 pt-2">
+        {rooms.length > 0 && (
+          <section className="flex flex-col gap-2.5 pt-2">
+            <div className="flex items-center justify-between">
+              <h2 className="text-[16px] font-bold text-[#253331]">Recently Added Moments</h2>
+              <span className="text-[12px] text-[#6E7977]">From your active rooms</span>
+            </div>
+
+            <div className="flex gap-3 overflow-x-auto pb-2 custom-scrollbar">
+              {rooms.map((room) => (
+                <div
+                  key={'thumb_' + room.id}
+                  onClick={() => setSelectedRoom(room)}
+                  className="shrink-0 w-32 h-32 rounded-xl overflow-hidden relative cursor-pointer group border border-[#E6E1D8]"
+                >
+                  <img
+                    src={room.coverImage}
+                    alt={room.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                  <div className="absolute inset-0 bg-black/25 group-hover:bg-black/10 transition-colors" />
+                  <span className="absolute bottom-1.5 left-2 right-2 text-[11px] font-bold text-white truncate">
+                    {room.title}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Section 3: Archived Trip Memories (Permanent Memory Vault) */}
+        <section className="flex flex-col gap-3 pt-2 text-left">
           <div className="flex items-center justify-between">
-            <h2 className="text-[16px] font-bold text-[#253331]">Recently Added Moments</h2>
-            <span className="text-[12px] text-[#6E7977]">From your active rooms</span>
+            <div>
+              <h2 className="text-[16px] font-bold text-[#253331] flex items-center gap-1.5">
+                <span className="material-symbols-outlined text-[18px] text-[#8E4E14]">inventory_2</span>
+                <span>Archived Trip Memories</span>
+              </h2>
+              <p className="text-[11px] text-[#6E7977]">
+                Saved permanently • Auto-archived after 30 days
+              </p>
+            </div>
+            <span className="px-2 py-0.5 rounded-full bg-[#F8F5EF] border border-[#E6E1D8] text-[#6E7977] text-[10px] font-bold">
+              0 Archived
+            </span>
           </div>
 
-          <div className="flex gap-3 overflow-x-auto pb-2 custom-scrollbar">
-            {rooms.map((room) => (
-              <div
-                key={'thumb_' + room.id}
-                onClick={() => setSelectedRoom(room)}
-                className="shrink-0 w-32 h-32 rounded-xl overflow-hidden relative cursor-pointer group border border-[#E6E1D8]"
-              >
-                <img
-                  src={room.coverImage}
-                  alt={room.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                />
-                <div className="absolute inset-0 bg-black/25 group-hover:bg-black/10 transition-colors" />
-                <span className="absolute bottom-1.5 left-2 right-2 text-[11px] font-bold text-white truncate">
-                  {room.title}
-                </span>
-              </div>
-            ))}
+          <div className="bg-white rounded-2xl p-6 border border-[#E6E1D8] text-center flex flex-col items-center gap-2 shadow-xs">
+            <span className="material-symbols-outlined text-[28px] text-[#8E4E14]">inventory_2</span>
+            <p className="text-[13px] font-bold text-[#101E1C]">No Archived Memories Yet</p>
+            <p className="text-[11px] text-[#6E7977] max-w-xs">
+              When a trip room passes its 30-day active window, its backup will be preserved here with links to your phone or Google Drive backup.
+            </p>
           </div>
         </section>
       </main>
@@ -920,7 +950,10 @@ export const HomeScreen: React.FC = () => {
           {/* Nav Item 5: Profile */}
           <button
             type="button"
-            onClick={() => setScreen('profile')}
+            onClick={() => {
+              setScreen('profile');
+              navigate('/profile');
+            }}
             className="flex flex-col items-center justify-center py-1 text-[#3E4947] hover:text-[#005C55] transition-colors duration-150 active:scale-95"
           >
             <span className="material-symbols-outlined text-[24px]">person</span>

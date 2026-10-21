@@ -1,52 +1,27 @@
-# Feature Catalog
+# Feature Catalog & Status
 
-Status values: `MVP`, `LATER`, `OPEN`.
+This document catalogs ChobiDeh's user-facing capabilities, architectural boundaries, and implementation status.
 
-## Identity
-- [MVP] Signup, login, logout.
-- [MVP] User profile and dashboard.
-- [MVP] Room-scoped AI face clustering toggle (no mandatory selfies or face registration).
-- [MVP] Cluster vector deletion / purge request.
-- [LATER] Social sign-in providers, if needed.
+---
 
-## Rooms
-- [MVP] Create room.
-- [MVP] Join room using room ID and secure joining credential.
-- [MVP] Room membership and owner permissions.
-- [MVP] Rotate joining credential and remove member.
-- [MVP] Room photo gallery.
-- [LATER] Room roles beyond owner/member, such as moderator.
+## 1. Feature Status Matrix
 
-## Media
-- [MVP] Explicit photo selection and upload.
-- [MVP] Private object storage.
-- [MVP] Upload progress, retries, and processing status.
-- [MVP] Photo detail and authorized download.
-- [MVP] Photo deletion.
-- [LATER] Duplicate detection, quality ranking, video support, bulk export.
+| Module | Feature | Level / Details | Status |
+| :--- | :--- | :--- | :---: |
+| **Media** | Cloudflare R2 Direct Upload | Pre-signed S3 URLs, zero server proxying, 1,000 photo cap | **Approved Plan** |
+| **Media** | Client-Side WebP Compression | 12 MB camera files compressed to ~400 KB 2K WebP | **Approved Plan** |
+| **AI Matching** | **Level 1: Confident Clustering** | Auto-matches faces $\ge T_{\text{high}}$, multi-person group photo links, single storage | **Approved Spec** |
+| **AI Matching** | **Level 2: Review Suggestions** | Uncertain matches ($T_{\text{low}} \le \text{Sim} < T_{\text{high}}$), closest candidates, A → B correction, undo | **Approved Spec** |
+| **AI Matching** | **Level 3: Rest Photos** | 3 Subsections: Unknown Faces, No People (scenic), Other Unassigned (blur/errors) | **Approved Spec** |
+| **Exports** | **Save to Phone (ZIP)** | In-browser multi-photo streaming ZIP download | **Approved Plan** |
+| **Exports** | **Export to Google Drive** | 1-click cloud-to-cloud copy to user's Google Drive (`drive.file` scope) | **Approved Plan** |
+| **Rooms** | Room Passcode & Invite Link | Cryptographic room codes, invite modal | **Implemented** |
+| **Auth** | Supabase JWT & Onboarding | Complete profile, display names | **Implemented** |
 
-## AI organization (3-Level Architecture)
-- [MVP] Face detection and room-scoped embedding computation.
-- [MVP] Level 1: Confident Clustering into anonymous person collections (e.g., Person 1, Person 2).
-- [MVP] Level 2: Uncertain Match suggestions between similar person groups for user review (never auto-merged).
-- [MVP] Level 3: Unsorted collection for unmatched faces or photos without usable faces.
-- [MVP] User naming, editing, and manual assignment of person collections.
-- [MVP] Job retries and processing status.
-- [LATER] Semantic photo search and smart album summaries.
+---
 
-## Collections
-- [MVP] Person collections within a room.
-- [MVP] A photo can belong to multiple person collections.
-- [MVP] One stored original referenced from many collections.
-- [MVP] Review and undo match decisions.
+## 2. Three-Level AI Matching Specifications
 
-## Future travel platform
-- [LATER] Trip destinations and dates.
-- [LATER] Itinerary and activities.
-- [LATER] Expense tracking and split calculations.
-- [LATER] Settlement tracking.
-- [LATER] Maps, reminders, and travel recommendations.
-
-## Release gate
-
-A feature cannot be considered complete unless its acceptance criteria, tests, privacy implications, failure states, and documentation are addressed.
+* **Level 1 (Confident):** Automatically groups faces meeting calibrated similarity. When multiple people appear in one photo, the photo is linked to each person's collection without duplicating files.
+* **Level 2 (Review Suggestions):** Displays ambiguous matches with top candidate people. Allows authorized users to confirm, reject, or correct A to B. Rejecting does not auto-assign to other candidates. User corrections do not retrain the AI model. Undo supported.
+* **Level 3 (Rest Photos):** Organizes unassigned photos into Unknown Faces, No People, and Other Unassigned. Allows manual tagging of unknown faces.

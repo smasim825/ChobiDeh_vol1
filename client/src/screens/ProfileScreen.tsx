@@ -1,10 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/useAuth';
 import { Button } from '../components/Button';
 import { Input } from '../components/Input';
 
 export const ProfileScreen: React.FC = () => {
-  const { currentUser, setScreen, logout, updateBiometricConsent, purgeAllFaceData, updateProfileName, setUserPassword } = useAuth();
+  const {
+    currentUser,
+    setScreen,
+    logout,
+    updateBiometricConsent,
+    purgeAllFaceData,
+    updateProfileName,
+    updateProfileAvatar,
+    setUserPassword,
+  } = useAuth();
+  const navigate = useNavigate();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [editName, setEditName] = useState(currentUser?.name || '');
   const [prevCurrentUserName, setPrevCurrentUserName] = useState(currentUser?.name);
@@ -12,6 +24,8 @@ export const ProfileScreen: React.FC = () => {
     setPrevCurrentUserName(currentUser?.name);
     setEditName(currentUser?.name || '');
   }
+
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
 
   const [isSavingName, setIsSavingName] = useState(false);
   const [faceGroupingEnabled, setFaceGroupingEnabled] = useState(currentUser?.biometricConsent ?? false);
@@ -95,6 +109,27 @@ export const ProfileScreen: React.FC = () => {
     setTimeout(() => setFeedbackMessage(null), 5000);
   };
 
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploadingAvatar(true);
+    const res = await updateProfileAvatar(file);
+    setIsUploadingAvatar(false);
+
+    if (res.success) {
+      setFeedbackMessage('Profile photo updated successfully!');
+      setTimeout(() => setFeedbackMessage(null), 3500);
+    } else {
+      setFeedbackMessage(res.error || 'Failed to update profile photo.');
+      setTimeout(() => setFeedbackMessage(null), 4000);
+    }
+
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
   return (
     <div className="bg-[#EDFDF9] text-[#101E1C] antialiased min-h-screen pb-28 selection:bg-[#9CF2E8] selection:text-[#00201D]">
       {/* TOP APP BAR */}
@@ -103,8 +138,11 @@ export const ProfileScreen: React.FC = () => {
           <button
             type="button"
             aria-label="Go back"
-            onClick={() => setScreen('home')}
-            className="w-9 h-9 rounded-full flex items-center justify-center text-[#005C55] hover:bg-[#E1F1EE] transition-colors duration-150 active:scale-95 focus:outline-none"
+            onClick={() => {
+              setScreen('home');
+              navigate('/');
+            }}
+            className="w-9 h-9 rounded-full flex items-center justify-center text-[#0F766E] hover:bg-[#E1F1EE] transition-colors duration-150 active:scale-95 focus:outline-none"
           >
             <span className="material-symbols-outlined text-[22px]">arrow_back</span>
           </button>
@@ -142,28 +180,42 @@ export const ProfileScreen: React.FC = () => {
           <div className="flex items-start gap-4 relative z-10">
             {/* Avatar */}
             <div className="relative shrink-0">
-              <div className="w-20 h-20 rounded-full ring-2 ring-[#005C55]/20 overflow-hidden shadow-inner bg-[#E1F1EE]">
+              <div className="w-20 h-20 rounded-full ring-2 ring-[#005C55]/20 overflow-hidden shadow-inner bg-[#E1F1EE] flex items-center justify-center">
                 <img
                   className="w-full h-full object-cover"
-                  alt={currentUser?.name || 'Tasnim Rahman'}
-                  src="/placeholder-avatar.svg"
+                  alt={currentUser?.name || 'Traveler'}
+                  src={currentUser?.avatarUrl || '/placeholder-avatar.svg'}
                 />
               </div>
               <button
                 type="button"
                 aria-label="Change Profile Photo"
-                onClick={() => alert('Change profile photo is available in user preferences.')}
-                className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-[#0F766E] text-white flex items-center justify-center shadow-md active:scale-95 transition-transform focus:outline-none"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isUploadingAvatar}
+                className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-[#0F766E] text-white flex items-center justify-center shadow-md active:scale-95 hover:bg-[#0D645E] transition-all focus:outline-none disabled:opacity-70 cursor-pointer"
+                title="Upload Profile Picture"
               >
-                <span className="material-symbols-outlined text-[15px]">edit</span>
+                {isUploadingAvatar ? (
+                  <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <span className="material-symbols-outlined text-[15px]">edit</span>
+                )}
               </button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                className="hidden"
+                disabled={isUploadingAvatar}
+                onChange={handleAvatarChange}
+              />
             </div>
 
             {/* Name & Badges */}
             <div className="flex-1 min-w-0 pt-0.5">
               <div className="flex items-center gap-1.5 flex-wrap">
                 <h2 className="text-[20px] text-[#101E1C] font-bold truncate">
-                  {currentUser?.name || 'Tasnim Rahman'}
+                  {currentUser?.name || 'Traveler'}
                 </h2>
                 <span
                   className="material-symbols-outlined text-[#005C55] text-[18px]"
@@ -174,22 +226,8 @@ export const ProfileScreen: React.FC = () => {
                 </span>
               </div>
               <p className="text-[13px] text-[#3E4947] truncate mt-0.5">
-                {currentUser?.email || 'tasnim.rahman@example.com'}
+                {currentUser?.email || ''}
               </p>
-              <div className="mt-2.5 flex items-center gap-1.5 flex-wrap">
-                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#FFDCC4]/50 text-[#8E4E14] text-[11px] font-bold">
-                  <span
-                    className="material-symbols-outlined text-[13px]"
-                    style={{ fontVariationSettings: "'FILL' 1" }}
-                  >
-                    workspace_premium
-                  </span>
-                  Founding Traveler
-                </span>
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#DCECE8] text-[#3E4947] text-[11px] font-semibold">
-                  Room Admin
-                </span>
-              </div>
             </div>
           </div>
         </section>
@@ -466,7 +504,7 @@ export const ProfileScreen: React.FC = () => {
                   </span>
                   <div>
                     <p className="text-[14px] font-semibold text-[#101E1C]">Primary Email Address</p>
-                    <p className="text-[12px] text-[#3E4947]">{currentUser?.email || 'tasnim.rahman@example.com'}</p>
+                    <p className="text-[12px] text-[#3E4947]">{currentUser?.email || ''}</p>
                   </div>
                 </div>
                 <span className="material-symbols-outlined text-[#6E7977] text-[20px]">chevron_right</span>
@@ -474,7 +512,10 @@ export const ProfileScreen: React.FC = () => {
 
               <button
                 type="button"
-                onClick={() => setScreen('forgot-password')}
+                onClick={() => {
+                  setScreen('forgot-password');
+                  navigate('/forgot-password');
+                }}
                 className="w-full flex items-center justify-between p-3.5 hover:bg-[#E7F7F4]/50 text-left"
               >
                 <div className="flex items-center gap-3">
@@ -655,7 +696,10 @@ export const ProfileScreen: React.FC = () => {
         <div className="w-full max-w-lg mx-auto flex justify-around items-center">
           <button
             type="button"
-            onClick={() => setScreen('home')}
+            onClick={() => {
+              setScreen('home');
+              navigate('/');
+            }}
             className="flex flex-col items-center justify-center py-1 text-[#3E4947] hover:text-[#005C55] transition-colors"
           >
             <span className="material-symbols-outlined text-[24px]">photo_library</span>
@@ -679,7 +723,10 @@ export const ProfileScreen: React.FC = () => {
           </button>
           <button
             type="button"
-            onClick={() => setScreen('profile')}
+            onClick={() => {
+              setScreen('profile');
+              navigate('/profile');
+            }}
             className="flex flex-col items-center justify-center py-1 text-[#005C55] font-bold"
           >
             <span

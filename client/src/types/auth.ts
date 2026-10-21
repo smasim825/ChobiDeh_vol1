@@ -15,6 +15,7 @@ export interface User {
   id: string;
   name: string;
   email: string;
+  avatarUrl?: string;
   /**
    * User preference for anonymous AI face clustering (3-level matching).
    * No mandatory face registration or selfie enrollment required.
@@ -59,6 +60,7 @@ export interface AuthContextType {
   updateBiometricConsent: (consent: boolean) => Promise<{ success: boolean; error?: string }>;
   purgeAllFaceData: () => Promise<{ success: boolean; error?: string; message?: string }>;
   updateProfileName: (newName: string) => Promise<boolean>;
+  updateProfileAvatar: (file: File) => Promise<{ success: boolean; avatarUrl?: string; error?: string }>;
   setUserPassword: (newPassword: string) => Promise<{ success: boolean; error?: string }>;
   isSupabaseConnected: boolean;
 }

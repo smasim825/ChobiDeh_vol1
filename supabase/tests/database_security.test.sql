@@ -3,7 +3,7 @@
 -- Run via: supabase test db
 -- ==============================================================================
 BEGIN;
-SELECT plan(24);
+SELECT plan(26);
 
 -- 1. Extensions check
 SELECT has_extension('pgcrypto', 'Extension pgcrypto must be installed for security functions');
@@ -57,6 +57,7 @@ SELECT has_function('public', 'join_room', ARRAY['text', 'text'], 'Function join
 SELECT has_function('public', 'purge_room_face_data', ARRAY['uuid'], 'Function purge_room_face_data(uuid) exists');
 SELECT has_function('public', 'withdraw_member_face_consent', ARRAY['uuid'], 'Function withdraw_member_face_consent(uuid) exists');
 SELECT has_function('public', 'create_upload', ARRAY['uuid', 'text', 'bigint'], 'Function create_upload(uuid, text, bigint) exists');
+SELECT has_function('public', 'confirm_upload', ARRAY['uuid', 'bigint', 'text'], 'Function confirm_upload(uuid, bigint, text) exists');
 SELECT has_function('public', 'complete_onboarding', ARRAY['text'], 'Function complete_onboarding(text) exists');
 
 -- 6. RPC Privileges: Revoked from anon
@@ -75,6 +76,10 @@ SELECT function_privs_are(
 SELECT function_privs_are(
     'public', 'withdraw_member_face_consent', ARRAY['uuid'], 'anon', ARRAY[]::text[],
     'anon cannot execute withdraw_member_face_consent'
+);
+SELECT function_privs_are(
+    'public', 'confirm_upload', ARRAY['uuid', 'bigint', 'text'], 'anon', ARRAY[]::text[],
+    'anon cannot execute confirm_upload'
 );
 
 SELECT * FROM finish();

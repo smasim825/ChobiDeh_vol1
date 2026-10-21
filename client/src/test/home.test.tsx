@@ -7,14 +7,17 @@ import { ProfileScreen } from '../screens/ProfileScreen';
 import { RoomAreaScreen } from '../screens/RoomAreaScreen';
 import { CreateRoomScreen } from '../screens/CreateRoomScreen';
 import { JoinRoomScreen } from '../screens/JoinRoomScreen';
+import { DEMO_ROOMS } from './fixtures/demoData';
 import App from '../App';
 
 describe('ChobiDeh Home & Room Suite', () => {
   it('renders HomeScreen with top bar, greeting, and memory room cards', () => {
     render(
-      <AuthProvider>
-        <HomeScreen />
-      </AuthProvider>
+      <MemoryRouter>
+        <AuthProvider>
+          <HomeScreen initialRooms={DEMO_ROOMS} />
+        </AuthProvider>
+      </MemoryRouter>
     );
 
     // Hero title
@@ -32,11 +35,26 @@ describe('ChobiDeh Home & Room Suite', () => {
     expect(screen.getByRole('button', { name: /join a room/i })).toBeInTheDocument();
   });
 
+  it('renders HomeScreen clean empty state when no rooms exist', () => {
+    render(
+      <MemoryRouter>
+        <AuthProvider>
+          <HomeScreen />
+        </AuthProvider>
+      </MemoryRouter>
+    );
+
+    expect(screen.getByText(/No Active Rooms Yet/i)).toBeInTheDocument();
+    expect(screen.getByText(/No Archived Memories Yet/i)).toBeInTheDocument();
+  });
+
   it('renders ProfileScreen with user details, metrics, and private vault settings', () => {
     render(
-      <AuthProvider>
-        <ProfileScreen />
-      </AuthProvider>
+      <MemoryRouter>
+        <AuthProvider>
+          <ProfileScreen />
+        </AuthProvider>
+      </MemoryRouter>
     );
 
     expect(screen.getByRole('heading', { name: /chobideh/i })).toBeInTheDocument();
@@ -49,16 +67,19 @@ describe('ChobiDeh Home & Room Suite', () => {
 
   it('renders RoomAreaScreen with room metadata, member stack, and photo gallery', () => {
     render(
-      <AuthProvider>
-        <RoomAreaScreen />
-      </AuthProvider>
+      <MemoryRouter>
+        <AuthProvider>
+          <RoomAreaScreen />
+        </AuthProvider>
+      </MemoryRouter>
     );
 
-    expect(screen.getByRole('heading', { name: /cox's bazar winter escape/i })).toBeInTheDocument();
+    expect(screen.getAllByRole('heading', { name: /shared trip album/i })[0]).toBeInTheDocument();
     expect(screen.getByText(/private to room members/i)).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /person collections/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /upload photos/i })).toBeInTheDocument();
     expect(screen.getByText(/gallery/i)).toBeInTheDocument();
+    expect(screen.getByText(/no photos in this room yet/i)).toBeInTheDocument();
   });
 
   it('renders CreateRoomScreen with form fields and preset selectors', () => {
@@ -112,7 +133,7 @@ describe('ChobiDeh Home & Room Suite', () => {
     // Click Room Area tab
     const roomTab = screen.getByRole('button', { name: /room area/i });
     fireEvent.click(roomTab);
-    expect(screen.getByRole('heading', { name: /cox's bazar winter escape/i })).toBeInTheDocument();
+    expect(screen.getAllByRole('heading', { name: /shared trip album/i })[0]).toBeInTheDocument();
 
     // Click Create Room tab
     const createRoomTab = screen.getByRole('button', { name: /create room/i });
