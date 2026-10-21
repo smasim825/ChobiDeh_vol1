@@ -13,9 +13,11 @@ import App from '../App';
 describe('ChobiDeh Home & Room Suite', () => {
   it('renders HomeScreen with top bar, greeting, and memory room cards', () => {
     render(
-      <AuthProvider>
-        <HomeScreen initialRooms={DEMO_ROOMS} />
-      </AuthProvider>
+      <MemoryRouter>
+        <AuthProvider>
+          <HomeScreen initialRooms={DEMO_ROOMS} />
+        </AuthProvider>
+      </MemoryRouter>
     );
 
     // Hero title
@@ -35,9 +37,11 @@ describe('ChobiDeh Home & Room Suite', () => {
 
   it('renders HomeScreen clean empty state when no rooms exist', () => {
     render(
-      <AuthProvider>
-        <HomeScreen />
-      </AuthProvider>
+      <MemoryRouter>
+        <AuthProvider>
+          <HomeScreen />
+        </AuthProvider>
+      </MemoryRouter>
     );
 
     expect(screen.getByText(/No Active Rooms Yet/i)).toBeInTheDocument();
@@ -46,9 +50,11 @@ describe('ChobiDeh Home & Room Suite', () => {
 
   it('renders ProfileScreen with user details, metrics, and private vault settings', () => {
     render(
-      <AuthProvider>
-        <ProfileScreen />
-      </AuthProvider>
+      <MemoryRouter>
+        <AuthProvider>
+          <ProfileScreen />
+        </AuthProvider>
+      </MemoryRouter>
     );
 
     expect(screen.getByRole('heading', { name: /chobideh/i })).toBeInTheDocument();
@@ -61,9 +67,11 @@ describe('ChobiDeh Home & Room Suite', () => {
 
   it('renders RoomAreaScreen with room metadata, member stack, and photo gallery', () => {
     render(
-      <AuthProvider>
-        <RoomAreaScreen />
-      </AuthProvider>
+      <MemoryRouter>
+        <AuthProvider>
+          <RoomAreaScreen />
+        </AuthProvider>
+      </MemoryRouter>
     );
 
     expect(screen.getAllByRole('heading', { name: /shared trip album/i })[0]).toBeInTheDocument();

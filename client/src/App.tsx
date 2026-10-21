@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { useAuth } from './context/useAuth';
@@ -63,6 +63,17 @@ const DevNavbarWrapper: React.FC = () => {
 };
 
 export const AppRoutes: React.FC = () => {
+  const location = useLocation();
+  const { screen, setScreen } = useAuth();
+
+  // Sync AuthContext screen state when route changes
+  useEffect(() => {
+    const expectedScreen = getScreenFromPath(location.pathname);
+    if (screen !== expectedScreen) {
+      setScreen(expectedScreen);
+    }
+  }, [location.pathname, screen, setScreen]);
+
   return (
     <div className="min-h-screen bg-[#F8F5EF] flex flex-col justify-between">
       {/* Screen preview selector renders only in DEV */}

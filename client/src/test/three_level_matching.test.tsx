@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import React from 'react';
+import { MemoryRouter } from 'react-router-dom';
 import { RoomAreaScreen } from '../screens/RoomAreaScreen';
 import { AuthContext } from '../context/AuthContextBase';
 import { DEMO_PHOTOS, DEMO_SUGGESTIONS } from './fixtures/demoData';
@@ -30,9 +31,11 @@ const renderWithAuth = (ui: React.ReactElement) => {
     isSupabaseConnected: false,
   };
   return render(
-    <AuthContext.Provider value={mockValue}>
-      {ui}
-    </AuthContext.Provider>
+    <MemoryRouter>
+      <AuthContext.Provider value={mockValue}>
+        {ui}
+      </AuthContext.Provider>
+    </MemoryRouter>
   );
 };
 

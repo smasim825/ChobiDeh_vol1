@@ -117,9 +117,11 @@ describe('ChobiDeh Authentication Suite', () => {
   it('renders Security & Login Methods card in ProfileScreen allowing password setup', async () => {
     const { ProfileScreen } = await import('../screens/ProfileScreen');
     render(
-      <AuthProvider>
-        <ProfileScreen />
-      </AuthProvider>
+      <MemoryRouter>
+        <AuthProvider>
+          <ProfileScreen />
+        </AuthProvider>
+      </MemoryRouter>
     );
 
     expect(screen.getByRole('heading', { name: /security & login methods/i })).toBeInTheDocument();

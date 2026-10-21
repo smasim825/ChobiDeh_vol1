@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/useAuth';
 import { Button } from '../components/Button';
 import { Input } from '../components/Input';
 
 export const ProfileScreen: React.FC = () => {
   const { currentUser, setScreen, logout, updateBiometricConsent, purgeAllFaceData, updateProfileName, setUserPassword } = useAuth();
+  const navigate = useNavigate();
 
   const [editName, setEditName] = useState(currentUser?.name || '');
   const [prevCurrentUserName, setPrevCurrentUserName] = useState(currentUser?.name);
@@ -103,8 +105,11 @@ export const ProfileScreen: React.FC = () => {
           <button
             type="button"
             aria-label="Go back"
-            onClick={() => setScreen('home')}
-            className="w-9 h-9 rounded-full flex items-center justify-center text-[#005C55] hover:bg-[#E1F1EE] transition-colors duration-150 active:scale-95 focus:outline-none"
+            onClick={() => {
+              setScreen('home');
+              navigate('/');
+            }}
+            className="w-9 h-9 rounded-full flex items-center justify-center text-[#0F766E] hover:bg-[#E1F1EE] transition-colors duration-150 active:scale-95 focus:outline-none"
           >
             <span className="material-symbols-outlined text-[22px]">arrow_back</span>
           </button>
@@ -474,7 +479,10 @@ export const ProfileScreen: React.FC = () => {
 
               <button
                 type="button"
-                onClick={() => setScreen('forgot-password')}
+                onClick={() => {
+                  setScreen('forgot-password');
+                  navigate('/forgot-password');
+                }}
                 className="w-full flex items-center justify-between p-3.5 hover:bg-[#E7F7F4]/50 text-left"
               >
                 <div className="flex items-center gap-3">
@@ -655,7 +663,10 @@ export const ProfileScreen: React.FC = () => {
         <div className="w-full max-w-lg mx-auto flex justify-around items-center">
           <button
             type="button"
-            onClick={() => setScreen('home')}
+            onClick={() => {
+              setScreen('home');
+              navigate('/');
+            }}
             className="flex flex-col items-center justify-center py-1 text-[#3E4947] hover:text-[#005C55] transition-colors"
           >
             <span className="material-symbols-outlined text-[24px]">photo_library</span>
@@ -679,7 +690,10 @@ export const ProfileScreen: React.FC = () => {
           </button>
           <button
             type="button"
-            onClick={() => setScreen('profile')}
+            onClick={() => {
+              setScreen('profile');
+              navigate('/profile');
+            }}
             className="flex flex-col items-center justify-center py-1 text-[#005C55] font-bold"
           >
             <span

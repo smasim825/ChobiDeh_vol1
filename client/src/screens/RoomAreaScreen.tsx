@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/useAuth';
 import type { PhotoItem, ReviewSuggestion, RestPhotoCategory } from '../types/room';
 import { uploadRoomPhotos, type UploadProgress } from '../services/photoUploader';
@@ -20,6 +21,7 @@ export const RoomAreaScreen: React.FC<RoomAreaScreenProps> = ({
   roomTitle = 'Shared Trip Album',
 }) => {
   const { setScreen, currentUser } = useAuth();
+  const navigate = useNavigate();
 
   // Navigation: Primary sections
   // 'people' = Level 1 Confirmed Collections
@@ -334,7 +336,10 @@ export const RoomAreaScreen: React.FC<RoomAreaScreenProps> = ({
           <button
             type="button"
             aria-label="Go back to dashboard"
-            onClick={() => setScreen('home')}
+            onClick={() => {
+              setScreen('home');
+              navigate('/');
+            }}
             className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-[#E1F1EE] active:scale-95 transition-all text-[#101E1C] focus:outline-none"
           >
             <span className="material-symbols-outlined text-[22px]">arrow_back</span>

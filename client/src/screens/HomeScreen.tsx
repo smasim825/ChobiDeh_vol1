@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/useAuth';
 import type { Room } from '../types/room';
 import { supabase } from '../lib/supabase';
@@ -9,6 +10,7 @@ export interface HomeScreenProps {
 
 export const HomeScreen: React.FC<HomeScreenProps> = ({ initialRooms }) => {
   const { currentUser, logout, updateBiometricConsent, setScreen } = useAuth();
+  const navigate = useNavigate();
 
   const [rooms, setRooms] = useState<Room[]>(initialRooms || []);
   const [isDemoData, setIsDemoData] = useState(false);
@@ -87,7 +89,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ initialRooms }) => {
     return () => {
       isMounted = false;
     };
-  }, [currentUser]);
+  }, [currentUser, initialRooms]);
 
   const handleCreateRoom = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -341,6 +343,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ initialRooms }) => {
                     onClick={() => {
                       setShowProfileMenu(false);
                       setScreen('profile');
+                      navigate('/profile');
                     }}
                     className="w-full py-1.5 text-center text-[12px] font-bold text-[#005C55] hover:bg-[#E7F7F4] rounded-lg transition-colors flex items-center justify-center gap-1.5"
                   >
@@ -401,7 +404,10 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ initialRooms }) => {
             <div className="flex items-center gap-2 pl-2 shrink-0">
               <button
                 type="button"
-                onClick={() => setScreen('room-area')}
+                onClick={() => {
+                  setScreen('room-area');
+                  navigate('/rooms/demo');
+                }}
                 className="text-[13px] font-bold text-[#005C55] hover:underline active:scale-95 transition-transform"
               >
                 View
@@ -434,7 +440,10 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ initialRooms }) => {
             {/* Primary CTA: Create a Room */}
             <button
               type="button"
-              onClick={() => setScreen('create-room')}
+              onClick={() => {
+                setScreen('create-room');
+                navigate('/rooms/new');
+              }}
               className="min-h-[48px] h-[50px] flex items-center justify-center gap-2 bg-[#0F766E] text-white px-4 rounded-full font-semibold text-[15px] sm:text-[16px] shadow-sm hover:bg-[#0D645E] active:scale-[0.98] transition-all"
             >
               <span className="material-symbols-outlined text-[20px]">add</span>
@@ -444,7 +453,10 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ initialRooms }) => {
             {/* Secondary CTA: Join a Room */}
             <button
               type="button"
-              onClick={() => setScreen('join-room')}
+              onClick={() => {
+                setScreen('join-room');
+                navigate('/join');
+              }}
               className="min-h-[48px] h-[50px] flex items-center justify-center gap-2 bg-white text-[#005C55] border border-[#0F766E]/30 px-4 rounded-full font-semibold text-[15px] sm:text-[16px] shadow-xs hover:bg-[#E7F7F4] active:scale-[0.98] transition-all"
             >
               <span className="material-symbols-outlined text-[20px]">group_add</span>
@@ -591,7 +603,10 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ initialRooms }) => {
                   {/* Quick Action */}
                   <button
                     type="button"
-                    onClick={() => setScreen('room-area')}
+                    onClick={() => {
+                      setScreen('room-area');
+                      navigate(`/rooms/${room.id}`);
+                    }}
                     className="flex items-center gap-1 text-[#005C55] hover:text-[#0F766E] text-[13px] font-bold pl-2 focus:outline-none"
                   >
                     <span>Open</span>
@@ -935,7 +950,10 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ initialRooms }) => {
           {/* Nav Item 5: Profile */}
           <button
             type="button"
-            onClick={() => setScreen('profile')}
+            onClick={() => {
+              setScreen('profile');
+              navigate('/profile');
+            }}
             className="flex flex-col items-center justify-center py-1 text-[#3E4947] hover:text-[#005C55] transition-colors duration-150 active:scale-95"
           >
             <span className="material-symbols-outlined text-[24px]">person</span>
