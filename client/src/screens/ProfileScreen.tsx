@@ -228,20 +228,6 @@ export const ProfileScreen: React.FC = () => {
               <p className="text-[13px] text-[#3E4947] truncate mt-0.5">
                 {currentUser?.email || ''}
               </p>
-              <div className="mt-2.5 flex items-center gap-1.5 flex-wrap">
-                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#FFDCC4]/50 text-[#8E4E14] text-[11px] font-bold">
-                  <span
-                    className="material-symbols-outlined text-[13px]"
-                    style={{ fontVariationSettings: "'FILL' 1" }}
-                  >
-                    workspace_premium
-                  </span>
-                  Founding Traveler
-                </span>
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#DCECE8] text-[#3E4947] text-[11px] font-semibold">
-                  Room Admin
-                </span>
-              </div>
             </div>
           </div>
         </section>
