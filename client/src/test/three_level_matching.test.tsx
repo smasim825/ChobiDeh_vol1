@@ -3,6 +3,8 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import React from 'react';
 import { RoomAreaScreen } from '../screens/RoomAreaScreen';
 import { AuthContext } from '../context/AuthContextBase';
+import { DEMO_PHOTOS, DEMO_SUGGESTIONS } from './fixtures/demoData';
+
 // Mock Auth Provider Wrapper
 const renderWithAuth = (ui: React.ReactElement) => {
   const mockValue: any = {
@@ -34,9 +36,18 @@ const renderWithAuth = (ui: React.ReactElement) => {
   );
 };
 
+const renderTestRoom = () =>
+  renderWithAuth(
+    <RoomAreaScreen
+      initialPhotos={DEMO_PHOTOS}
+      initialSuggestions={DEMO_SUGGESTIONS}
+      roomTitle="Cox's Bazar Winter Escape"
+    />
+  );
+
 describe('Three-Level Photo Matching & Grouping System', () => {
   it('Level 1: Renders confirmed People tab and supports multi-person group photos', () => {
-    renderWithAuth(<RoomAreaScreen />);
+    renderTestRoom();
 
     // Check Tab
     expect(screen.getByText('People (Level 1)')).toBeDefined();
@@ -58,7 +69,7 @@ describe('Three-Level Photo Matching & Grouping System', () => {
   });
 
   it('Level 2: Renders Review Suggestions with candidate people and allows explicit A -> B correction', () => {
-    renderWithAuth(<RoomAreaScreen />);
+    renderTestRoom();
 
     // Switch to Review Suggestions tab
     const suggestionsTab = screen.getByText('Review Suggestions');
@@ -78,7 +89,7 @@ describe('Three-Level Photo Matching & Grouping System', () => {
   });
 
   it('Level 2: Rejection does not auto-assign to another candidate and allows Undo', () => {
-    renderWithAuth(<RoomAreaScreen />);
+    renderTestRoom();
 
     // Switch to suggestions
     fireEvent.click(screen.getByText('Review Suggestions'));
@@ -100,7 +111,7 @@ describe('Three-Level Photo Matching & Grouping System', () => {
   });
 
   it('Level 3: Rest Photos organizes into Unknown Faces, No People, and Other Unassigned', () => {
-    renderWithAuth(<RoomAreaScreen />);
+    renderTestRoom();
 
     // Switch to Rest Photos tab
     const restTab = screen.getByText('Rest Photos');
@@ -127,7 +138,7 @@ describe('Three-Level Photo Matching & Grouping System', () => {
   });
 
   it('Enforces Dual Export actions: Save to Phone (ZIP) and Export to Google Drive', () => {
-    renderWithAuth(<RoomAreaScreen />);
+    renderTestRoom();
 
     const savePhoneBtn = screen.getByRole('button', { name: /Save to Phone \(ZIP\)/i });
     const exportDriveBtn = screen.getByRole('button', { name: /Export to Google Drive/i });
@@ -140,5 +151,11 @@ describe('Three-Level Photo Matching & Grouping System', () => {
 
     fireEvent.click(exportDriveBtn);
     expect(screen.getByText(/Exporting album cloud-to-cloud directly into your Google Drive/i)).toBeDefined();
+  });
+
+  it('Renders clean empty state when room has 0 photos', () => {
+    renderWithAuth(<RoomAreaScreen />);
+    expect(screen.getByText(/No Photos in This Room Yet/i)).toBeDefined();
+    expect(screen.getByText(/Upload photos to automatically recognize friends/i)).toBeDefined();
   });
 });

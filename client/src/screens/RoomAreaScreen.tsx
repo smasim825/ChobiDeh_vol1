@@ -8,137 +8,17 @@ import { downloadPhotosAsZip, triggerFileDownload, type DownloadProgress } from 
 // Seed Data: Curated Photos across 3 Levels
 // ==========================================
 
-const INITIAL_PHOTOS: PhotoItem[] = [
-  // Level 1: Confident Matches (Including Multi-Person Group Photos!)
-  {
-    id: 'p1',
-    url: '/placeholder-cover.svg',
-    alt: 'Tasnim and Rafiqul walking along tide pools of Inani Beach during sunset.',
-    aspect: 'aspect-[3/4]',
-    time: '5:42 PM',
-    // MULTI-PERSON PHOTO: Appears in both Tasnim's and Rafiqul's collections without duplicating files!
-    assignedPeople: ['Tasnim', 'Rafiqul'],
-    clusterLevel: 'Level 1: Confident',
-    detectedFaceCount: 2,
-    badge: 'Tasnim + Rafiqul (Group Photo)',
-  },
-  {
-    id: 'p2',
-    url: '/placeholder-cover.svg',
-    alt: 'Portrait of Tasnim smiling on the sandy beach.',
-    aspect: 'aspect-square',
-    time: '5:30 PM',
-    assignedPeople: ['Tasnim'],
-    clusterLevel: 'Level 1: Confident',
-    detectedFaceCount: 1,
-    badge: 'Tasnim',
-  },
-  {
-    id: 'p3',
-    url: '/placeholder-cover.svg',
-    alt: 'Portrait of Rafiqul on sandy beach dunes.',
-    aspect: 'aspect-[3/4]',
-    time: '4:15 PM',
-    assignedPeople: ['Rafiqul'],
-    clusterLevel: 'Level 1: Confident',
-    detectedFaceCount: 1,
-    badge: 'Rafiqul',
-  },
-  {
-    id: 'p4',
-    url: '/placeholder-cover.svg',
-    alt: 'Portrait of Samira smiling in front of sea breeze horizon.',
-    aspect: 'aspect-square',
-    time: '3:45 PM',
-    assignedPeople: ['Samira'],
-    clusterLevel: 'Level 1: Confident',
-    detectedFaceCount: 1,
-    badge: 'Samira',
-  },
-  {
-    id: 'p5',
-    url: '/placeholder-cover.svg',
-    alt: 'Tanvir laughing during coastal road trip.',
-    aspect: 'aspect-[4/5]',
-    time: '2:10 PM',
-    assignedPeople: ['Tanvir'],
-    clusterLevel: 'Level 1: Confident',
-    detectedFaceCount: 1,
-    badge: 'Tanvir',
-  },
-  // Level 3: Rest Photos — Subcategory: No People (Scenery / Food)
-  {
-    id: 'p6',
-    url: '/placeholder-cover.svg',
-    alt: "Wide panoramic sunset landscape of Cox's Bazar coastline.",
-    aspect: 'aspect-video',
-    time: '1:20 PM',
-    assignedPeople: [],
-    clusterLevel: 'Level 3: Rest',
-    restCategory: 'no_people',
-    detectedFaceCount: 0,
-    badge: 'Scenic / No People',
-  },
-  {
-    id: 'p7',
-    url: '/placeholder-cover.svg',
-    alt: 'Fresh seafood platter at beachside restaurant.',
-    aspect: 'aspect-square',
-    time: '12:45 PM',
-    assignedPeople: [],
-    clusterLevel: 'Level 3: Rest',
-    restCategory: 'no_people',
-    detectedFaceCount: 0,
-    badge: 'Food & Dining',
-  },
-  // Level 3: Rest Photos — Subcategory: Unknown Faces (Human face detected, but unassigned)
-  {
-    id: 'p8',
-    url: '/placeholder-cover.svg',
-    alt: 'Unidentified friend in distant beach volleyball game.',
-    aspect: 'aspect-[4/5]',
-    time: '11:15 AM',
-    assignedPeople: [],
-    clusterLevel: 'Level 3: Rest',
-    restCategory: 'unknown_faces',
-    detectedFaceCount: 1,
-    badge: 'Unknown Face Detected',
-  },
-  // Level 3: Rest Photos — Subcategory: Other Unassigned (Blur / Low light)
-  {
-    id: 'p9',
-    url: '/placeholder-cover.svg',
-    alt: 'Motion blurred night walk along Marine Drive.',
-    aspect: 'aspect-video',
-    time: '9:30 PM',
-    assignedPeople: [],
-    clusterLevel: 'Level 3: Rest',
-    restCategory: 'other_unassigned',
-    detectedFaceCount: 0,
-    badge: 'Low Light / Motion Blur',
-  },
-];
+export interface RoomAreaScreenProps {
+  initialPhotos?: PhotoItem[];
+  initialSuggestions?: ReviewSuggestion[];
+  roomTitle?: string;
+}
 
-const INITIAL_SUGGESTIONS: ReviewSuggestion[] = [
-  {
-    id: 'sug_1',
-    photoId: 'p_uncertain_1',
-    photoUrl: '/placeholder-cover.svg',
-    suggestedPerson: {
-      clusterId: 'cluster_2',
-      name: 'Person 2 (Rafiqul)',
-      similarityScore: 0.74,
-    },
-    candidatePeople: [
-      { clusterId: 'cluster_2', name: 'Rafiqul', similarityScore: 0.74 },
-      { clusterId: 'cluster_3', name: 'Samira', similarityScore: 0.71 },
-      { clusterId: 'cluster_4', name: 'Tanvir', similarityScore: 0.68 },
-    ],
-    status: 'pending',
-  },
-];
-
-export const RoomAreaScreen: React.FC = () => {
+export const RoomAreaScreen: React.FC<RoomAreaScreenProps> = ({
+  initialPhotos = [],
+  initialSuggestions = [],
+  roomTitle = 'Shared Trip Album',
+}) => {
   const { setScreen, currentUser } = useAuth();
 
   // Navigation: Primary sections
@@ -153,11 +33,16 @@ export const RoomAreaScreen: React.FC = () => {
   // Level 3 Subfilter: Rest Photos Category
   const [restSubfilter, setRestSubfilter] = useState<RestPhotoCategory>('unknown_faces');
 
-  // Photos State
-  const [photos, setPhotos] = useState<PhotoItem[]>(INITIAL_PHOTOS);
+  // Photos State (Default empty for real rooms)
+  const [photos, setPhotos] = useState<PhotoItem[]>(initialPhotos);
 
   // Suggestions State (Level 2)
-  const [suggestions, setSuggestions] = useState<ReviewSuggestion[]>(INITIAL_SUGGESTIONS);
+  const [suggestions, setSuggestions] = useState<ReviewSuggestion[]>(initialSuggestions);
+
+  // Derived dynamically from uploaded photos instead of hardcoded demo names
+  const identifiedPeople = Array.from(
+    new Set(photos.flatMap((p) => p.assignedPeople || []))
+  ).filter(Boolean);
 
   // History for Undo
   const [undoStack, setUndoStack] = useState<{
@@ -456,10 +341,10 @@ export const RoomAreaScreen: React.FC = () => {
           </button>
           <div>
             <h1 className="text-[16px] font-bold text-[#101E1C] tracking-tight truncate max-w-[200px]">
-              Cox's Bazar
+              {roomTitle}
             </h1>
             <p className="text-[11px] text-[#3E4947] flex items-center gap-1 font-medium">
-              <span>Nov 12 - 15</span>
+              <span>Trip Album</span>
               <span>•</span>
               <span className="text-[#005C55] font-semibold">3-Level Matching Active</span>
             </p>
@@ -503,7 +388,7 @@ export const RoomAreaScreen: React.FC = () => {
           <div className="relative h-40 w-full">
             <img
               src="/placeholder-cover.svg"
-              alt="Cox's Bazar Sunset"
+              alt={roomTitle}
               className="w-full h-full object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
@@ -533,7 +418,7 @@ export const RoomAreaScreen: React.FC = () => {
                 </span>
               </div>
               <h2 className="text-[19px] font-bold tracking-tight text-white drop-shadow-xs">
-                Cox's Bazar Winter Escape
+                {roomTitle}
               </h2>
             </div>
           </div>
@@ -543,12 +428,14 @@ export const RoomAreaScreen: React.FC = () => {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="flex -space-x-2 overflow-hidden">
-                  <div className="w-7 h-7 rounded-full bg-[#005C55] text-white flex items-center justify-center text-[10px] font-bold ring-2 ring-white">T</div>
-                  <div className="w-7 h-7 rounded-full bg-[#8E4E14] text-white flex items-center justify-center text-[10px] font-bold ring-2 ring-white">R</div>
-                  <div className="w-7 h-7 rounded-full bg-[#0F766E] text-white flex items-center justify-center text-[10px] font-bold ring-2 ring-white">S</div>
+                  <div className="w-7 h-7 rounded-full bg-[#005C55] text-white flex items-center justify-center text-[10px] font-bold ring-2 ring-white">
+                    {(currentUser?.name || 'Y').charAt(0).toUpperCase()}
+                  </div>
                 </div>
                 <div className="flex flex-col text-left">
-                  <span className="text-[12px] text-[#101E1C] font-semibold">Tasnim, Rafiqul, Samira, Tanvir</span>
+                  <span className="text-[12px] text-[#101E1C] font-semibold">
+                    {identifiedPeople.length > 0 ? identifiedPeople.join(', ') : (currentUser?.name || 'You')}
+                  </span>
                   <span className="text-[10px] text-[#3E4947]">Room Quota: {photos.length} / 1,000 photos</span>
                 </div>
               </div>
@@ -748,7 +635,7 @@ export const RoomAreaScreen: React.FC = () => {
               >
                 All People
               </button>
-              {['Tasnim', 'Rafiqul', 'Samira', 'Tanvir'].map((name) => (
+              {identifiedPeople.map((name) => (
                 <button
                   key={name}
                   type="button"
@@ -762,6 +649,11 @@ export const RoomAreaScreen: React.FC = () => {
                   {name}
                 </button>
               ))}
+              {identifiedPeople.length === 0 && (
+                <span className="text-[12px] text-[#6E7977] italic py-1">
+                  Upload photos to automatically recognize friends
+                </span>
+              )}
             </div>
           </section>
         )}
@@ -952,7 +844,17 @@ export const RoomAreaScreen: React.FC = () => {
               </span>
             </div>
 
-            {displayPhotos.length === 0 ? (
+            {photos.length === 0 ? (
+              <div className="p-8 bg-white rounded-2xl border border-[#E2DDD4] text-center flex flex-col items-center gap-3 shadow-xs">
+                <div className="w-12 h-12 rounded-full bg-[#E1F1EE] text-[#005C55] flex items-center justify-center">
+                  <span className="material-symbols-outlined text-[26px]">add_a_photo</span>
+                </div>
+                <h4 className="text-[15px] font-bold text-[#101E1C]">No Photos in This Room Yet</h4>
+                <p className="text-[12px] text-[#3E4947] max-w-xs">
+                  Upload photos using the button above. Images will be optimized with WebP compression and organized privately.
+                </p>
+              </div>
+            ) : displayPhotos.length === 0 ? (
               <div className="p-8 bg-white rounded-2xl border border-[#E2DDD4] text-center text-[#6E7977] text-[13px]">
                 No photos found in this category.
               </div>
@@ -1041,12 +943,12 @@ export const RoomAreaScreen: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => {
-                      handleManualTagUnknownFace(selectedPhoto.id, 'Tasnim');
+                      handleManualTagUnknownFace(selectedPhoto.id, currentUser?.name || 'Friend');
                       setSelectedPhoto(null);
                     }}
                     className="px-3 py-1.5 rounded-full bg-[#005C55] text-white text-[11px] font-semibold hover:bg-[#0F766E]"
                   >
-                    Tag as Tasnim
+                    Tag as {currentUser?.name || 'Friend'}
                   </button>
                 )}
               </div>

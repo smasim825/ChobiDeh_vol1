@@ -3,51 +3,14 @@ import { useAuth } from '../context/useAuth';
 import type { Room } from '../types/room';
 import { supabase } from '../lib/supabase';
 
-const INITIAL_ROOMS: Room[] = [
-  {
-    id: 'room_coxsbazar_01',
-    title: "Cox's Bazar Trip",
-    category: 'Coastal Trip',
-    badge: { label: 'New', type: 'new' },
-    photoCount: 142,
-    updatedAt: 'Updated 2h ago',
-    coverImage: '/placeholder-cover.svg',
-    altText:
-      "Vibrant panoramic view of Cox's Bazar beach at golden sunset with warm reflections on ocean tides.",
-    members: [
-      {
-        id: 'm1',
-        name: 'Amina',
-        avatar: '',
-      },
-    ],
-    extraMemberCount: 1,
-  },
-  {
-    id: 'room_univ_02',
-    title: 'University Memories',
-    category: 'Campus & Reunion',
-    badge: { label: 'Shared Room', type: 'shared' },
-    photoCount: 384,
-    updatedAt: 'Updated yesterday',
-    coverImage: '/placeholder-cover.svg',
-    altText:
-      'Candid group photograph of university friends laughing together outdoors on a lush green campus lawn.',
-    members: [
-      {
-        id: 'm4',
-        name: 'Farzana',
-        avatar: '',
-      },
-    ],
-    extraMemberCount: 4,
-  },
-];
+export interface HomeScreenProps {
+  initialRooms?: Room[];
+}
 
-export const HomeScreen: React.FC = () => {
+export const HomeScreen: React.FC<HomeScreenProps> = ({ initialRooms }) => {
   const { currentUser, logout, updateBiometricConsent, setScreen } = useAuth();
 
-  const [rooms, setRooms] = useState<Room[]>([]);
+  const [rooms, setRooms] = useState<Room[]>(initialRooms || []);
   const [isDemoData, setIsDemoData] = useState(false);
   const [activeNav, setActiveNav] = useState<'rooms' | 'gallery' | 'people' | 'review'>('rooms');
   const [showAiBanner, setShowAiBanner] = useState(true);
@@ -71,9 +34,9 @@ export const HomeScreen: React.FC = () => {
     let isMounted = true;
     const fetchRooms = async () => {
       if (!currentUser || !supabase) {
-        if (import.meta.env.DEV && isMounted) {
-          setRooms(INITIAL_ROOMS);
-          setIsDemoData(true);
+        if (!initialRooms && isMounted) {
+          setRooms([]);
+          setIsDemoData(false);
         }
         return;
       }
@@ -84,10 +47,7 @@ export const HomeScreen: React.FC = () => {
           .select('room_id, role, rooms(id, name, created_at, join_slug, face_clustering_enabled)');
 
         if (memberErr || !memberRooms || memberRooms.length === 0) {
-          if (import.meta.env.DEV && isMounted) {
-            setRooms(INITIAL_ROOMS);
-            setIsDemoData(true);
-          } else if (isMounted) {
+          if (!initialRooms && isMounted) {
             setRooms([]);
             setIsDemoData(false);
           }
@@ -116,9 +76,9 @@ export const HomeScreen: React.FC = () => {
           setIsDemoData(false);
         }
       } catch {
-        if (import.meta.env.DEV && isMounted) {
-          setRooms(INITIAL_ROOMS);
-          setIsDemoData(true);
+        if (!initialRooms && isMounted) {
+          setRooms([]);
+          setIsDemoData(false);
         }
       }
     };
@@ -428,23 +388,20 @@ export const HomeScreen: React.FC = () => {
               </div>
               <div className="min-w-0">
                 <div className="flex items-center gap-1.5">
-                  <span className="inline-block w-2 h-2 rounded-full bg-[#FFAB69] animate-pulse" />
+                  <span className="inline-block w-2 h-2 rounded-full bg-[#005C55]" />
                   <p className="text-[11px] font-bold text-[#005C55] tracking-wide uppercase">
                     3-LEVEL AI CLUSTERING ACTIVE
                   </p>
                 </div>
                 <p className="text-[13px] text-[#253331] font-medium truncate">
-                  4 anonymous person clusters • 2 uncertain matches to review
+                  Privacy-first face matching organizes photos with zero biometric data leaks
                 </p>
               </div>
             </div>
             <div className="flex items-center gap-2 pl-2 shrink-0">
               <button
                 type="button"
-                onClick={() => {
-                  const coxRoom = rooms.find((r) => r.id === 'room_coxsbazar_01');
-                  if (coxRoom) setSelectedRoom(coxRoom);
-                }}
+                onClick={() => setScreen('room-area')}
                 className="text-[13px] font-bold text-[#005C55] hover:underline active:scale-95 transition-transform"
               >
                 View
@@ -520,8 +477,37 @@ export const HomeScreen: React.FC = () => {
           </div>
 
           {/* Shared Rooms List */}
-          <div className="flex flex-col gap-4">
-            {rooms.map((room) => (
+          {rooms.length === 0 ? (
+            <div className="bg-white rounded-2xl p-8 border border-[#E6E1D8] text-center flex flex-col items-center gap-3 shadow-xs">
+              <div className="w-14 h-14 rounded-full bg-[#E1F1EE] text-[#005C55] flex items-center justify-center">
+                <span className="material-symbols-outlined text-[28px]">photo_library</span>
+              </div>
+              <h3 className="text-[17px] font-bold text-[#101E1C]">No Active Rooms Yet</h3>
+              <p className="text-[13px] text-[#3E4947] max-w-xs">
+                Create a trip room or join one with a room code to start uploading and sharing memories with friends.
+              </p>
+              <div className="flex gap-2.5 mt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowCreateModal(true)}
+                  className="px-4 py-2 rounded-xl bg-[#0F766E] text-white text-[13px] font-semibold hover:bg-[#005C55] transition-all shadow-xs flex items-center gap-1.5"
+                >
+                  <span className="material-symbols-outlined text-[16px]">add</span>
+                  <span>Create Room</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowJoinModal(true)}
+                  className="px-4 py-2 rounded-xl border border-[#D6E6E2] bg-white text-[#101E1C] text-[13px] font-semibold hover:bg-[#F8F5EF] transition-all flex items-center gap-1.5"
+                >
+                  <span className="material-symbols-outlined text-[16px]">meeting_room</span>
+                  <span>Join Room</span>
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-4">
+              {rooms.map((room) => (
               <div
                 key={room.id}
                 className="relative bg-white rounded-xl overflow-hidden shadow-xs border border-[#BDC9C6]/30 hover:shadow-md transition-shadow group"
@@ -614,36 +600,39 @@ export const HomeScreen: React.FC = () => {
                 </div>
               </div>
             ))}
-          </div>
+            </div>
+          )}
         </section>
 
         {/* Section 2: Recently Added Photos Carousel */}
-        <section className="flex flex-col gap-2.5 pt-2">
-          <div className="flex items-center justify-between">
-            <h2 className="text-[16px] font-bold text-[#253331]">Recently Added Moments</h2>
-            <span className="text-[12px] text-[#6E7977]">From your active rooms</span>
-          </div>
+        {rooms.length > 0 && (
+          <section className="flex flex-col gap-2.5 pt-2">
+            <div className="flex items-center justify-between">
+              <h2 className="text-[16px] font-bold text-[#253331]">Recently Added Moments</h2>
+              <span className="text-[12px] text-[#6E7977]">From your active rooms</span>
+            </div>
 
-          <div className="flex gap-3 overflow-x-auto pb-2 custom-scrollbar">
-            {rooms.map((room) => (
-              <div
-                key={'thumb_' + room.id}
-                onClick={() => setSelectedRoom(room)}
-                className="shrink-0 w-32 h-32 rounded-xl overflow-hidden relative cursor-pointer group border border-[#E6E1D8]"
-              >
-                <img
-                  src={room.coverImage}
-                  alt={room.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                />
-                <div className="absolute inset-0 bg-black/25 group-hover:bg-black/10 transition-colors" />
-                <span className="absolute bottom-1.5 left-2 right-2 text-[11px] font-bold text-white truncate">
-                  {room.title}
-                </span>
-              </div>
-            ))}
-          </div>
-        </section>
+            <div className="flex gap-3 overflow-x-auto pb-2 custom-scrollbar">
+              {rooms.map((room) => (
+                <div
+                  key={'thumb_' + room.id}
+                  onClick={() => setSelectedRoom(room)}
+                  className="shrink-0 w-32 h-32 rounded-xl overflow-hidden relative cursor-pointer group border border-[#E6E1D8]"
+                >
+                  <img
+                    src={room.coverImage}
+                    alt={room.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                  <div className="absolute inset-0 bg-black/25 group-hover:bg-black/10 transition-colors" />
+                  <span className="absolute bottom-1.5 left-2 right-2 text-[11px] font-bold text-white truncate">
+                    {room.title}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* Section 3: Archived Trip Memories (Permanent Memory Vault) */}
         <section className="flex flex-col gap-3 pt-2 text-left">
@@ -657,73 +646,17 @@ export const HomeScreen: React.FC = () => {
                 Saved permanently • Auto-archived after 30 days
               </p>
             </div>
-            <span className="px-2 py-0.5 rounded-full bg-[#FFF4EB] border border-[#FFAB69]/30 text-[#8E4E14] text-[10px] font-bold">
-              2 Past Trips
+            <span className="px-2 py-0.5 rounded-full bg-[#F8F5EF] border border-[#E6E1D8] text-[#6E7977] text-[10px] font-bold">
+              0 Archived
             </span>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {/* Archived Trip 1 */}
-            <div className="bg-white rounded-xl overflow-hidden border border-[#E6E1D8] shadow-xs flex flex-col group">
-              <div className="relative h-28 w-full overflow-hidden">
-                <img
-                  src="/placeholder-cover.svg"
-                  alt="Sylhet Tea Gardens & Waterfalls"
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent" />
-                <span className="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-white text-[9px] font-bold flex items-center gap-1">
-                  <span className="material-symbols-outlined text-[11px] text-[#6FFBBE]">cloud_done</span>
-                  Drive Backup
-                </span>
-                <div className="absolute bottom-2 left-2 text-white">
-                  <p className="text-[10px] text-[#FFDCC4] uppercase font-bold tracking-wide">Archived • Oct 2026</p>
-                  <h4 className="text-[14px] font-bold text-white leading-tight">Sylhet Tea Gardens & Falls</h4>
-                </div>
-              </div>
-              <div className="p-2.5 flex items-center justify-between bg-[#F8F5EF] text-[11px]">
-                <span className="text-[#3E4947] font-medium">324 moments • 5 friends</span>
-                <button
-                  type="button"
-                  onClick={() => setActionFeedback("Opening Google Drive album for Sylhet Tea Gardens...")}
-                  className="text-[#005C55] font-bold hover:underline flex items-center gap-0.5"
-                >
-                  <span>Google Drive</span>
-                  <span className="material-symbols-outlined text-[13px]">open_in_new</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Archived Trip 2 */}
-            <div className="bg-white rounded-xl overflow-hidden border border-[#E6E1D8] shadow-xs flex flex-col group">
-              <div className="relative h-28 w-full overflow-hidden">
-                <img
-                  src="/placeholder-cover.svg"
-                  alt="Bandarban Mountain Trek"
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent" />
-                <span className="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-white text-[9px] font-bold flex items-center gap-1">
-                  <span className="material-symbols-outlined text-[11px] text-[#6FFBBE]">cloud_done</span>
-                  ZIP Exported
-                </span>
-                <div className="absolute bottom-2 left-2 text-white">
-                  <p className="text-[10px] text-[#FFDCC4] uppercase font-bold tracking-wide">Archived • Sep 2026</p>
-                  <h4 className="text-[14px] font-bold text-white leading-tight">Bandarban Mountain Trek</h4>
-                </div>
-              </div>
-              <div className="p-2.5 flex items-center justify-between bg-[#F8F5EF] text-[11px]">
-                <span className="text-[#3E4947] font-medium">512 moments • 4 friends</span>
-                <button
-                  type="button"
-                  onClick={() => setActionFeedback("Bandarban trip archive is saved to your phone.")}
-                  className="text-[#005C55] font-bold hover:underline flex items-center gap-0.5"
-                >
-                  <span>View Details</span>
-                  <span className="material-symbols-outlined text-[13px]">chevron_right</span>
-                </button>
-              </div>
-            </div>
+          <div className="bg-white rounded-2xl p-6 border border-[#E6E1D8] text-center flex flex-col items-center gap-2 shadow-xs">
+            <span className="material-symbols-outlined text-[28px] text-[#8E4E14]">inventory_2</span>
+            <p className="text-[13px] font-bold text-[#101E1C]">No Archived Memories Yet</p>
+            <p className="text-[11px] text-[#6E7977] max-w-xs">
+              When a trip room passes its 30-day active window, its backup will be preserved here with links to your phone or Google Drive backup.
+            </p>
           </div>
         </section>
       </main>

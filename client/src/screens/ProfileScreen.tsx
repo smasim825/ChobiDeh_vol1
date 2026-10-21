@@ -145,7 +145,7 @@ export const ProfileScreen: React.FC = () => {
               <div className="w-20 h-20 rounded-full ring-2 ring-[#005C55]/20 overflow-hidden shadow-inner bg-[#E1F1EE]">
                 <img
                   className="w-full h-full object-cover"
-                  alt={currentUser?.name || 'Tasnim Rahman'}
+                  alt={currentUser?.name || 'Traveler'}
                   src="/placeholder-avatar.svg"
                 />
               </div>
@@ -163,7 +163,7 @@ export const ProfileScreen: React.FC = () => {
             <div className="flex-1 min-w-0 pt-0.5">
               <div className="flex items-center gap-1.5 flex-wrap">
                 <h2 className="text-[20px] text-[#101E1C] font-bold truncate">
-                  {currentUser?.name || 'Tasnim Rahman'}
+                  {currentUser?.name || 'Traveler'}
                 </h2>
                 <span
                   className="material-symbols-outlined text-[#005C55] text-[18px]"
@@ -174,7 +174,7 @@ export const ProfileScreen: React.FC = () => {
                 </span>
               </div>
               <p className="text-[13px] text-[#3E4947] truncate mt-0.5">
-                {currentUser?.email || 'tasnim.rahman@example.com'}
+                {currentUser?.email || ''}
               </p>
               <div className="mt-2.5 flex items-center gap-1.5 flex-wrap">
                 <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#FFDCC4]/50 text-[#8E4E14] text-[11px] font-bold">
@@ -466,7 +466,7 @@ export const ProfileScreen: React.FC = () => {
                   </span>
                   <div>
                     <p className="text-[14px] font-semibold text-[#101E1C]">Primary Email Address</p>
-                    <p className="text-[12px] text-[#3E4947]">{currentUser?.email || 'tasnim.rahman@example.com'}</p>
+                    <p className="text-[12px] text-[#3E4947]">{currentUser?.email || ''}</p>
                   </div>
                 </div>
                 <span className="material-symbols-outlined text-[#6E7977] text-[20px]">chevron_right</span>
