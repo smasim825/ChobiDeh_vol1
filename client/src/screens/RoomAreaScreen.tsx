@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useAuth } from '../context/useAuth';
 import type { PhotoItem, ReviewSuggestion, RestPhotoCategory } from '../types/room';
+import { uploadRoomPhotos, type UploadProgress } from '../services/photoUploader';
+import { downloadPhotosAsZip, triggerFileDownload, type DownloadProgress } from '../services/downloadManager';
 
 // ==========================================
 // Seed Data: Curated Photos across 3 Levels
@@ -137,7 +139,7 @@ const INITIAL_SUGGESTIONS: ReviewSuggestion[] = [
 ];
 
 export const RoomAreaScreen: React.FC = () => {
-  const { setScreen } = useAuth();
+  const { setScreen, currentUser } = useAuth();
 
   // Navigation: Primary sections
   // 'people' = Level 1 Confirmed Collections
@@ -171,6 +173,13 @@ export const RoomAreaScreen: React.FC = () => {
   const [selectedCandidatePerson, setSelectedCandidatePerson] = useState<string>('Rafiqul');
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
 
+  // Direct Storage & Export State
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<UploadProgress | null>(null);
+  const [isDownloading, setIsDownloading] = useState(false);
+  const [downloadProgress, setDownloadProgress] = useState<DownloadProgress | null>(null);
+
   const showAlert = (msg: string) => {
     setAlertMessage(msg);
     setTimeout(() => setAlertMessage(null), 4000);
@@ -180,6 +189,90 @@ export const RoomAreaScreen: React.FC = () => {
     navigator.clipboard?.writeText('CB-9821');
     setCopiedKey(true);
     setTimeout(() => setCopiedKey(false), 2500);
+  };
+
+  const handleUploadClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFilesSelected = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const fileList = e.target.files;
+    if (!fileList || fileList.length === 0) return;
+    const filesToUpload = Array.from(fileList);
+
+    // Reset input so re-selecting same file works
+    e.target.value = '';
+
+    setIsUploading(true);
+    setUploadProgress(null);
+
+    try {
+      const result = await uploadRoomPhotos('cb-9821', filesToUpload, (prog) => {
+        setUploadProgress(prog);
+      });
+
+      if (result.successful.length > 0) {
+        // Add new photos directly into gallery state
+        const newPhotoItems: PhotoItem[] = result.successful.map((item) => ({
+          id: item.mediaId,
+          url: URL.createObjectURL(item.optimized.blob),
+          alt: `Uploaded photo (${Math.round(item.optimized.compressedSizeBytes / 1024)} KB)`,
+          aspect: 'aspect-square',
+          time: 'Just now',
+          assignedPeople: [currentUser?.name || 'You'],
+          clusterLevel: 'Level 1: Confident',
+          detectedFaceCount: 1,
+          badge: `${currentUser?.name || 'You'} (Uploaded)`,
+        }));
+
+        setPhotos((prev) => [...newPhotoItems, ...prev]);
+        showAlert(`Successfully uploaded ${result.successful.length} photo(s) directly to Cloudflare R2!`);
+      }
+
+      if (result.failed.length > 0) {
+        showAlert(`Failed to upload ${result.failed.length} photo(s): ${result.failed[0].error}`);
+      }
+    } catch (err: any) {
+      showAlert(err.message || 'Photo upload encountered an issue.');
+    } finally {
+      setIsUploading(false);
+      setUploadProgress(null);
+    }
+  };
+
+  const handleDownloadZip = async () => {
+    showAlert("Starting in-browser ZIP download of all authorized photos...");
+
+    if (photos.length === 0) {
+      showAlert('No photos available to download.');
+      return;
+    }
+
+    setIsDownloading(true);
+    setDownloadProgress(null);
+
+    try {
+      const downloadItems = photos.map((p, idx) => ({
+        id: p.id,
+        url: p.url,
+        filename: `${p.badge || 'Photo'}_${idx + 1}.webp`,
+      }));
+
+      const zipBlob = await downloadPhotosAsZip("Cox's Bazar Tour 2026", downloadItems, (prog) => {
+        setDownloadProgress(prog);
+      });
+
+      triggerFileDownload(zipBlob, 'Coxs_Bazar_Tour_2026_Photos.zip');
+    } catch (err: any) {
+      showAlert(err.message || 'Failed to download ZIP.');
+    } finally {
+      setIsDownloading(false);
+      setDownloadProgress(null);
+    }
+  };
+
+  const handleGoogleDriveExport = () => {
+    showAlert("Exporting album cloud-to-cloud directly into your Google Drive folder...");
   };
 
   // ==========================================
@@ -489,27 +582,84 @@ export const RoomAreaScreen: React.FC = () => {
 
         {/* 3. UPLOAD & DUAL EXPORT ACTION BAR */}
         <section className="mt-3 space-y-2">
+          {/* Hidden File Picker */}
+          <input
+            ref={fileInputRef}
+            type="file"
+            multiple
+            accept="image/jpeg,image/png,image/webp"
+            className="hidden"
+            onChange={handleFilesSelected}
+          />
+
+          {/* Active Uploading Banner */}
+          {isUploading && (
+            <div className="p-3 bg-[#E6F4F1] border border-[#0F766E]/30 rounded-2xl flex flex-col gap-1.5 animate-pulse">
+              <div className="flex items-center justify-between text-xs font-semibold text-[#005C55]">
+                <span>
+                  {uploadProgress?.stage === 'compressing'
+                    ? `🔄 Compressing Photo ${uploadProgress.currentPhotoIndex}/${uploadProgress.totalPhotos} to WebP...`
+                    : `☁️ Uploading to Storage (${uploadProgress?.currentPhotoIndex || 1}/${uploadProgress?.totalPhotos || 1})...`}
+                </span>
+                <span>{uploadProgress?.percent || 30}%</span>
+              </div>
+              <div className="w-full bg-[#CCE8E3] h-1.5 rounded-full overflow-hidden">
+                <div
+                  className="bg-[#0F766E] h-full transition-all duration-300"
+                  style={{ width: `${uploadProgress?.percent || 30}%` }}
+                />
+              </div>
+              {uploadProgress?.savedPercent && uploadProgress.savedPercent > 0 ? (
+                <span className="text-[10px] text-[#005C55]">
+                  💡 Canvas WebP compressed ~{uploadProgress.savedPercent}% bandwidth saved
+                </span>
+              ) : null}
+            </div>
+          )}
+
+          {/* Active Downloading Banner */}
+          {isDownloading && (
+            <div className="p-3 bg-[#FEF3C7] border border-[#D97706]/30 rounded-2xl flex flex-col gap-1.5">
+              <div className="flex items-center justify-between text-xs font-semibold text-[#92400E]">
+                <span>📦 {downloadProgress?.currentFilename || 'Preparing ZIP archive...'}</span>
+                <span>{downloadProgress?.percent || 50}%</span>
+              </div>
+              <div className="w-full bg-[#FDE68A] h-1.5 rounded-full overflow-hidden">
+                <div
+                  className="bg-[#D97706] h-full transition-all duration-300"
+                  style={{ width: `${downloadProgress?.percent || 50}%` }}
+                />
+              </div>
+            </div>
+          )}
+
           <button
             type="button"
-            onClick={() => showAlert("Direct upload to Cloudflare R2 via pre-signed URL")}
-            className="w-full inline-flex items-center justify-center gap-2 px-5 min-h-[48px] h-[50px] rounded-full bg-[#0F766E] text-white font-semibold text-[15px] tracking-wide hover:bg-[#005C55] active:scale-98 transition-all shadow-xs"
+            disabled={isUploading}
+            onClick={handleUploadClick}
+            className="w-full inline-flex items-center justify-center gap-2 px-5 min-h-[48px] h-[50px] rounded-full bg-[#0F766E] text-white font-semibold text-[15px] tracking-wide hover:bg-[#005C55] active:scale-98 disabled:opacity-60 transition-all shadow-xs"
           >
-            <span className="material-symbols-outlined text-[18px]">upload_file</span>
-            <span>Upload Photos</span>
+            <span className="material-symbols-outlined text-[18px]">
+              {isUploading ? 'hourglass_top' : 'upload_file'}
+            </span>
+            <span>{isUploading ? 'Optimizing & Uploading...' : 'Upload Photos'}</span>
           </button>
 
           <div className="grid grid-cols-2 gap-2">
             <button
               type="button"
-              onClick={() => showAlert("Starting in-browser ZIP download of all authorized photos...")}
-              className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl border border-[#E2DDD4] bg-white text-[#101E1C] hover:bg-[#F8F5EF] active:scale-98 transition-all text-[12px] font-semibold shadow-xs"
+              disabled={isDownloading}
+              onClick={handleDownloadZip}
+              className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl border border-[#E2DDD4] bg-white text-[#101E1C] hover:bg-[#F8F5EF] active:scale-98 disabled:opacity-60 transition-all text-[12px] font-semibold shadow-xs"
             >
-              <span className="material-symbols-outlined text-[17px] text-[#005C55]">download</span>
-              <span>Save to Phone (ZIP)</span>
+              <span className="material-symbols-outlined text-[17px] text-[#005C55]">
+                {isDownloading ? 'hourglass_bottom' : 'download'}
+              </span>
+              <span>{isDownloading ? 'Packaging ZIP...' : 'Save to Phone (ZIP)'}</span>
             </button>
             <button
               type="button"
-              onClick={() => showAlert("Exporting album cloud-to-cloud directly into your Google Drive folder...")}
+              onClick={handleGoogleDriveExport}
               className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl border border-[#E2DDD4] bg-white text-[#101E1C] hover:bg-[#F8F5EF] active:scale-98 transition-all text-[12px] font-semibold shadow-xs"
             >
               <span className="material-symbols-outlined text-[17px] text-[#4285F4]">cloud_upload</span>
