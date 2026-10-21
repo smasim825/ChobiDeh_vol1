@@ -92,7 +92,9 @@ export async function uploadRoomPhotos(
       let mediaId = `sim-${Date.now()}-${photoIndex}`;
       let storageKey = `rooms/${roomId}/${mediaId}.webp`;
 
-      if (isSupabaseConfigured && supabase) {
+      const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(roomId);
+
+      if (isSupabaseConfigured && supabase && isUuid) {
         // Call create_upload RPC
         const { data: uploadIntent, error: intentError } = await supabase.rpc('create_upload', {
           target_room_id: roomId,
