@@ -445,28 +445,45 @@ export const RoomAreaScreen: React.FC = () => {
             </div>
           </div>
 
-          {/* Members Bar & Room Quota (1,000 Photo Cap) */}
-          <div className="p-3 bg-white flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="flex -space-x-2 overflow-hidden">
-                <div className="w-7 h-7 rounded-full bg-[#005C55] text-white flex items-center justify-center text-[10px] font-bold ring-2 ring-white">T</div>
-                <div className="w-7 h-7 rounded-full bg-[#8E4E14] text-white flex items-center justify-center text-[10px] font-bold ring-2 ring-white">R</div>
-                <div className="w-7 h-7 rounded-full bg-[#0F766E] text-white flex items-center justify-center text-[10px] font-bold ring-2 ring-white">S</div>
+          {/* Members Bar & Room Quota & 30-Day Retention */}
+          <div className="p-3 bg-white flex flex-col gap-2.5">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="flex -space-x-2 overflow-hidden">
+                  <div className="w-7 h-7 rounded-full bg-[#005C55] text-white flex items-center justify-center text-[10px] font-bold ring-2 ring-white">T</div>
+                  <div className="w-7 h-7 rounded-full bg-[#8E4E14] text-white flex items-center justify-center text-[10px] font-bold ring-2 ring-white">R</div>
+                  <div className="w-7 h-7 rounded-full bg-[#0F766E] text-white flex items-center justify-center text-[10px] font-bold ring-2 ring-white">S</div>
+                </div>
+                <div className="flex flex-col text-left">
+                  <span className="text-[12px] text-[#101E1C] font-semibold">Tasnim, Rafiqul, Samira, Tanvir</span>
+                  <span className="text-[10px] text-[#3E4947]">Room Quota: {photos.length} / 1,000 photos</span>
+                </div>
               </div>
-              <div className="flex flex-col text-left">
-                <span className="text-[12px] text-[#101E1C] font-semibold">Tasnim, Rafiqul, Samira, Tanvir</span>
-                <span className="text-[10px] text-[#3E4947]">Room Quota: {photos.length} / 1,000 photos</span>
-              </div>
+
+              <button
+                type="button"
+                onClick={() => setShowInviteModal(true)}
+                className="inline-flex items-center gap-1 px-3 py-1 rounded-full border border-[#E2DDD4] bg-[#F8F5EF] text-[#101E1C] hover:bg-[#E1F1EE] active:scale-95 transition-all text-[11px] font-semibold"
+              >
+                <span className="material-symbols-outlined text-[14px] text-[#005C55]">person_add</span>
+                <span>Invite</span>
+              </button>
             </div>
 
-            <button
-              type="button"
-              onClick={() => setShowInviteModal(true)}
-              className="inline-flex items-center gap-1 px-3 py-1 rounded-full border border-[#E2DDD4] bg-[#F8F5EF] text-[#101E1C] hover:bg-[#E1F1EE] active:scale-95 transition-all text-[11px] font-semibold"
-            >
-              <span className="material-symbols-outlined text-[14px] text-[#005C55]">person_add</span>
-              <span>Invite</span>
-            </button>
+            {/* 30-Day Archival Countdown Alert */}
+            <div className="pt-2 border-t border-[#E6E1D8] flex items-center justify-between text-[11px]">
+              <div className="flex items-center gap-1.5 text-[#8E4E14] font-medium">
+                <span className="material-symbols-outlined text-[15px] text-[#8E4E14]">hourglass_bottom</span>
+                <span><strong>24 Days Left</strong> to sync • Auto-archival on Dec 15</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => showAlert("After 30 days, photos are archived to keep storage lean. Use 'Save to Phone (ZIP)' or 'Export to Google Drive' anytime to keep all photos forever!")}
+                className="text-[#0F766E] font-semibold hover:underline text-[10px]"
+              >
+                Memory Policy ℹ️
+              </button>
+            </div>
           </div>
         </section>
 

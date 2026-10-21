@@ -644,6 +644,88 @@ export const HomeScreen: React.FC = () => {
             ))}
           </div>
         </section>
+
+        {/* Section 3: Archived Trip Memories (Permanent Memory Vault) */}
+        <section className="flex flex-col gap-3 pt-2 text-left">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-[16px] font-bold text-[#253331] flex items-center gap-1.5">
+                <span className="material-symbols-outlined text-[18px] text-[#8E4E14]">inventory_2</span>
+                <span>Archived Trip Memories</span>
+              </h2>
+              <p className="text-[11px] text-[#6E7977]">
+                Saved permanently • Auto-archived after 30 days
+              </p>
+            </div>
+            <span className="px-2 py-0.5 rounded-full bg-[#FFF4EB] border border-[#FFAB69]/30 text-[#8E4E14] text-[10px] font-bold">
+              2 Past Trips
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {/* Archived Trip 1 */}
+            <div className="bg-white rounded-xl overflow-hidden border border-[#E6E1D8] shadow-xs flex flex-col group">
+              <div className="relative h-28 w-full overflow-hidden">
+                <img
+                  src="/placeholder-cover.svg"
+                  alt="Sylhet Tea Gardens & Waterfalls"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent" />
+                <span className="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-white text-[9px] font-bold flex items-center gap-1">
+                  <span className="material-symbols-outlined text-[11px] text-[#6FFBBE]">cloud_done</span>
+                  Drive Backup
+                </span>
+                <div className="absolute bottom-2 left-2 text-white">
+                  <p className="text-[10px] text-[#FFDCC4] uppercase font-bold tracking-wide">Archived • Oct 2026</p>
+                  <h4 className="text-[14px] font-bold text-white leading-tight">Sylhet Tea Gardens & Falls</h4>
+                </div>
+              </div>
+              <div className="p-2.5 flex items-center justify-between bg-[#F8F5EF] text-[11px]">
+                <span className="text-[#3E4947] font-medium">324 moments • 5 friends</span>
+                <button
+                  type="button"
+                  onClick={() => setActionFeedback("Opening Google Drive album for Sylhet Tea Gardens...")}
+                  className="text-[#005C55] font-bold hover:underline flex items-center gap-0.5"
+                >
+                  <span>Google Drive</span>
+                  <span className="material-symbols-outlined text-[13px]">open_in_new</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Archived Trip 2 */}
+            <div className="bg-white rounded-xl overflow-hidden border border-[#E6E1D8] shadow-xs flex flex-col group">
+              <div className="relative h-28 w-full overflow-hidden">
+                <img
+                  src="/placeholder-cover.svg"
+                  alt="Bandarban Mountain Trek"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent" />
+                <span className="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-white text-[9px] font-bold flex items-center gap-1">
+                  <span className="material-symbols-outlined text-[11px] text-[#6FFBBE]">cloud_done</span>
+                  ZIP Exported
+                </span>
+                <div className="absolute bottom-2 left-2 text-white">
+                  <p className="text-[10px] text-[#FFDCC4] uppercase font-bold tracking-wide">Archived • Sep 2026</p>
+                  <h4 className="text-[14px] font-bold text-white leading-tight">Bandarban Mountain Trek</h4>
+                </div>
+              </div>
+              <div className="p-2.5 flex items-center justify-between bg-[#F8F5EF] text-[11px]">
+                <span className="text-[#3E4947] font-medium">512 moments • 4 friends</span>
+                <button
+                  type="button"
+                  onClick={() => setActionFeedback("Bandarban trip archive is saved to your phone.")}
+                  className="text-[#005C55] font-bold hover:underline flex items-center gap-0.5"
+                >
+                  <span>View Details</span>
+                  <span className="material-symbols-outlined text-[13px]">chevron_right</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
       </main>
 
       {/* Modal: Create a Room */}
