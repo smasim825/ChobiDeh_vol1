@@ -15,7 +15,10 @@ Update this file when starting or handing off a multi-file task. Keep entries sh
     5. Google Drive album exporter (`client/src/services/googleDriveExport.ts`) with non-sensitive `drive.file` scope.
     6. Functional Room UI in `RoomAreaScreen.tsx`: Room storage quota bar, photo upload modal with real-time compression savings, dual export modal (Save to Phone / ZIP & Google Drive backup).
     7. Unit tests in `client/src/test/storage_pipeline.test.ts`.
-  - Tests run: 33/33 Vitest tests pass, `oxlint` 0 warnings/errors, `tsc -b` 0 errors, `npm run build` succeeds cleanly.
+  - Tests run: 40/40 Vitest tests pass, `oxlint` 0 warnings/errors, `tsc -b` 0 errors, `npm run build` succeeds cleanly.
+  - Recent fixes:
+    - Zero demo data: Removed hardcoded demo rooms, memories, and photos; added clean empty states with fallback test fixtures.
+    - Profile Navigation: Wired React Router `useNavigate` into `HomeScreen.tsx`, `ProfileScreen.tsx`, and `RoomAreaScreen.tsx`, and added two-way route synchronization in `App.tsx` so "View Full Profile" and the bottom nav Profile button navigate to `/profile` correctly.
 
 
 ## Handoff template
