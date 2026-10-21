@@ -1,6 +1,7 @@
-import React, { useState, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useRef, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../context/useAuth';
+import { supabase } from '../lib/supabase';
 import type { PhotoItem, ReviewSuggestion, RestPhotoCategory } from '../types/room';
 import { uploadRoomPhotos, type UploadProgress } from '../services/photoUploader';
 import { downloadPhotosAsZip, triggerFileDownload, type DownloadProgress } from '../services/downloadManager';
@@ -22,6 +23,84 @@ export const RoomAreaScreen: React.FC<RoomAreaScreenProps> = ({
 }) => {
   const { setScreen, currentUser } = useAuth();
   const navigate = useNavigate();
+  const { id: routeRoomId } = useParams<{ id: string }>();
+
+  const isRealRoomUuid = Boolean(
+    routeRoomId && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(routeRoomId)
+  );
+  const effectiveRoomId = isRealRoomUuid ? (routeRoomId as string) : (routeRoomId || 'demo');
+
+  const [roomData, setRoomData] = useState<{ id: string; name: string; join_slug?: string } | null>(null);
+
+  useEffect(() => {
+    if (!isRealRoomUuid || !supabase) return;
+    let isMounted = true;
+
+    // Fetch room metadata
+    supabase
+      .from('rooms')
+      .select('id, name, join_slug')
+      .eq('id', routeRoomId)
+      .maybeSingle()
+      .then(({ data, error }) => {
+        if (isMounted && data && !error) {
+          setRoomData(data);
+        }
+      });
+
+    // Fetch confirmed uploaded photos for this room
+    supabase
+      .from('media')
+      .select('id, storage_key, content_type, size_bytes, created_at')
+      .eq('room_id', routeRoomId)
+      .eq('upload_status', 'uploaded')
+      .is('deleted_at', null)
+      .order('created_at', { ascending: false })
+      .then(async ({ data: mediaList, error: mediaError }) => {
+        if (!isMounted || mediaError || !mediaList || mediaList.length === 0) return;
+
+        const loadedPhotos: PhotoItem[] = await Promise.all(
+          mediaList.map(async (m: any) => {
+            let photoUrl = '/placeholder-cover.svg';
+            try {
+              if (supabase) {
+                const { data: signedData } = await supabase.storage
+                  .from('room-media')
+                  .createSignedUrl(m.storage_key, 3600);
+                if (signedData?.signedUrl) {
+                  photoUrl = signedData.signedUrl;
+                }
+              }
+            } catch {
+              // fallback placeholder if storage signed URL fails
+            }
+
+            return {
+              id: m.id,
+              url: photoUrl,
+              alt: `Photo (${Math.round(m.size_bytes / 1024)} KB)`,
+              aspect: 'aspect-square' as const,
+              time: new Date(m.created_at).toLocaleDateString(),
+              assignedPeople: [currentUser?.name || 'You'],
+              clusterLevel: 'Level 1: Confident' as const,
+              detectedFaceCount: 1,
+              badge: `${currentUser?.name || 'You'} (Uploaded)`,
+            };
+          })
+        );
+
+        if (isMounted && loadedPhotos.length > 0) {
+          setPhotos(loadedPhotos);
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [isRealRoomUuid, routeRoomId, currentUser]);
+
+  const activeRoomTitle = roomData?.name || roomTitle;
+  const activeRoomSlug = roomData?.join_slug ? roomData.join_slug.toUpperCase() : 'CB-9821';
 
   // Navigation: Primary sections
   // 'people' = Level 1 Confirmed Collections
@@ -73,7 +152,7 @@ export const RoomAreaScreen: React.FC<RoomAreaScreenProps> = ({
   };
 
   const handleCopyKey = () => {
-    navigator.clipboard?.writeText('CB-9821');
+    navigator.clipboard?.writeText(activeRoomSlug);
     setCopiedKey(true);
     setTimeout(() => setCopiedKey(false), 2500);
   };
@@ -94,7 +173,7 @@ export const RoomAreaScreen: React.FC<RoomAreaScreenProps> = ({
     setUploadProgress(null);
 
     try {
-      const result = await uploadRoomPhotos('cb-9821', filesToUpload, (prog) => {
+      const result = await uploadRoomPhotos(effectiveRoomId, filesToUpload, (prog) => {
         setUploadProgress(prog);
       });
 
@@ -346,7 +425,7 @@ export const RoomAreaScreen: React.FC<RoomAreaScreenProps> = ({
           </button>
           <div>
             <h1 className="text-[16px] font-bold text-[#101E1C] tracking-tight truncate max-w-[200px]">
-              {roomTitle}
+              {activeRoomTitle}
             </h1>
             <p className="text-[11px] text-[#3E4947] flex items-center gap-1 font-medium">
               <span>Trip Album</span>
@@ -369,7 +448,7 @@ export const RoomAreaScreen: React.FC<RoomAreaScreenProps> = ({
             type="button"
             aria-label="Room details"
             onClick={() =>
-              alert("Room Details: Key CB-9821. Three-Level Photo Matching organizes photos with single original storage, multi-person linking, human review for close matches, and categorized Rest Photos.")
+              alert(`Room Details: Key ${activeRoomSlug}. Three-Level Photo Matching organizes photos with single original storage, multi-person linking, human review for close matches, and categorized Rest Photos.`)
             }
             className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-[#E1F1EE] active:scale-95 transition-all text-[#3E4947]"
           >
@@ -393,7 +472,7 @@ export const RoomAreaScreen: React.FC<RoomAreaScreenProps> = ({
           <div className="relative h-40 w-full">
             <img
               src="/placeholder-cover.svg"
-              alt={roomTitle}
+              alt={activeRoomTitle}
               className="w-full h-full object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
@@ -407,7 +486,7 @@ export const RoomAreaScreen: React.FC<RoomAreaScreenProps> = ({
                 title="Copy Room Key"
               >
                 <span className="material-symbols-outlined text-[12px] text-[#FFAB69]">key</span>
-                <span>{copiedKey ? 'COPIED!' : 'CB-9821'}</span>
+                <span>{copiedKey ? 'COPIED!' : activeRoomSlug}</span>
                 <span className="material-symbols-outlined text-[13px] text-[#BDC9C6] ml-0.5">
                   content_copy
                 </span>
@@ -423,7 +502,7 @@ export const RoomAreaScreen: React.FC<RoomAreaScreenProps> = ({
                 </span>
               </div>
               <h2 className="text-[19px] font-bold tracking-tight text-white drop-shadow-xs">
-                {roomTitle}
+                {activeRoomTitle}
               </h2>
             </div>
           </div>
@@ -995,7 +1074,7 @@ export const RoomAreaScreen: React.FC<RoomAreaScreenProps> = ({
             <div className="p-3 bg-[#F8F5EF] rounded-xl border border-[#E2DDD4] flex items-center justify-between mb-4">
               <div>
                 <span className="text-[10px] text-[#6E7977] uppercase font-bold block">Room Key</span>
-                <span className="text-[18px] font-mono font-bold tracking-wider text-[#005C55]">CB-9821</span>
+                <span className="text-[18px] font-mono font-bold tracking-wider text-[#005C55]">{activeRoomSlug}</span>
               </div>
               <button
                 type="button"
