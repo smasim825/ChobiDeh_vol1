@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ChobiDeh — Sign In & Sign Up (PC Sliding Panel)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Ambient Soft Background Waves -->
+  <div class="glow-orb orb-top-right"></div>
+  <div class="glow-orb orb-bottom-left"></div>
+
+  <!-- Header Navbar -->
+  <header class="navbar">
+    <div class="nav-container">
+      <div class="brand-logo">
+        <div class="brand-icon">
+          <span class="material-symbols-outlined">photo_camera</span>
+        </div>
+        <div class="brand-text">
+          <span class="brand-name">ChobiDeh</span>
+          <span class="brand-tag">ARCHIVAL WORKSPACE</span>
+        </div>
+      </div>
+      <nav class="nav-links">
+        <button class="nav-pill active"><span class="material-symbols-outlined">home</span> Home</button>
+        <button class="nav-link"><span class="material-symbols-outlined">meeting_room</span> Room Area</button>
+        <button class="nav-link"><span class="material-symbols-outlined">person</span> Profile</button>
+        <button class="nav-link"><span class="material-symbols-outlined">add_circle</span> Create Room</button>
+        <button class="nav-link"><span class="material-symbols-outlined">group_add</span> Join Room</button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="main-wrapper">
+    <div class="sliding-container" id="authContainer">
+      <div class="panels-wrapper">
+        
+        <!-- PANEL 1: HERO SHOWCASE (Slides Left <-> Right) -->
+        <div class="panel hero-panel" id="heroPanel">
+          <!-- Large Emblem -->
+          <div class="hero-emblem">
+            <div class="emblem-box">
+              <span class="material-symbols-outlined">photo_camera</span>
+            </div>
+            <div class="emblem-text">
+              <span class="emblem-title">ChobiDeh</span>
+              <span class="emblem-sub">ARCHIVAL WORKSPACE</span>
+            </div>
+          </div>
+
+          <!-- Titles Container -->
+          <div class="hero-titles-wrapper">
+            <div class="title-block" id="titleLogin">
+              <h1 class="hero-heading">Welcome <span class="highlight">back</span></h1>
+              <p class="hero-desc">Access your secure archival rooms and memories.</p>
+            </div>
+            <div class="title-block title-hidden" id="titleSignup">
+              <h1 class="hero-heading">Join the <span class="highlight">archival</span> vault</h1>
+              <p class="hero-desc">Direct cloud sync, zero redundancy, and private group memory rooms.</p>
+            </div>
+          </div>
+
+          <!-- 4 Feature Pills -->
+          <div class="feature-pills-grid">
+            <button class="pill-card" data-tip="Browse your precious memories securely">
+              <div class="pill-icon-circle bg-emerald">
+                <span class="material-symbols-outlined">photo_library</span>
+              </div>
+              <span class="pill-name">Store Memories</span>
+              <span class="pill-sub">Keep your precious moments safe</span>
+            </button>
+
+            <button class="pill-card" data-tip="Biometric privacy standards">
+              <div class="pill-icon-circle bg-teal">
+                <span class="material-symbols-outlined">verified_user</span>
+              </div>
+              <span class="pill-name">Secure & Private</span>
+              <span class="pill-sub">Your data, your control</span>
+            </button>
+
+            <button class="pill-card" data-tip="Manage shared family & friends rooms">
+              <div class="pill-icon-circle bg-cyan">
+                <span class="material-symbols-outlined">groups</span>
+              </div>
+              <span class="pill-name">Create & Join Rooms</span>
+              <span class="pill-sub">Share with people you trust</span>
+            </button>
+
+            <button class="pill-card" data-tip="Cloudflare R2 cloud pipeline">
+              <div class="pill-icon-circle bg-sky">
+                <span class="material-symbols-outlined">cloud</span>
+              </div>
+              <span class="pill-name">Access Anywhere</span>
+              <span class="pill-sub">Your memories, anytime</span>
+            </button>
+          </div>
+
+          <div id="featureToast" class="feature-toast"></div>
+
+          <!-- 3D Cloud Vault Polaroids Illustration & Handwriting -->
+          <div class="hero-graphic-row">
+            <div class="graphic-3d-wrap">
+              <div class="backlight-orb"></div>
+              <span class="sparkle sparkle-1">✦</span>
+              <span class="sparkle sparkle-2">✦</span>
+              <span class="sparkle sparkle-3">★</span>
+              <div class="floating-illustration">
+                <img src="images/cloud_vault_transparent.png" onerror="this.src='images/picture2.png'" alt="ChobiDeh Cloud Vault" class="vault-img">
+                <div class="glass-badge">
+                  <span class="badge-dot-wrap">
+                    <span class="badge-dot-ping"></span>
+                    <span class="badge-dot"></span>
+                  </span>
+                  <span class="badge-label">Cloud Vault</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="handwriting-col">
+              <span class="handwriting-text">Preserve<br>What Matters</span>
+              <span class="handwriting-sub">Zero-knowledge archival for future generations</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- PANEL 2: AUTH FORM CARD (Slides Right <-> Left) -->
+        <div class="panel form-panel" id="formPanel">
+          <div class="auth-card">
+            <div class="card-header">
+              <div class="card-brand">
+                <div class="card-logo-box">
+                  <span class="material-symbols-outlined">photo_camera</span>
+                </div>
+                <span class="card-brand-name">ChobiDeh</span>
+              </div>
+
+              <!-- Animated Form Title -->
+              <div class="form-title-wrapper">
+                <div class="form-title-block" id="formTitleLogin">
+                  <h2 class="card-title">Login to your account</h2>
+                  <p class="card-subtitle">Enter your details to continue to your archival rooms.</p>
+                </div>
+                <div class="form-title-block title-hidden" id="formTitleSignup">
+                  <h2 class="card-title">Create your account</h2>
+                  <p class="card-subtitle">Start your secure archival vault and preserve lifetime memories.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- FORMS VIEWPORT (Same Ratio Grid Container) -->
+            <div class="forms-viewport">
+              <!-- FORM A: LOGIN FORM -->
+              <form id="loginForm" class="auth-form form-login">
+                <div class="input-group">
+                  <label for="loginEmail">Email address <span class="required">*</span></label>
+                  <div class="input-field-wrap">
+                    <span class="material-symbols-outlined field-icon">mail</span>
+                    <input type="email" id="loginEmail" placeholder="timjennings@exemple.com" required>
+                    <span class="material-symbols-outlined field-icon-right">mark_email_read</span>
+                  </div>
+                </div>
+
+                <div class="input-group">
+                  <label for="loginPassword">Password <span class="required">*</span></label>
+                  <div class="input-field-wrap">
+                    <span class="material-symbols-outlined field-icon">lock</span>
+                    <input type="password" id="loginPassword" placeholder="••••••••" required>
+                    <button type="button" class="pwd-toggle" id="toggleLoginPwd" aria-label="Toggle password visibility">
+                      <span class="material-symbols-outlined">visibility</span>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="form-row-between">
+                  <label class="checkbox-wrap">
+                    <input type="checkbox" id="rememberMe" checked>
+                    <span class="custom-checkbox"></span>
+                    <span class="checkbox-text">Remember me</span>
+                  </label>
+                  <a href="#forgot" class="link-forgot">Forgot password?</a>
+                </div>
+
+                <button type="submit" class="btn-gradient">
+                  <span class="material-symbols-outlined">lock</span>
+                  <span>Login</span>
+                </button>
+
+                <div class="switch-row">
+                  <span>Don't have an account?</span>
+                  <button type="button" class="btn-switch" id="btnToSignup">Sign Up</button>
+                </div>
+
+                <div class="or-divider"><span>OR</span></div>
+
+                <button type="button" class="btn-google">
+                  <svg viewBox="0 0 24 24" class="google-icon">
+                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+                  </svg>
+                  <span>Login with Google</span>
+                </button>
+              </form>
+
+              <!-- FORM B: SIGNUP FORM -->
+              <form id="signupForm" class="auth-form form-signup">
+                <div class="input-group">
+                  <label for="signupName">Full name <span class="required">*</span></label>
+                  <div class="input-field-wrap">
+                    <span class="material-symbols-outlined field-icon">person</span>
+                    <input type="text" id="signupName" placeholder="e.g. Maya Lin" required>
+                  </div>
+                </div>
+
+                <div class="input-group">
+                  <label for="signupEmail">Email address <span class="required">*</span></label>
+                  <div class="input-field-wrap">
+                    <span class="material-symbols-outlined field-icon">mail</span>
+                    <input type="email" id="signupEmail" placeholder="maya@example.com" required>
+                    <span class="material-symbols-outlined field-icon-right">mark_email_read</span>
+                  </div>
+                </div>
+
+                <div class="input-group">
+                  <label for="signupPassword">Password <span class="required">*</span></label>
+                  <div class="input-field-wrap">
+                    <span class="material-symbols-outlined field-icon">lock</span>
+                    <input type="password" id="signupPassword" placeholder="At least 8 characters" minlength="8" required>
+                    <button type="button" class="pwd-toggle" id="toggleSignupPwd" aria-label="Toggle password visibility">
+                      <span class="material-symbols-outlined">visibility</span>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="consent-box">
+                  <label class="checkbox-wrap">
+                    <input type="checkbox" id="biometricConsent" checked>
+                    <span class="custom-checkbox"></span>
+                    <span class="consent-text">Enable 3-level AI face clustering inside joined rooms (Zero-knowledge & anonymous).</span>
+                  </label>
+                </div>
+
+                <button type="submit" class="btn-gradient">
+                  <span class="material-symbols-outlined">person_add</span>
+                  <span>Create Account</span>
+                </button>
+
+                <div class="switch-row">
+                  <span>Already have an account?</span>
+                  <button type="button" class="btn-switch" id="btnToLogin">Log In</button>
+                </div>
+
+                <div class="or-divider"><span>OR</span></div>
+
+                <button type="button" class="btn-google">
+                  <svg viewBox="0 0 24 24" class="google-icon">
+                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+                  </svg>
+                  <span>Sign up with Google</span>
+                </button>
+              </form>
+            </div>
+
+            <!-- Privacy Note -->
+            <div class="privacy-note">
+              <div class="privacy-icon-circle">
+                <span class="material-symbols-outlined">verified_user</span>
+              </div>
+              <div class="privacy-text">
+                <strong>Privacy-first architecture</strong>
+                <p>No automatic scanning of your private camera roll. Photos are shared only when you deliberately invite travelers to a Room.</p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
